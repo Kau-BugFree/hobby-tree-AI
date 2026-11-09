@@ -1,0 +1,4 @@
+# HTTP API·입출력 검증·ASGI 실행에 필요한 고정 버전 의존성.
+fastapi==0.162.0
+pydantic==2.14.1
+uvicorn==0.54.0

@@ -1,0 +1,4 @@
+# 실행 의존성에 HTTP 테스트 클라이언트와 테스트 실행기를 추가한다.
+-r requirements.txt
+httpx==0.28.1
+pytest==9.1.1

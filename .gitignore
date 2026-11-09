@@ -1,0 +1,15 @@
+.DS_Store
+
+.DS_Store
+**/.DS_Store
+
+.DS_Store
+**/.DS_Store
+*.json
+*.jsonl
+data/cooking_json_data/
+
+# Large data files
+*.json
+*.jsonl
+data/cooking_json_data/
