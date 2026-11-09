@@ -19,3 +19,9 @@ data/cooking_json_data/
 !/src/hobby-recommender/app/data/questionnaire.json
 !/src/hobby-recommender/app/data/rules.json
 !/src/hobby-recommender/app/data/catalog.json
+
+# Recommender validation fixtures and examples
+!/src/hobby-recommender/tests/fixtures/frontend_onboarding.json
+!/src/hobby-recommender/examples/request.json
+!/src/hobby-recommender/examples/response.json
+!/src/hobby-recommender/docs/openapi.json
