@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="하비트리 온보딩 답변으로 요리·악기·독서를 추천하는 규칙 기반 FastAPI 서비스의 입력·출력·계산·운영 설계 보고서">
+<title>하비트리 · 취미 추천 시스템 설계 보고서</title>
+<style>
+:root{--ink:#193d32;--muted:#647168;--paper:#f6f7f1;--white:#fff;--line:#d8e1d6;--soft:#eaf0e4;--accent:#b45131;--dark:#163d30;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.75;word-break:keep-all}a{color:inherit;text-underline-offset:4px}button{font:inherit;cursor:pointer}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.skip{position:absolute;left:-9999px}.skip:focus{left:20px;top:20px;background:white;padding:12px;z-index:5}.masthead{max-width:1280px;margin:auto;padding:26px 48px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.brand{font-weight:800;font-size:19px;letter-spacing:-.5px}.brand em{font-style:normal;font-weight:500;color:var(--muted);font-size:13px;margin-left:10px}.edition{font-size:11px;letter-spacing:1.1px;font-weight:700}.hero{max-width:1280px;margin:auto;padding:70px 48px 58px;display:grid;grid-template-columns:1.65fr 1fr;gap:80px}.eyebrow{font-size:12px;letter-spacing:1.4px;font-weight:800;color:var(--accent);margin:0 0 20px}.hero h1{font-size:clamp(34px,4.5vw,60px);line-height:1.2;letter-spacing:-2.8px;margin:0 0 26px;max-width:720px}.lead{font-size:18px;color:#506257;max-width:640px;margin:0}.hero-aside{align-self:end}.stat{border-top:1px solid var(--line);padding:16px 0;display:flex;align-items:baseline;gap:20px}.stat b{font-size:32px;font-variant-numeric:tabular-nums;width:85px;flex-shrink:0;font-weight:600;line-height:1.3}.stat span{font-size:13px;color:var(--muted)}.versions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}.pill{border:1px solid var(--line);border-radius:100px;padding:4px 10px;font:11px/1.6 var(--mono);color:var(--muted)}.layout{max-width:1280px;margin:auto;padding:0 48px 80px;display:grid;grid-template-columns:165px minmax(0,1fr);gap:48px}.toc{position:sticky;top:30px;align-self:start;padding-top:40px;font-size:12px}.toc p{font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:800;margin-bottom:20px}.toc a{display:block;text-decoration:none;border-left:2px solid var(--line);padding:7px 12px;line-height:1.5}.toc a:hover{border-left-color:var(--ink);background:var(--soft)}main{min-width:0}section{border-top:1px solid var(--line);padding-top:40px;margin-bottom:58px}.section-kicker{color:var(--accent);font-size:11px;letter-spacing:1.2px;font-weight:800;margin:0 0 8px}h2{font-size:29px;letter-spacing:-1px;line-height:1.35;margin:0 0 22px}h3{font-size:18px;margin:28px 0 12px;letter-spacing:-.4px}p{margin:0 0 16px}.muted{color:var(--muted)}.small{font-size:13px}.callout{background:var(--soft);border-left:3px solid #77956a;padding:18px 22px;font-size:14px;margin:22px 0}.callout.warm{background:#f4eae0;border-color:var(--accent)}.callout strong{display:block;margin-bottom:5px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--white);border:1px solid var(--line);padding:24px;border-radius:3px}.card .num{font:12px var(--mono);color:var(--accent)}.card h3{margin:14px 0 12px}.card p{font-size:14px;margin-bottom:0}.flow{display:grid;grid-template-columns:1fr 34px 1fr;gap:10px;align-items:stretch;margin:22px 0}.flow-box{background:var(--white);border:1px solid var(--line);padding:23px}.flow-box.dark{background:var(--dark);color:#f4f8ed;border-color:var(--dark)}.flow-box span{font-size:11px;letter-spacing:1px;font-weight:700;opacity:.7}.flow-box b{display:block;font-size:20px;line-height:1.4;margin:8px 0 12px}.flow-box p{font-size:13px;margin:0}.arrow{display:grid;place-items:center;font-size:25px;color:#96a38e}.formula{background:var(--dark);color:#f4f8ed;padding:26px 30px;border-radius:3px;margin:22px 0}.formula .equation{font-family:var(--mono);font-size:22px;line-height:1.7;overflow-wrap:anywhere}.formula p{color:#c1d0bc;font-size:13px;margin:10px 0 0}.weightbar{height:18px;display:flex;margin:22px 0 10px;border-radius:2px;overflow:hidden}.weightbar span:nth-child(1){width:40%;background:#264e3a}.weightbar span:nth-child(2){width:30%;background:#5d7a54}.weightbar span:nth-child(3){width:10%;background:#8ca47a}.weightbar span:nth-child(4){width:15%;background:#b7c6a4}.weightbar span:nth-child(5){width:5%;background:#d6dfc9}.legend{display:flex;gap:10px 22px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.legend b{color:var(--ink)}.table-wrap{overflow:auto;border:1px solid var(--line);background:var(--white);margin:18px 0}table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.65;word-break:normal}th{text-align:left;font-size:11px;background:#edf1e9;color:#52644f;letter-spacing:.2px;padding:11px 13px;white-space:nowrap}td{border-top:1px solid #e5eae1;padding:13px;vertical-align:top}td small{display:block;color:var(--muted);font-size:11px;margin-top:4px}td.number{font-variant-numeric:tabular-nums;white-space:nowrap}td:first-child code{white-space:nowrap}.tag{display:inline-block;background:var(--soft);padding:1px 7px;font-size:11px;white-space:nowrap}.filter{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 14px}.filter button{border:1px solid var(--line);padding:7px 13px;background:transparent;color:var(--ink);border-radius:2px;font-size:12px}.filter button[aria-pressed="true"]{background:var(--dark);color:white;border-color:var(--dark)}details{background:var(--white);border:1px solid var(--line);margin:10px 0}summary{padding:18px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:center;list-style:none}summary::-webkit-details-marker{display:none}summary b{font-size:14px;line-height:1.5;display:block}summary small{display:block;font-size:11px;color:var(--muted);margin-top:4px}.key{font:10px var(--mono);color:var(--muted);white-space:nowrap}.key::after{content:' +';font-size:17px}details[open] .key::after{content:' −'}.matrix .table-wrap{border:0;border-top:1px solid var(--line);margin:0}.matrix table th:not(:first-child){min-width:80px}.matrix-note{font-size:12px;padding:14px 18px;margin:0;background:#f4f6ef;color:var(--muted)}code{font-family:var(--mono);font-size:.88em;overflow-wrap:anywhere;background:#edf1e8;padding:2px 4px}pre{margin:14px 0 22px;background:#17392e;color:#edf4e7;padding:22px;overflow:auto;font:12px/1.85 var(--mono);border-radius:3px;tab-size:2;word-break:normal}pre code{font:inherit;padding:0;background:transparent;overflow-wrap:normal}.code-label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;letter-spacing:.5px;margin:22px 0 -6px}.code-label a{font-size:11px}.steps{list-style:none;padding:0;margin:20px 0;counter-reset:step}.steps li{counter-increment:step;position:relative;padding:0 0 22px 42px;border-left:1px solid var(--line);margin-left:12px}.steps li:last-child{border:0;padding-bottom:0}.steps li::before{content:counter(step,decimal-leading-zero);position:absolute;left:-13px;top:0;width:26px;height:26px;text-align:center;border-radius:50%;background:var(--paper);border:1px solid var(--line);font:10px/26px var(--mono)}.steps strong{display:block;font-size:15px;margin-bottom:6px}.steps p{font-size:13px;color:var(--muted);margin:0}.endpoint{font-family:var(--mono);font-size:12px;white-space:nowrap}.method{color:var(--accent);font-weight:800}.result-chart{display:grid;grid-template-columns:52px 1fr 55px;gap:10px 16px;align-items:center;margin:24px 0;font-size:13px}.result-chart .track{background:#e5ecdf;height:24px;position:relative}.result-chart .fill{background:#718c60;height:100%}.result-chart .fill.top{background:var(--dark)}.result-chart b{text-align:right;font-variant-numeric:tabular-nums}ul{padding-left:22px}li{margin-bottom:8px;font-size:14px}.reference{font-size:13px;padding-left:20px}.footer{max-width:1184px;margin:auto;border-top:1px solid var(--line);padding:28px 0 40px;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.print{border:1px solid var(--line);background:transparent;padding:7px 12px;color:var(--ink);font-size:11px}.nowrap{white-space:nowrap}[hidden]{display:none!important}.sample-output{max-height:650px}.address{word-break:break-all}
+@media(max-width:1050px){.layout{grid-template-columns:130px minmax(0,1fr);gap:28px}.hero{gap:35px}.masthead,.hero{padding-left:32px;padding-right:32px}.layout{padding-left:32px;padding-right:32px}.hero h1{font-size:43px}.footer{padding-left:32px;padding-right:32px}}@media(max-width:760px){.masthead{padding:18px 22px}.brand em,.edition{display:none}.hero{grid-template-columns:1fr;gap:24px;padding:42px 22px 35px}.hero h1{font-size:37px;letter-spacing:-1.8px}.lead{font-size:16px}.hero-aside{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.stat{display:block;padding:12px 0}.stat b{display:block;font-size:24px;width:auto}.stat span{font-size:11px;display:block;margin-top:6px}.layout{display:block;padding:0 22px 40px}.toc{position:static;display:flex;overflow:auto;white-space:nowrap;gap:5px;padding:0 0 24px}.toc p{display:none}.toc a{border:1px solid var(--line);padding:7px 10px;font-size:11px}section{padding-top:30px;margin-bottom:38px}h2{font-size:25px}.grid2{grid-template-columns:1fr}.flow{grid-template-columns:1fr;gap:8px}.arrow{transform:rotate(90deg);line-height:1.2}.formula{padding:20px}.formula .equation{font-size:17px}.footer{margin:0 22px;padding:20px 0;display:block}.footer span{display:block;margin-bottom:8px}table{min-width:560px}pre{font-size:11px;padding:16px}.callout{padding:15px 17px}.versions{gap:6px}.pill{font-size:9px}}
+@media print{@page{size:A4;margin:16mm 15mm}html{scroll-behavior:auto}body{background:white;color:#193d32;font-size:10pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}.masthead,.hero,.layout{max-width:none;padding:0;display:block}.masthead{padding-bottom:10px}.hero{padding-top:25px;padding-bottom:25px}.hero h1{font-size:32pt;max-width:none}.hero-aside{display:flex;gap:30px;margin-top:20px}.stat{flex:1}.toc,.filter,.print,.skip{display:none}.layout{padding:0}.hero .lead{font-size:12pt}.versions{margin-top:15px}.table-wrap,pre{overflow:visible}table{min-width:0;font-size:9pt}td,th{padding:7px}section{margin-bottom:25px;padding-top:22px;break-inside:auto}h2{font-size:19pt;break-after:avoid}h3,summary{break-after:avoid}.card,.flow-box,details{break-inside:avoid}.matrix table{font-size:8pt}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8pt;break-inside:auto}.sample-output{max-height:none}.footer{padding:16px 0}.code-label a{display:none}.matrix{display:block!important}.matrix>div,.matrix>p{display:block!important}.grid2{gap:10px}.callout{break-inside:avoid}.reference a::after{content:" (" attr(href) ")";font-size:8pt;overflow-wrap:anywhere}.brand em,.edition{display:inline}}
+</style>
+</head>
+<body>
+<a class="skip" href="#overview">본문으로 바로 가기</a>
+<header class="masthead"><div class="brand">hobbytree<span aria-hidden="true">.</span><em>Recommendation Engineering</em></div><div class="edition">DESIGN REPORT / 2026.11.08</div><button class="print" type="button" onclick="printReport()">인쇄 / PDF 저장</button></header>
+<div class="hero"><div><p class="eyebrow">온보딩에서 첫 활동까지</p><h1>설명할 수 있는<br>취미 추천의 설계</h1><p class="lead">사용자의 답변을 가중치로 계산하고, 실제로 할 수 있는 활동을 먼저 확인합니다. 요리·악기·독서를 연결하는 규칙 기반 추천 API.</p><div class="versions"><span class="pill">onboarding-2026-10-13</span><span class="pill">rules-2.0.0</span><span class="pill">catalog-2.0.0</span></div></div><aside class="hero-aside" aria-label="설계 요약"><div class="stat"><b>13 + 1</b><span>13개 질문 · Q09 두 묶음<br>총 14개 응답 키</span></div><div class="stat"><b>100</b><span>가중치 합계<br>성공 확률이 아닌 규칙 점수</span></div><div class="stat"><b>3 / 9</b><span>지원 취미 3개<br>예시 활동 9개</span></div></aside></div>
+<div class="layout"><nav class="toc" aria-label="보고서 목차"><p>IN THIS REPORT</p><a href="#overview">01 설계 원칙</a><a href="#questions">02 질문의 역할</a><a href="#scoring">03 계산 방식</a><a href="#matrix">04 선택지·가중치</a><a href="#filters">05 활동 필터</a><a href="#input">06 입력 계약</a><a href="#output">07 출력과 계산 예</a><a href="#runtime">08 서버 구동</a><a href="#extension">09 확장과 검증</a><a href="#references">10 근거·한계</a></nav><main>
+<section id="overview"><p class="section-kicker">01 / DESIGN INTENT</p><h2>가능한 활동을 남긴 뒤,<br>잘 맞는 취미의 순서를 정합니다.</h2><p>기존 <code>onboarding.ts</code>의 질문 키·선택지·단독 선택 규칙을 보존해 API 요청에 연결했습니다. 원본의 <code>initial</code>은 Figma 예시 선택 상태이므로 사용자 답변으로 자동 전송하지 않습니다. 예시 추천 카드의 96·92 같은 숫자도 실제 추천 계산에 재사용하지 않습니다.</p><div class="flow" aria-label="활동 필터링 다음 취미 점수 계산"><div class="flow-box"><span>STAGE 01 · FEASIBILITY</span><b>활동 단위 조건 확인</b><p>첫 지출 · 남은 월 예산 · 전체 시간 · 반드시 제외할 조건 · 필요한 물품. 확정 불가 항목은 확인 질문으로 남깁니다.</p></div><div class="arrow" aria-hidden="true">→</div><div class="flow-box dark"><span>STAGE 02 · PREFERENCE</span><b>취미 단위 점수 계산</b><p>관심 40 + 목적 30 + 물품 10 + 장소 15 + 함께할 사람 5. 남은 활동이 있는 취미만 점수순으로 반환합니다.</p></div></div><div class="grid2"><article class="card"><span class="num">A / 설명 가능성</span><h3>결과에 계산 근거를 붙입니다.</h3><p>각 질문의 적합도, 가중치, 기여 점수와 추천 이유를 함께 반환합니다. 점수는 0~100 범위의 설계값이며 개인의 만족 확률이나 정확도는 아닙니다.</p></article><article class="card"><span class="num">B / 데이터 분리</span><h3>규칙을 코드 밖에서 관리합니다.</h3><p>질문·가중치·활동 카탈로그를 별도 JSON으로 관리하고 버전을 응답에 남깁니다. API·입력 모델·추천 서비스가 분리되어 취미 추가와 검증을 독립적으로 진행할 수 있습니다.</p></article></div><div class="callout"><strong>취미를 시작하지 않겠다는 답도 하나의 정상적인 결과입니다.</strong>Q01에서 시작 의사가 없거나 Q11에서 직접 찾기를 선택하면 <code>browse</code>를 반환합니다. 답변을 모두 채워야만 추천받는 구조가 아니며, 누락은 자동으로 무관심이나 0원으로 바뀌지 않습니다.</div></section>
+<section id="questions"><p class="section-kicker">02 / QUESTION MAP</p><h2>모든 질문이 점수를 올리지는 않습니다.</h2><p>5개 응답 그룹만 순위 계산에 사용합니다. 예산·시간·제외 조건은 실행 가능성을 확인하고, 기록·알림 선호는 앱 표시 설정으로 전달합니다.</p><div class="table-wrap"><table><thead><tr><th>응답 키</th><th>질문 / 그룹</th><th>역할</th><th>반영 방식</th></tr></thead><tbody><tr><td><code>q01</code></td><td>현재 취미생활은 어떤 상태인가요?</td><td><span class="tag">경로</span></td><td>취미를 시작할 생각이 없으면 순위 추천을 멈추고 둘러보기로 안내합니다.</td></tr><tr><td><code>q02</code></td><td>지금 해보고 싶거나 이어가고 싶은 취미가 있나요?</td><td><span class="tag">40점</span></td><td>지원 취미를 직접 선택한 신호입니다. 여러 개를 고르면 취미별 최고 적합도를 사용합니다. 커피·러닝은 미지원 관심사로 반환합니다.</td></tr><tr><td><code>q03</code></td><td>취미를 통해 가장 얻고 싶은 것은 무엇인가요?</td><td><span class="tag">30점</span></td><td>선택한 목적의 적합도를 평균합니다. 최대 2개이며 특정 목적만으로 취미를 제외하지 않습니다.</td></tr><tr><td><code>q04</code></td><td>첫 활동에 새로 쓸 수 있는 돈은 얼마인가요?</td><td><span class="tag">필터</span></td><td>첫 활동의 추가 지출 한도입니다. 미정·확인 후 결정은 0원이 아닙니다.</td></tr><tr><td><code>q05</code></td><td>이번 달 취미 전체에 쓸 수 있는 돈은 얼마인가요?</td><td><span class="tag">필터</span></td><td>모든 취미를 합친 월 한도입니다. 이미 사용·예약한 금액이 있으면 남은 예산과 첫 활동 비용을 비교합니다.</td></tr><tr><td><code>q06</code></td><td>준비·정리·이동까지 포함해, 한 번에 얼마 동안 할 수 있나요?</td><td><span class="tag">필터</span></td><td>직접 활동 시간만이 아니라 준비·정리·이동·대기를 포함한 전체 시간을 비교합니다.</td></tr><tr><td><code>q07</code></td><td>일주일에 어느 정도 할 수 있을 것 같나요?</td><td><span class="tag">계획</span></td><td>주간 빈도를 계획 참고값으로 전달합니다. 월 4주로 환산하거나 연속 목표를 만들지 않습니다.</td></tr><tr><td><code>q08</code></td><td>지금 사용할 수 있는 물건은 무엇인가요?</td><td><span class="tag">10점</span></td><td>사용 가능한 물품 묶음의 선호 신호입니다. 구체적인 물품 보유는 resources로 별도 확인합니다.</td></tr><tr><td><code>q09Place</code></td><td>어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요?</td><td><span class="tag">15점</span></td><td>선호 장소의 적합도 중 최댓값을 사용합니다. 선호 장소만으로 다른 장소의 활동을 금지하지 않습니다.</td></tr><tr><td><code>q09Exclude</code></td><td>어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요?</td><td><span class="tag">필터</span></td><td>반드시 피할 조건과 활동 태그가 겹치면 해당 활동을 제외합니다. 직접 입력은 검토를 요청합니다.</td></tr><tr><td><code>q10</code></td><td>처음에는 누구와 하고 싶나요?</td><td><span class="tag">5점</span></td><td>처음 함께할 사람에 대한 선호입니다. 혼자·지인·새로운 사람을 구별하며 매칭 기능은 포함하지 않습니다.</td></tr><tr><td><code>q11</code></td><td>다음 활동은 어떻게 고르고 싶나요?</td><td><span class="tag">표시</span></td><td>기본 후보 수와 탐색 방식을 결정합니다. 한 개 제안은 기본 top 1, 직접 찾기는 둘러보기입니다.</td></tr><tr><td><code>q12</code></td><td>활동 후 기록은 어느 정도가 편한가요?</td><td><span class="tag">기록</span></td><td>원하는 기록 방식을 전달합니다. 취미 순위와 무관합니다.</td></tr><tr><td><code>q13</code></td><td>앱에서 부담스럽게 느낄 요소가 있나요?</td><td><span class="tag">부담</span></td><td>앱에서 피하고 싶은 표현·기능을 전달합니다. 취미 순위와 무관합니다.</td></tr></tbody></table></div><p class="small muted">Q02의 “3개까지 추천”은 안내 문구이며 원본 정의에 <code>max</code>가 없습니다. 서버는 이를 입력 개수 제한으로 바꾸지 않습니다. Q03의 <code>max: 2</code>와 각 그룹의 <code>exclusive</code>는 실제 검증 규칙으로 적용합니다.</p></section>
+<section id="scoring"><p class="section-kicker">03 / RANKING MODEL</p><h2>단순하게 계산하고,<br>가중치의 의미를 드러냅니다.</h2><div class="formula"><div class="equation">Score(h) = Σ weight(q) × fit(q, h)</div><p>fit은 0~1 · 가중치의 합은 100 · 최종 결과는 0~100점</p></div><div class="weightbar" role="img" aria-label="관심 40점, 목적 30점, 물품 10점, 장소 15점, 동행 5점"><span></span><span></span><span></span><span></span><span></span></div><div class="legend"><span>관심 <b>40</b></span><span>목적 <b>30</b></span><span>물품 <b>10</b></span><span>장소 <b>15</b></span><span>동행 <b>5</b></span></div><ol class="steps"><li><strong>응답을 정해진 형태로 읽습니다.</strong><p>단일 선택은 문자열, 복수 선택은 배열입니다. 실제 선택한 값만 전송하고, 미응답 그룹은 생략합니다.</p></li><li><strong>여러 선택을 하나의 적합도로 합칩니다.</strong><p>Q03 목적은 평균을 사용합니다. 다른 점수 질문은 최댓값을 사용해 관련 물건을 여러 개 선택했다고 점수가 중복으로 늘지 않게 합니다.</p></li><li><strong>모르는 답은 0.5로 둡니다.</strong><p>미응답, ‘아직 모르겠어요’, ‘상관없어요’ 등 별도 점수가 없는 선택은 중립값 0.5입니다. 미지원 관심사만 선택해도 세 취미를 모두 중립으로 평가합니다.</p></li><li><strong>가중 합산 후 남은 취미를 정렬합니다.</strong><p>지원 취미 직접 선택은 그 취미 1.0, 다른 취미 0.5입니다. 직접 고른 여러 취미에는 각각 1.0을 적용합니다. 점수 동률은 <code>hobby_id</code> 오름차순으로 정렬해 같은 입력에서 결과가 바뀌지 않게 합니다.</p></li></ol><div class="callout warm"><strong>50점은 ‘반반의 확률’이 아닙니다.</strong>아무런 순위 신호가 없으면 세 취미 모두 50점이 됩니다. 이때는 응답 충실도와 추가 확인 질문을 함께 읽어야 합니다. 가중치를 바꾸기 전에는 사용자 만족도·첫 활동 선택·완료율로 검증해야 합니다.</div></section>
+<section id="matrix"><p class="section-kicker">04 / COMPLETE OPTION MATRIX</p><h2>선택지별 반영 기준</h2><p>실제 <code>rules.json</code>과 <code>questionnaire.json</code>에서 가져온 전체 선택지입니다. 숫자는 <b>적합도</b>, 아래 작은 숫자는 해당 질문 가중치를 곱한 <b>기여 점수</b>입니다. 복수 선택 시에는 합산 전에 평균 또는 최댓값을 적용합니다.</p><div class="filter" aria-label="선택지 표 필터"><button type="button" data-filter="all" aria-pressed="true">모든 질문</button><button type="button" data-filter="score" aria-pressed="false">점수 질문만</button><button type="button" data-filter="other" aria-pressed="false">조건·표시 질문만</button></div><div id="matrices"><details class="matrix" data-key="q01" ><summary><span><b>Q01 현재 취미생활은 어떤 상태인가요?</b><small>가중치 없음 · 경로</small></span><span class="key">q01</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>해보고 싶지만 아직 시작하지 못했어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr><tr><td>무엇을 할지 모르겠어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr><tr><td>최근 시작해 이어가고 있어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr><tr><td>쉬거나 그만둔 취미가 있어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr><tr><td>오래 해온 취미를 계속하고 싶어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr><tr><td>지금은 취미를 시작할 생각이 없어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 경로</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">취미를 시작할 생각이 없으면 순위 추천을 멈추고 둘러보기로 안내합니다.</p></details><details class="matrix" data-key="q02" open><summary><span><b>Q02 지금 해보고 싶거나 이어가고 싶은 취미가 있나요?</b><small>가중치 40 · 선택값의 최댓값</small></span><span class="key">q02</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>커피</td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>요리 (한식·중식·양식·일식·제과·제빵)</td><td class="number">1<small>40점</small></td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">점수 반영</td></tr><tr><td>악기 (피아노·기타)</td><td class="number">0.5<small>20점</small></td><td class="number">1<small>40점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">점수 반영</td></tr><tr><td>독서</td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="number">1<small>40점</small></td><td class="muted">점수 반영</td></tr><tr><td>러닝·걷기</td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>다른 취미 직접 입력</td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>아직 모르겠어요</td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="number">0.5<small>20점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr></tbody></table></div><p class="matrix-note">지원 취미를 직접 선택한 신호입니다. 여러 개를 고르면 취미별 최고 적합도를 사용합니다. 커피·러닝은 미지원 관심사로 반환합니다. 단독 선택: 아직 모르겠어요.</p></details><details class="matrix" data-key="q03" open><summary><span><b>Q03 취미를 통해 가장 얻고 싶은 것은 무엇인가요?</b><small>가중치 30 · 선택값의 평균</small></span><span class="key">q03</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>휴식·기분 전환</td><td class="number">0.8<small>24점</small></td><td class="number">0.8<small>24점</small></td><td class="number">1<small>30점</small></td><td class="muted">점수 반영</td></tr><tr><td>건강·체력</td><td class="number">0.65<small>19.5점</small></td><td class="number">0.3<small>9점</small></td><td class="number">0.35<small>10.5점</small></td><td class="muted">점수 반영</td></tr><tr><td>실력 향상·성취감</td><td class="number">1<small>30점</small></td><td class="number">1<small>30점</small></td><td class="number">0.8<small>24점</small></td><td class="muted">점수 반영</td></tr><tr><td>창작·자기표현</td><td class="number">1<small>30점</small></td><td class="number">1<small>30점</small></td><td class="number">0.7<small>21점</small></td><td class="muted">점수 반영</td></tr><tr><td>사람과의 교류</td><td class="number">0.8<small>24점</small></td><td class="number">0.8<small>24점</small></td><td class="number">0.55<small>16.5점</small></td><td class="muted">점수 반영</td></tr><tr><td>새로운 경험·호기심</td><td class="number">0.95<small>28.5점</small></td><td class="number">0.9<small>27점</small></td><td class="number">1<small>30점</small></td><td class="muted">점수 반영</td></tr><tr><td>아직 모르겠어요</td><td class="number">0.5<small>15점</small></td><td class="number">0.5<small>15점</small></td><td class="number">0.5<small>15점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr></tbody></table></div><p class="matrix-note">선택한 목적의 적합도를 평균합니다. 최대 2개이며 특정 목적만으로 취미를 제외하지 않습니다. 단독 선택: 아직 모르겠어요. 최대 2개.</p></details><details class="matrix" data-key="q04" ><summary><span><b>Q04 첫 활동에 새로 쓸 수 있는 돈은 얼마인가요?</b><small>가중치 없음 · 필터</small></span><span class="key">q04</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>0원</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>1만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>3만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>5만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>직접 금액 입력</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">추가 입력</td></tr><tr><td>나와 맞는지 확인한 뒤 결정</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>아직 모르겠어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">첫 활동의 추가 지출 한도입니다. 미정·확인 후 결정은 0원이 아닙니다.</p></details><details class="matrix" data-key="q05" ><summary><span><b>Q05 이번 달 취미 전체에 쓸 수 있는 돈은 얼마인가요?</b><small>가중치 없음 · 필터</small></span><span class="key">q05</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>0원</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>1만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>3만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>5만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>10만 원까지</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>직접 금액 입력</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">추가 입력</td></tr><tr><td>아직 모르겠어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">모든 취미를 합친 월 한도입니다. 이미 사용·예약한 금액이 있으면 남은 예산과 첫 활동 비용을 비교합니다.</p></details><details class="matrix" data-key="q06" ><summary><span><b>Q06 준비·정리·이동까지 포함해, 한 번에 얼마 동안 할 수 있나요?</b><small>가중치 없음 · 필터</small></span><span class="key">q06</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>10분</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>15분</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>30분</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>1시간</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>2시간</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>직접 시간 입력</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">추가 입력</td></tr><tr><td>아직 모르겠어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">직접 활동 시간만이 아니라 준비·정리·이동·대기를 포함한 전체 시간을 비교합니다.</p></details><details class="matrix" data-key="q07" ><summary><span><b>Q07 일주일에 어느 정도 할 수 있을 것 같나요?</b><small>가중치 없음 · 계획</small></span><span class="key">q07</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>주 1회 미만</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr><tr><td>주 1회</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr><tr><td>주 2~3회</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr><tr><td>주 4회 이상</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr><tr><td>주마다 달라요</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr><tr><td>아직 모르겠어요</td><td colspan="3" class="muted">점수 계산에서 제외 · 계획</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">주간 빈도를 계획 참고값으로 전달합니다. 월 4주로 환산하거나 연속 목표를 만들지 않습니다.</p></details><details class="matrix" data-key="q08" open><summary><span><b>Q08 지금 사용할 수 있는 물건은 무엇인가요?</b><small>가중치 10 · 선택값의 최댓값</small></span><span class="key">q08</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>스마트폰</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.7<small>7점</small></td><td class="muted">점수 반영</td></tr><tr><td>읽을 책·전자책</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">1<small>10점</small></td><td class="muted">점수 반영</td></tr><tr><td>필기구</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>운동화·운동복</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>주방 도구</td><td class="number">1<small>10점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">점수 반영</td></tr><tr><td>커피 도구</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>피아노·건반</td><td class="number">0.5<small>5점</small></td><td class="number">1<small>10점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">점수 반영</td></tr><tr><td>기타</td><td class="number">0.5<small>5점</small></td><td class="number">1<small>10점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">점수 반영</td></tr><tr><td>그 밖의 물건</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>해당 없음</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr><tr><td>확인이 필요해요</td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="number">0.5<small>5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr></tbody></table></div><p class="matrix-note">사용 가능한 물품 묶음의 선호 신호입니다. 구체적인 물품 보유는 resources로 별도 확인합니다. 단독 선택: 해당 없음 / 확인이 필요해요.</p></details><details class="matrix" data-key="q09Place" open><summary><span><b>Q09 어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요?</b><small>가중치 15 · 선택값의 최댓값</small></span><span class="key">q09Place</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>집</td><td class="number">1<small>15점</small></td><td class="number">1<small>15점</small></td><td class="number">1<small>15점</small></td><td class="muted">점수 반영</td></tr><tr><td>가까운 실내 공간</td><td class="number">0.75<small>11.25점</small></td><td class="number">0.9<small>13.5점</small></td><td class="number">0.9<small>13.5점</small></td><td class="muted">점수 반영</td></tr><tr><td>야외</td><td class="number">0.4<small>6점</small></td><td class="number">0.3<small>4.5점</small></td><td class="number">0.65<small>9.75점</small></td><td class="muted">점수 반영</td></tr><tr><td>상관없어요</td><td class="number">0.5<small>7.5점</small></td><td class="number">0.5<small>7.5점</small></td><td class="number">0.5<small>7.5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr></tbody></table></div><p class="matrix-note">선호 장소의 적합도 중 최댓값을 사용합니다. 선호 장소만으로 다른 장소의 활동을 금지하지 않습니다. 단독 선택: 상관없어요.</p></details><details class="matrix" data-key="q09Exclude" ><summary><span><b>Q09 어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요?</b><small>가중치 없음 · 필터</small></span><span class="key">q09Exclude</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>새 장비 구매</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>야외</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>외부 시설</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>많은 신체 활동</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>다른 사람 필수</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>큰 소음</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>화기 사용</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>없음</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">별도 처리</td></tr><tr><td>직접 입력</td><td colspan="3" class="muted">점수 계산에서 제외 · 필터</td><td class="muted">추가 입력</td></tr></tbody></table></div><p class="matrix-note">반드시 피할 조건과 활동 태그가 겹치면 해당 활동을 제외합니다. 직접 입력은 검토를 요청합니다. 단독 선택: 없음.</p></details><details class="matrix" data-key="q10" open><summary><span><b>Q10 처음에는 누구와 하고 싶나요?</b><small>가중치 5 · 선택값의 최댓값</small></span><span class="key">q10</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>혼자</td><td class="number">0.9<small>4.5점</small></td><td class="number">1<small>5점</small></td><td class="number">1<small>5점</small></td><td class="muted">점수 반영</td></tr><tr><td>아는 사람과</td><td class="number">0.9<small>4.5점</small></td><td class="number">0.8<small>4점</small></td><td class="number">0.6<small>3점</small></td><td class="muted">점수 반영</td></tr><tr><td>새로운 사람도 괜찮아요</td><td class="number">0.8<small>4점</small></td><td class="number">0.7<small>3.5점</small></td><td class="number">0.65<small>3.25점</small></td><td class="muted">점수 반영</td></tr><tr><td>상관없어요</td><td class="number">0.5<small>2.5점</small></td><td class="number">0.5<small>2.5점</small></td><td class="number">0.5<small>2.5점</small></td><td class="muted">유효 신호 없으면 중립값</td></tr></tbody></table></div><p class="matrix-note">처음 함께할 사람에 대한 선호입니다. 혼자·지인·새로운 사람을 구별하며 매칭 기능은 포함하지 않습니다.</p></details><details class="matrix" data-key="q11" ><summary><span><b>Q11 다음 활동은 어떻게 고르고 싶나요?</b><small>가중치 없음 · 표시</small></span><span class="key">q11</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>2~3개 후보 중 직접 고르기</td><td colspan="3" class="muted">점수 계산에서 제외 · 표시</td><td class="muted">별도 처리</td></tr><tr><td>한 개를 제안받기</td><td colspan="3" class="muted">점수 계산에서 제외 · 표시</td><td class="muted">별도 처리</td></tr><tr><td>전체 단계를 보며 고르기</td><td colspan="3" class="muted">점수 계산에서 제외 · 표시</td><td class="muted">별도 처리</td></tr><tr><td>안내 없이 직접 찾기</td><td colspan="3" class="muted">점수 계산에서 제외 · 표시</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">기본 후보 수와 탐색 방식을 결정합니다. 한 개 제안은 기본 top 1, 직접 찾기는 둘러보기입니다.</p></details><details class="matrix" data-key="q12" ><summary><span><b>Q12 활동 후 기록은 어느 정도가 편한가요?</b><small>가중치 없음 · 기록</small></span><span class="key">q12</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>한 번 누르기</td><td colspan="3" class="muted">점수 계산에서 제외 · 기록</td><td class="muted">별도 처리</td></tr><tr><td>누르기와 아쉬웠던 점 1개</td><td colspan="3" class="muted">점수 계산에서 제외 · 기록</td><td class="muted">별도 처리</td></tr><tr><td>만족도·난이도·시간</td><td colspan="3" class="muted">점수 계산에서 제외 · 기록</td><td class="muted">별도 처리</td></tr><tr><td>사진·짧은 메모</td><td colspan="3" class="muted">점수 계산에서 제외 · 기록</td><td class="muted">별도 처리</td></tr><tr><td>기록하지 않기</td><td colspan="3" class="muted">점수 계산에서 제외 · 기록</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">원하는 기록 방식을 전달합니다. 취미 순위와 무관합니다.</p></details><details class="matrix" data-key="q13" ><summary><span><b>Q13 앱에서 부담스럽게 느낄 요소가 있나요?</b><small>가중치 없음 · 부담</small></span><span class="key">q13</span></summary><div class="table-wrap"><table><thead><tr><th scope="col">선택지</th><th scope="col">요리</th><th scope="col">악기</th><th scope="col">독서</th><th scope="col">처리</th></tr></thead><tbody><tr><td>매일 알림</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>연속 기록 끊김 표시</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>나무가 시드는 표현</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>사용자 순위·비교</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>긴 전체 로드맵</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>여러 항목 기록</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>기한 목표</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr><tr><td>없음</td><td colspan="3" class="muted">점수 계산에서 제외 · 부담</td><td class="muted">별도 처리</td></tr></tbody></table></div><p class="matrix-note">앱에서 피하고 싶은 표현·기능을 전달합니다. 취미 순위와 무관합니다. 단독 선택: 없음.</p></details></div><noscript><p class="small">자바스크립트 없이도 각 질문을 펼쳐 전체 선택지를 확인할 수 있습니다.</p></noscript></section>
+<section id="filters"><p class="section-kicker">05 / ACTIVITY CATALOG & GATES</p><h2>취미는 같아도,<br>실행 가능한 첫 활동은 다릅니다.</h2><p>요리 전체를 금지하는 대신 화기를 쓰는 활동만 제거할 수 있습니다. ‘큰 소음’을 피하면 어쿠스틱 기타·연습실 활동을 제외하되 헤드폰 건반은 실제 연결·타건 소음 조건을 별도로 확인합니다. 모든 활동이 제외된 취미만 <code>excluded</code>에 들어갑니다.</p><div class="table-wrap"><table><thead><tr><th>취미 / ID</th><th>활동 / 제외 태그</th><th>전체 시간</th><th>첫 회 / 반복</th><th>필수 자원 ID</th></tr></thead><tbody><tr><td><strong>요리</strong><small>cooking-pantry-dressing</small></td><td>기존 재료를 계량해 드레싱 만들기<small>제외 태그 없음</small></td><td class="number">15분<small>직접 10분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>pantry_ingredients</code><br><code>bowl</code><br><code>measuring_spoon</code></td></tr><tr><td><strong>요리</strong><small>cooking-buy-dressing</small></td><td>재료를 준비해 드레싱 만들기<small>제외 태그 없음</small></td><td class="number">30분<small>직접 15분</small></td><td class="number">5,000원<small>반복 2,000원</small></td><td><code>bowl</code><br><code>measuring_spoon</code></td></tr><tr><td><strong>요리</strong><small>cooking-warm-soup</small></td><td>간단한 따뜻한 국 만들기<small>화기 사용</small></td><td class="number">40분<small>직접 25분</small></td><td class="number">7,000원<small>반복 3,000원</small></td><td><code>stove</code><br><code>pot</code><br><code>measuring_spoon</code></td></tr><tr><td><strong>악기</strong><small>instrument-keyboard-headphones-15</small></td><td>헤드폰을 연결해 전자건반 첫 소리 내기<small>제외 태그 없음</small></td><td class="number">15분<small>직접 10분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>digital_keyboard</code><br><code>headphones</code></td></tr><tr><td><strong>악기</strong><small>instrument-acoustic-guitar-20</small></td><td>가진 기타로 열린 줄 소리 탐색하기<small>큰 소음</small></td><td class="number">20분<small>직접 12분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>acoustic_guitar</code><br><code>sound_allowed_space</code></td></tr><tr><td><strong>악기</strong><small>instrument-practice-room-40</small></td><td>연습실에서 피아노 첫 소리 내기<small>외부 시설 · 큰 소음</small></td><td class="number">40분<small>직접 20분</small></td><td class="number">5,000원<small>반복 5,000원</small></td><td><code>instrument_practice_room</code></td></tr><tr><td><strong>독서</strong><small>reading-owned-10</small></td><td>가진 책의 표지와 첫 문장 읽기<small>제외 태그 없음</small></td><td class="number">10분<small>직접 8분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>owned_book</code></td></tr><tr><td><strong>독서</strong><small>reading-free-ebook-15</small></td><td>무료 공개 전자책 첫 부분 읽기<small>제외 태그 없음</small></td><td class="number">15분<small>직접 10분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>smartphone</code></td></tr><tr><td><strong>독서</strong><small>reading-library-30</small></td><td>도서관에서 책 한 권 골라 읽기<small>외부 시설</small></td><td class="number">30분<small>직접 15분</small></td><td class="number">0원<small>반복 0원</small></td><td><code>library_access</code></td></tr></tbody></table></div><div class="callout warm"><strong>시간과 가격은 설계용 예시입니다.</strong>실제 지출에는 재료·물품·대여·시설·이동비를 포함해야 합니다. 0원은 필요한 것을 이미 사용할 수 있고 추가 비용이 없다는 전제의 예시입니다. 현재 카탈로그는 실시간 가격·재고·영업시간을 조회하지 않습니다.</div><h3>필터의 구체적인 판단</h3><div class="table-wrap"><table><thead><tr><th>조건</th><th>판단</th><th>값이 불확실하면</th></tr></thead><tbody><tr><td>첫 활동 예산 Q04</td><td>첫 회 예시 비용이 한도를 넘으면 제외</td><td>0원으로 바꾸지 않고 유료 활동에서 확인 요청</td></tr><tr><td>월 전체 예산 Q05</td><td>월 한도 − 전체 취미 사용·예약 금액과 첫 비용 비교</td><td>사용·예약 금액이 없으면 전체 한도만 상한으로 적용하고 유료 활동에서 잔여 예산 확인</td></tr><tr><td>1회 시간 Q06</td><td><code>total_minutes</code>가 허용 시간을 넘으면 제외</td><td>실제 가능한 전체 시간 확인</td></tr><tr><td>필수 제외 Q09</td><td>선택한 제외 조건과 활동 태그가 하나라도 겹치면 제외</td><td>그룹 미응답은 ‘제외 없음’으로 간주하지 않고 확인 요청</td></tr><tr><td>필수 물품·시설</td><td><code>resources[id] = false</code>이면 해당 자원을 필요로 하는 활동 제외</td><td>누락된 자원은 <code>needs_confirmation</code></td></tr><tr><td>직접 입력 제외 조건</td><td>의미를 자동 추측하지 않고 <code>needs_review</code></td><td>추천 목록은 비워 두고 검토 질문 반환</td></tr></tbody></table></div><p class="small muted">Q05는 첫 활동 가능 여부의 필요조건을 확인합니다. 여러 취미의 향후 횟수·예약·반복비를 합산한 월 예산 최적화는 아직 제공하지 않습니다. Q07을 월 4주로 환산해 월 비용을 확정하지 않습니다.</p><details><summary><span><b>필수 자원 ID 전체 목록</b><small>GET /api/v1/catalog에서도 조회할 수 있습니다.</small></span><span class="key">resources</span></summary><div class="table-wrap"><table><thead><tr><th>ID</th><th>확인할 내용</th></tr></thead><tbody><tr><td><code>pantry_ingredients</code></td><td>드레싱에 쓸 기존 재료(간장·식초·식용유 등)</td></tr><tr><td><code>bowl</code></td><td>혼합용 그릇</td></tr><tr><td><code>measuring_spoon</code></td><td>계량스푼</td></tr><tr><td><code>stove</code></td><td>사용 가능한 가열 조리기구</td></tr><tr><td><code>pot</code></td><td>가열용 냄비</td></tr><tr><td><code>owned_book</code></td><td>지금 읽을 수 있는 보유 또는 대여한 책·전자책</td></tr><tr><td><code>smartphone</code></td><td>무료 전자책을 열 수 있는 스마트폰과 통신 환경</td></tr><tr><td><code>library_access</code></td><td>운영 시간·회원 자격·이동·비용을 확인한 도서관</td></tr><tr><td><code>digital_keyboard</code></td><td>헤드폰 연결이 가능한 사용 가능한 전자건반</td></tr><tr><td><code>headphones</code></td><td>전자건반에 연결해 사용할 수 있는 헤드폰</td></tr><tr><td><code>acoustic_guitar</code></td><td>지금 사용할 수 있는 어쿠스틱 기타</td></tr><tr><td><code>sound_allowed_space</code></td><td>실제 연주 소리가 허용되는 장소와 시간</td></tr><tr><td><code>instrument_practice_room</code></td><td>예약·악기 제공·이동·총비용을 확인한 연습실</td></tr></tbody></table></div></details></section>
+<section id="input"><p class="section-kicker">06 / INPUT CONTRACT</p><h2>온보딩 응답을 JSON으로 보냅니다.</h2><p><span class="method">POST</span> <code>/api/v1/recommendations</code> · <code>Content-Type: application/json</code></p><div class="table-wrap"><table><thead><tr><th>필드</th><th>형식 / 기본값</th><th>의미</th></tr></thead><tbody><tr><td><code>schema_version</code></td><td>문자열 · onboarding-2026-10-13</td><td>선택지 문구가 속한 설문 버전</td></tr><tr><td><code>answers</code></td><td>객체 · 각 응답 키 선택 입력</td><td>원본 문구를 정확히 사용. 단일은 문자열, 복수는 문자열 배열</td></tr><tr><td><code>custom_values</code></td><td>객체 · 선택 입력</td><td>직접 입력 선택 시 금액·분·자유 텍스트</td></tr><tr><td><code>context_text</code></td><td>1~200자 문자열 · 선택 입력</td><td>실제로 작성한 Q14 추가 고려사항. 내용이 있으면 검토 필요 상태로 반환</td></tr><tr><td><code>resources</code></td><td>자원 ID → boolean</td><td>true: 실제 사용 가능 확인 / false: 사용 불가 확인 / 미전송: 모름</td></tr><tr><td><code>monthly_committed_krw</code></td><td>0 이상의 정수 · 선택 입력</td><td>이번 달 모든 취미에 이미 사용하거나 예약한 금액. 잔여 예산 자체를 넣지 않음</td></tr><tr><td><code>top_k</code></td><td>1~10 정수 · 선택 입력</td><td>최대 반환 취미 수. Q11 한 개 제안은 생략 시 1, 일반 기본은 3</td></tr></tbody></table></div><h3>직접 입력값</h3><p class="small"><code>q04_amount_krw</code>, <code>q05_amount_krw</code>는 0~1,000,000,000원 정수, <code>q06_minutes</code>는 1~1,440분 정수입니다. <code>q02_other</code>는 다른 취미 이름(1~200자), <code>q09_exclude_text</code>는 제외 조건 원문(1~500자)입니다. 공백만으로 채운 문자열은 허용하지 않습니다. 해당 ‘직접 입력’ 선택과 값이 함께 있어야 합니다.</p><div class="code-label"><span>REQUEST · 실제 실행 예제</span><a href="../examples/request.json">JSON 파일</a></div><pre><code id="sample-input">{
+  &quot;schema_version&quot;: &quot;onboarding-2026-10-13&quot;,
+  &quot;answers&quot;: {
+    &quot;q01&quot;: &quot;해보고 싶지만 아직 시작하지 못했어요&quot;,
+    &quot;q02&quot;: [&quot;요리 (한식·중식·양식·일식·제과·제빵)&quot;, &quot;독서&quot;],
+    &quot;q03&quot;: [&quot;휴식·기분 전환&quot;, &quot;새로운 경험·호기심&quot;],
+    &quot;q04&quot;: &quot;1만 원까지&quot;,
+    &quot;q05&quot;: &quot;3만 원까지&quot;,
+    &quot;q06&quot;: &quot;30분&quot;,
+    &quot;q07&quot;: &quot;주 2~3회&quot;,
+    &quot;q08&quot;: [&quot;스마트폰&quot;, &quot;읽을 책·전자책&quot;, &quot;주방 도구&quot;],
+    &quot;q09Place&quot;: [&quot;집&quot;],
+    &quot;q09Exclude&quot;: [&quot;많은 신체 활동&quot;, &quot;화기 사용&quot;],
+    &quot;q10&quot;: &quot;혼자&quot;,
+    &quot;q11&quot;: &quot;2~3개 후보 중 직접 고르기&quot;,
+    &quot;q12&quot;: &quot;한 번 누르기&quot;,
+    &quot;q13&quot;: [&quot;없음&quot;]
+  },
+  &quot;custom_values&quot;: {},
+  &quot;resources&quot;: {
+    &quot;owned_book&quot;: true,
+    &quot;smartphone&quot;: true,
+    &quot;pantry_ingredients&quot;: true,
+    &quot;bowl&quot;: true,
+    &quot;measuring_spoon&quot;: true
+  },
+  &quot;monthly_committed_krw&quot;: 10000,
+  &quot;top_k&quot;: 3
+}</code></pre><div class="callout"><strong>Q08과 resources는 서로 다른 정보입니다.</strong>‘주방 도구’를 선택했다고 계량스푼·그릇·가열 기구를 모두 보유한 것으로 처리하지 않습니다. 관심 취미에 필요한 구체적인 물품만 추가 확인 후 <code>resources</code>에 넣습니다. 원본 B01~B06의 보유·안내 응답 전체를 자동 저장하는 기능은 포함하지 않았습니다.</div><h3>입력 검증</h3><p>알 수 없는 응답 키·선택지, 잘못된 자료형, 중복 선택, 단독 선택 위반, Q03의 2개 초과, 맞지 않는 설문 버전, 직접 입력값 누락은 HTTP <code>422</code>입니다. 서버가 모르는 새 문구를 임의의 중립 답변으로 숨기지 않습니다. 최신 문구는 <code>GET /api/v1/questionnaire</code>로 확인합니다.</p></section>
+<section id="output"><p class="section-kicker">07 / OUTPUT & TRACEABILITY</p><h2>추천 카드와 검토 상태를 함께 반환합니다.</h2><div class="table-wrap"><table><thead><tr><th>status</th><th>뜻</th><th>클라이언트 처리</th></tr></thead><tbody><tr><td><code>recommended</code></td><td>조건 검사를 통과한 후보가 있음</td><td>순위·점수·이유와 활동별 확인 항목을 표시</td></tr><tr><td><code>browse</code></td><td>사용자가 둘러보기 또는 직접 찾기를 선택함</td><td>추천 순위 없이 카탈로그 탐색으로 연결</td></tr><tr><td><code>needs_review</code></td><td>Q09 제외 조건 또는 Q14 추가 고려사항을 확인해야 함</td><td>추천을 확정하지 않고 추가 확인 질문 표시</td></tr><tr><td><code>no_match</code></td><td>현재 조건에서 남은 활동이 없음</td><td>제외 이유를 설명하고 사용자가 조건을 수정하도록 안내</td></tr></tbody></table></div><p><code>recommended</code>는 모든 활동 조건이 확정되었다는 뜻이 아닙니다. 활동마다 <code>eligible</code> 또는 <code>needs_confirmation</code> 상태가 있고, 확인 항목은 <code>confirmation_required</code>에 담깁니다.</p><div class="callout"><strong>활동별 확인 완료를 저장하는 기능은 아직 없습니다.</strong>카탈로그의 <code>checks</code>는 항상 확인 항목으로 반환합니다. 모든 물품을 true로 보내도 요리·악기는 재료·작업·연주 소리 조건를 앱에서 별도로 확인해야 합니다. 최상위 <code>follow_up_questions</code>는 추천 취미별 첫 활동의 확인 목록만 모으므로 다른 활동을 고르면 해당 활동의 <code>confirmation_required</code>를 읽어야 합니다.</div><h3>실제 입력의 점수를 따라가 보기</h3><div id="worked-example"><p>위 요청에서 요리와 독서를 직접 선택하고, 목적은 ‘휴식·기분 전환’과 ‘새로운 경험·호기심’입니다. 많은 신체 활동·화기를 제외하고 30분 이내로 제한했습니다. 월 한도 30,000원에서 전체 취미 사용·예약액 10,000원을 뺀 잔여 상한은 20,000원입니다.</p><div class="result-chart"><span>독서</span><div class="track"><div class="fill top" style="width:100%"></div></div><b>100.00</b><span>요리</span><div class="track"><div class="fill" style="width:95.75%"></div></div><b>95.75</b><span>악기</span><div class="track"><div class="fill" style="width:70.5%"></div></div><b>70.50</b></div><p class="small">독서는 40 + 30 + 10 + 15 + 5 = <b>100점</b>입니다. 요리의 목적 적합도는 (0.8 + 0.95) ÷ 2 = <b>0.875</b>입니다. 다음과 같이 합산해 95.75점이 됩니다.</p><div class="table-wrap"><table><thead><tr><th>요리 점수 항목</th><th>가중치</th><th>적합도</th><th>기여 점수</th></tr></thead><tbody><tr><td><code>q02</code></td><td>40.0</td><td>1.0</td><td>40.0</td></tr><tr><td><code>q03</code></td><td>30.0</td><td>0.875</td><td>26.25</td></tr><tr><td><code>q08</code></td><td>10.0</td><td>1.0</td><td>10.0</td></tr><tr><td><code>q09Place</code></td><td>15.0</td><td>1.0</td><td>15.0</td></tr><tr><td><code>q10</code></td><td>5.0</td><td>0.9</td><td>4.5</td></tr><tr><td colspan="3"><b>합계</b></td><td><b>95.75</b></td></tr></tbody></table></div><p class="small muted">독서의 보유 책 활동은 확인된 자원과 조건으로 eligible입니다. 요리는 물품이 확인되어도 재료·작업 조건에 대한 추가 확인이 남습니다. 악기는 20 + 25.5 + 5 + 15 + 5 = 70.5점이며 실제 악기·헤드폰과 연주 소리 조건을 확인해야 합니다.</p></div><div class="code-label"><span>RESPONSE · 동일 요청으로 생성한 전체 응답</span><a href="../examples/response.json">JSON 파일</a></div><pre class="sample-output"><code id="sample-output">{
+  &quot;status&quot;: &quot;recommended&quot;,
+  &quot;schema_version&quot;: &quot;onboarding-2026-10-13&quot;,
+  &quot;rules_version&quot;: &quot;rules-2.0.0&quot;,
+  &quot;catalog_version&quot;: &quot;catalog-2.0.0&quot;,
+  &quot;recommendations&quot;: [
+    {
+      &quot;hobby_id&quot;: &quot;reading&quot;,
+      &quot;name&quot;: &quot;독서&quot;,
+      &quot;ui_key&quot;: &quot;독서&quot;,
+      &quot;rank&quot;: 1,
+      &quot;score&quot;: 100.0,
+      &quot;breakdown&quot;: [
+        {
+          &quot;question_key&quot;: &quot;q02&quot;,
+          &quot;weight&quot;: 40.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 40.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;요리 (한식·중식·양식·일식·제과·제빵)&quot;,
+            &quot;독서&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q03&quot;,
+          &quot;weight&quot;: 30.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 30.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;휴식·기분 전환&quot;,
+            &quot;새로운 경험·호기심&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q08&quot;,
+          &quot;weight&quot;: 10.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 10.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;스마트폰&quot;,
+            &quot;읽을 책·전자책&quot;,
+            &quot;주방 도구&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q09Place&quot;,
+          &quot;weight&quot;: 15.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 15.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;집&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q10&quot;,
+          &quot;weight&quot;: 5.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 5.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;혼자&quot;
+          ]
+        }
+      ],
+      &quot;reasons&quot;: [
+        &quot;지금 해보고 싶거나 이어가고 싶은 취미가 있나요? → 요리 (한식·중식·양식·일식·제과·제빵), 독서: 40/40점&quot;,
+        &quot;취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 30/30점&quot;,
+        &quot;지금 사용할 수 있는 물건은 무엇인가요? → 스마트폰, 읽을 책·전자책, 주방 도구: 10/10점&quot;,
+        &quot;어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점&quot;,
+        &quot;처음에는 누구와 하고 싶나요? → 혼자: 5/5점&quot;
+      ],
+      &quot;activities&quot;: [
+        {
+          &quot;activity_id&quot;: &quot;reading-owned-10&quot;,
+          &quot;title&quot;: &quot;가진 책의 표지와 첫 문장 읽기&quot;,
+          &quot;total_minutes&quot;: 10,
+          &quot;active_minutes&quot;: 8,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;eligible&quot;,
+          &quot;confirmation_required&quot;: []
+        },
+        {
+          &quot;activity_id&quot;: &quot;reading-free-ebook-15&quot;,
+          &quot;title&quot;: &quot;무료 공개 전자책 첫 부분 읽기&quot;,
+          &quot;total_minutes&quot;: 15,
+          &quot;active_minutes&quot;: 10,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;스마트폰과 추가 과금 없는 통신 환경을 확인해요.&quot;,
+            &quot;합법적으로 무료 제공되는 공개 전자책인지, 별도 결제가 없는지 확인해요.&quot;
+          ]
+        },
+        {
+          &quot;activity_id&quot;: &quot;reading-library-30&quot;,
+          &quot;title&quot;: &quot;도서관에서 책 한 권 골라 읽기&quot;,
+          &quot;total_minutes&quot;: 30,
+          &quot;active_minutes&quot;: 15,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;도서관 운영 시간·이용 자격·자료 이용 가능 여부를 확인해요.&quot;,
+            &quot;이동·준비를 포함해 30분이며 별도 교통비·이용료가 없는 경우의 예시예요.&quot;,
+            &quot;운영 시간·회원 자격·이동·비용을 확인한 도서관 사용 가능 여부를 확인해 주세요.&quot;
+          ]
+        }
+      ]
+    },
+    {
+      &quot;hobby_id&quot;: &quot;cooking&quot;,
+      &quot;name&quot;: &quot;요리&quot;,
+      &quot;ui_key&quot;: &quot;요리&quot;,
+      &quot;rank&quot;: 2,
+      &quot;score&quot;: 95.75,
+      &quot;breakdown&quot;: [
+        {
+          &quot;question_key&quot;: &quot;q02&quot;,
+          &quot;weight&quot;: 40.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 40.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;요리 (한식·중식·양식·일식·제과·제빵)&quot;,
+            &quot;독서&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q03&quot;,
+          &quot;weight&quot;: 30.0,
+          &quot;fit&quot;: 0.875,
+          &quot;points&quot;: 26.25,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;휴식·기분 전환&quot;,
+            &quot;새로운 경험·호기심&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q08&quot;,
+          &quot;weight&quot;: 10.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 10.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;스마트폰&quot;,
+            &quot;읽을 책·전자책&quot;,
+            &quot;주방 도구&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q09Place&quot;,
+          &quot;weight&quot;: 15.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 15.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;집&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q10&quot;,
+          &quot;weight&quot;: 5.0,
+          &quot;fit&quot;: 0.9,
+          &quot;points&quot;: 4.5,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;혼자&quot;
+          ]
+        }
+      ],
+      &quot;reasons&quot;: [
+        &quot;지금 해보고 싶거나 이어가고 싶은 취미가 있나요? → 요리 (한식·중식·양식·일식·제과·제빵), 독서: 40/40점&quot;,
+        &quot;취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 26.25/30점&quot;,
+        &quot;지금 사용할 수 있는 물건은 무엇인가요? → 스마트폰, 읽을 책·전자책, 주방 도구: 10/10점&quot;,
+        &quot;어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점&quot;,
+        &quot;처음에는 누구와 하고 싶나요? → 혼자: 4.5/5점&quot;
+      ],
+      &quot;activities&quot;: [
+        {
+          &quot;activity_id&quot;: &quot;cooking-pantry-dressing&quot;,
+          &quot;title&quot;: &quot;기존 재료를 계량해 드레싱 만들기&quot;,
+          &quot;total_minutes&quot;: 15,
+          &quot;active_minutes&quot;: 10,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;기존 재료·그릇·계량스푼을 실제 사용할 수 있는지 확인해요.&quot;,
+            &quot;제외할 재료와 작업 조건을 확인해요.&quot;,
+            &quot;재료가 충분해 첫 회와 반복 활동에 추가 지출이 없는 경우의 예시예요.&quot;
+          ]
+        },
+        {
+          &quot;activity_id&quot;: &quot;cooking-buy-dressing&quot;,
+          &quot;title&quot;: &quot;재료를 준비해 드레싱 만들기&quot;,
+          &quot;total_minutes&quot;: 30,
+          &quot;active_minutes&quot;: 15,
+          &quot;estimated_first_cost_krw&quot;: 5000,
+          &quot;estimated_repeat_cost_krw&quot;: 2000,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;기존 그릇·계량스푼을 사용할 수 있는지 확인해요.&quot;,
+            &quot;제외할 재료를 확인하고 재료 구입·이동을 포함한 실제 비용과 시간을 확인해요.&quot;,
+            &quot;첫 회 5,000원·이후 1회 2,000원은 예시이며 장비 구매비는 포함되지 않아요.&quot;
+          ]
+        }
+      ]
+    },
+    {
+      &quot;hobby_id&quot;: &quot;instrument&quot;,
+      &quot;name&quot;: &quot;악기&quot;,
+      &quot;ui_key&quot;: &quot;악기&quot;,
+      &quot;rank&quot;: 3,
+      &quot;score&quot;: 70.5,
+      &quot;breakdown&quot;: [
+        {
+          &quot;question_key&quot;: &quot;q02&quot;,
+          &quot;weight&quot;: 40.0,
+          &quot;fit&quot;: 0.5,
+          &quot;points&quot;: 20.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;요리 (한식·중식·양식·일식·제과·제빵)&quot;,
+            &quot;독서&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q03&quot;,
+          &quot;weight&quot;: 30.0,
+          &quot;fit&quot;: 0.85,
+          &quot;points&quot;: 25.5,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;휴식·기분 전환&quot;,
+            &quot;새로운 경험·호기심&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q08&quot;,
+          &quot;weight&quot;: 10.0,
+          &quot;fit&quot;: 0.5,
+          &quot;points&quot;: 5.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;스마트폰&quot;,
+            &quot;읽을 책·전자책&quot;,
+            &quot;주방 도구&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q09Place&quot;,
+          &quot;weight&quot;: 15.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 15.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;집&quot;
+          ]
+        },
+        {
+          &quot;question_key&quot;: &quot;q10&quot;,
+          &quot;weight&quot;: 5.0,
+          &quot;fit&quot;: 1.0,
+          &quot;points&quot;: 5.0,
+          &quot;answered&quot;: true,
+          &quot;selected&quot;: [
+            &quot;혼자&quot;
+          ]
+        }
+      ],
+      &quot;reasons&quot;: [
+        &quot;취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 25.5/30점&quot;,
+        &quot;어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점&quot;,
+        &quot;처음에는 누구와 하고 싶나요? → 혼자: 5/5점&quot;
+      ],
+      &quot;activities&quot;: [
+        {
+          &quot;activity_id&quot;: &quot;instrument-keyboard-headphones-15&quot;,
+          &quot;title&quot;: &quot;헤드폰을 연결해 전자건반 첫 소리 내기&quot;,
+          &quot;total_minutes&quot;: 15,
+          &quot;active_minutes&quot;: 10,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;전자건반과 호환되는 헤드폰 연결 및 스피커 음소거를 확인해요.&quot;,
+            &quot;헤드폰을 사용해도 타건 소음은 남을 수 있으므로 장소·시간의 소리 조건을 확인해요.&quot;,
+            &quot;기존 또는 무료로 빌린 악기·헤드폰을 사용해 추가 지출 없이 전체 15분 안에 가능한 경우의 예시예요.&quot;,
+            &quot;헤드폰 연결이 가능한 사용 가능한 전자건반 사용 가능 여부를 확인해 주세요.&quot;,
+            &quot;전자건반에 연결해 사용할 수 있는 헤드폰 사용 가능 여부를 확인해 주세요.&quot;
+          ]
+        },
+        {
+          &quot;activity_id&quot;: &quot;instrument-acoustic-guitar-20&quot;,
+          &quot;title&quot;: &quot;가진 기타로 열린 줄 소리 탐색하기&quot;,
+          &quot;total_minutes&quot;: 20,
+          &quot;active_minutes&quot;: 12,
+          &quot;estimated_first_cost_krw&quot;: 0,
+          &quot;estimated_repeat_cost_krw&quot;: 0,
+          &quot;status&quot;: &quot;needs_confirmation&quot;,
+          &quot;confirmation_required&quot;: [
+            &quot;사용 가능한 기타와 연주 소리가 허용되는 장소·시간을 확인해요.&quot;,
+            &quot;헤드폰으로 어쿠스틱 기타 자체의 연주 소리를 줄일 수 있다고 가정하지 않아요.&quot;,
+            &quot;기존 또는 무료로 빌린 기타를 사용해 추가 지출 없이 전체 20분 안에 가능한 경우의 예시예요.&quot;,
+            &quot;지금 사용할 수 있는 어쿠스틱 기타 사용 가능 여부를 확인해 주세요.&quot;,
+            &quot;실제 연주 소리가 허용되는 장소와 시간 사용 가능 여부를 확인해 주세요.&quot;
+          ]
+        }
+      ]
+    }
+  ],
+  &quot;excluded&quot;: [],
+  &quot;unsupported_interests&quot;: [],
+  &quot;notices&quot;: [
+    &quot;점수는 규칙상 선호 적합도이며 성공 확률이나 검증된 추천 정확도가 아닙니다.&quot;,
+    &quot;활동의 비용·시간은 예시 추정치입니다. 후보를 동시에 실행하는 월간 예산 계획은 계산하지 않습니다.&quot;
+  ],
+  &quot;follow_up_questions&quot;: [
+    &quot;기존 재료·그릇·계량스푼을 실제 사용할 수 있는지 확인해요.&quot;,
+    &quot;제외할 재료와 작업 조건을 확인해요.&quot;,
+    &quot;재료가 충분해 첫 회와 반복 활동에 추가 지출이 없는 경우의 예시예요.&quot;,
+    &quot;전자건반과 호환되는 헤드폰 연결 및 스피커 음소거를 확인해요.&quot;,
+    &quot;헤드폰을 사용해도 타건 소음은 남을 수 있으므로 장소·시간의 소리 조건을 확인해요.&quot;,
+    &quot;기존 또는 무료로 빌린 악기·헤드폰을 사용해 추가 지출 없이 전체 15분 안에 가능한 경우의 예시예요.&quot;,
+    &quot;헤드폰 연결이 가능한 사용 가능한 전자건반 사용 가능 여부를 확인해 주세요.&quot;,
+    &quot;전자건반에 연결해 사용할 수 있는 헤드폰 사용 가능 여부를 확인해 주세요.&quot;
+  ],
+  &quot;preferences&quot;: {
+    &quot;selection_mode&quot;: &quot;2~3개 후보 중 직접 고르기&quot;,
+    &quot;recording_mode&quot;: &quot;한 번 누르기&quot;,
+    &quot;burdens&quot;: [
+      &quot;없음&quot;
+    ],
+    &quot;weekly_frequency&quot;: &quot;주 2~3회&quot;
+  },
+  &quot;coverage&quot;: {
+    &quot;weighted_answer_coverage&quot;: 100.0,
+    &quot;answered_groups&quot;: 14,
+    &quot;total_groups&quot;: 14
+  }
+}</code></pre><h3>응답을 읽는 순서</h3><ol class="steps"><li><strong>status와 버전을 확인합니다.</strong><p>설문·규칙·카탈로그 버전을 묶어서 저장하면 동일 조건의 결과를 비교하기 쉽습니다.</p></li><li><strong>recommendations 안의 취미와 활동을 표시합니다.</strong><p><code>hobby_id</code>는 서버의 안정적인 식별자입니다. MVP <code>ui_key</code>는 ‘요리’·‘악기’·‘독서’입니다. 엔진 코드는 Spring의 숫자 DB ID와 구분합니다. <code>score</code> 뒤에 %를 붙이지 않습니다.</p></li><li><strong>breakdown으로 점수를 설명합니다.</strong><p>질문 키, 가중치, 적합도, 기여 점수, 답변 여부와 선택값을 보여 줍니다. 응답 충실도 <code>coverage</code>는 점수의 신뢰 확률과 구분합니다.</p></li><li><strong>제외·미지원·추가 확인을 숨기지 않습니다.</strong><p><code>excluded</code>, <code>unsupported_interests</code>, <code>notices</code>, <code>follow_up_questions</code>를 적절히 안내합니다. <code>preferences</code>의 기록·부담 설정은 화면에 별도로 반영합니다.</p></li></ol><p class="small muted">동점은 <code>hobby_id</code> 오름차순입니다. <code>weighted_answer_coverage</code>는 점수표에 있는 선택지가 하나 이상 존재하는 질문들의 가중치 합(0~100)입니다. 커피만 선택한 Q02는 포함되지 않습니다. <code>answered_groups</code>는 비어 있지 않은 응답 그룹 수이며 ‘아직 모르겠어요’도 포함합니다. 활동은 eligible 우선 → 첫 비용 → 전체 시간 → 활동 ID 순으로 정렬합니다.</p></section>
+<section id="runtime"><p class="section-kicker">08 / RUN & INTEGRATE</p><h2>앱에서 FastAPI까지의 경로</h2><div class="flow"><div class="flow-box"><span>APP / CLIENT</span><b>응답 수집 → JSON 전송</b><p>기존 키·문구 유지. 실제 선택값과 확인된 자원만 수집. 실패·재시도와 결과 표시 상태를 구분합니다.</p></div><div class="arrow" aria-hidden="true">→</div><div class="flow-box dark"><span>FASTAPI / SERVER</span><b>검증 → 필터 → 계산 → 응답</b><p>서버 시작 시 버전이 있는 JSON을 로드·검증합니다. 각 요청은 상태를 저장하지 않는 추천 서비스에서 처리합니다.</p></div></div><h3>로컬에서 실행</h3><pre><code>python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000</code></pre><p class="small">Python 3.11 이상. 프로젝트 폴더에서 실행합니다. 가상 환경 활성화는 macOS/Linux 기준이며 Windows에서는 <code>.venv\Scripts\activate</code>를 사용합니다.</p><pre><code>curl -X POST http://localhost:8000/api/v1/recommendations \
+  -H 'Content-Type: application/json' \
+  --data-binary @examples/request.json
+
+pytest -q</code></pre><div class="table-wrap"><table><thead><tr><th>경로</th><th>용도</th></tr></thead><tbody><tr><td class="endpoint">GET /health</td><td>서버 상태 확인</td></tr><tr><td class="endpoint">GET /api/v1/questionnaire</td><td>질문 키·문구·단독 선택·최대 선택 수 조회</td></tr><tr><td class="endpoint">GET /api/v1/catalog</td><td>지원 취미·활동·확인할 자원 조회</td></tr><tr><td class="endpoint">POST /api/v1/recommendations</td><td>추천 계산</td></tr><tr><td class="endpoint">GET /docs</td><td>FastAPI 자동 API 명세와 직접 요청 테스트</td></tr></tbody></table></div><h3>앱 연결</h3><p>2026-11-08 공개 Kau-BugFree 기본 브랜치와 비교한 결과, 프론트엔드의 UI 전용 키·직접 입력값 변환, Q14 보존, 정상 응답 계약 검사를 보완했습니다. <code>toRecommendationRequest</code>에 실제 입력·확인한 질문 목록을 전달하고, <code>needs_review</code>는 확인 화면으로 처리합니다. Spring과 엔진은 같은 추천 경로라도 서로 다른 요청·응답·ID를 사용합니다. 다른 저장소는 수정하지 않았으며 실제 화면 호출 및 Spring DB 연결은 후속 작업입니다. 상세 비교와 재현 명령은 <a href="../README.md">README의 Kau-BugFree 연동 점검</a>을 참고하세요.</p><p><code>examples/client.ts</code>의 통신 예제에 배포 서버 주소를 넣습니다. 같은 컴퓨터에서는 <code>http://localhost:8000</code>, 실제 휴대폰에서는 개발 컴퓨터의 접속 가능한 LAN 주소 또는 HTTPS 배포 주소를 사용합니다. 휴대폰의 localhost는 휴대폰 자신입니다.</p><p class="small">웹 클라이언트 주소는 <code>CORS_ORIGINS</code>에 명시합니다. 기본값은 <code>http://localhost:8081,http://localhost:19006</code>입니다. CORS는 브라우저의 교차 출처 요청 정책이며 인증 기능을 대신하지 않습니다. 쿠키 자격 증명 허용은 기본적으로 꺼져 있습니다.</p><h3>오류 응답과 재시도</h3><p>입력 검증 실패는 HTTP <code>422</code>, 추천 계산 중 예상하지 못한 예외는 <code>500</code>, 추천 서비스가 준비되지 않았거나 사용할 수 없으면 <code>503</code>을 반환합니다. 500·503 응답은 <code>{"detail": "안내 메시지"}</code> 형식이며 내부 예외는 서버 로그에만 남깁니다. 서비스가 없으면 상태 확인·카탈로그·설문 조회도 503입니다. 잘못된 설정 파일은 기존대로 서버 시작을 실패시킵니다.</p><p><code>RecommendationApiError.status</code>로 분기하고 500·503의 <code>message</code>를 안내에 사용합니다. <code>retryable</code>은 HTTP 5xx에서 참이며 재시도 시점은 앱에서 결정합니다. HTML·일반 텍스트·빈 오류 응답도 상태 코드를 유지하고, 네트워크 실패·호출 취소는 기존 예외로 전달합니다.</p><h3>컨테이너 실행</h3><p class="small"><code>.env.example</code>은 로컬 실행에서 자동 로드되지 않습니다. 로컬에서는 환경 변수를 직접 지정하고, 컨테이너에서는 아래처럼 <code>--env-file</code>을 사용합니다.</p><pre><code>docker build -t hobby-recommender .
+docker run --rm -p 8000:8000 \
+  --env-file .env.example hobby-recommender</code></pre><div class="callout"><strong>실제 서비스에 배포할 때</strong>HTTPS와 인증·호출 제한을 앞단 게이트웨이에 붙이고, 필요한 출처만 CORS에 등록합니다. 여러 인스턴스를 배포할 때는 같은 규칙·카탈로그 버전을 사용합니다. 데이터 수정은 배포 또는 서버 재시작 후 반영됩니다.</div><h3>책임별 파일 분리</h3><pre><code>hobby-recommender/
+├── app/
+│   ├── main.py             # FastAPI 앱과 시작 설정
+│   ├── api.py              # HTTP 경로
+│   ├── models.py           # 요청·응답 계약
+│   ├── service.py          # 검증·필터·추천 계산
+│   ├── config.py           # JSON 설정 검증
+│   └── data/
+│       ├── questionnaire.json
+│       ├── rules.json
+│       └── catalog.json
+├── examples/               # 실제 요청·응답, 앱 통신 예제
+├── tests/                  # 규칙·제약·API 검증
+├── docs/report.html        # 이 보고서
+├── README.md
+├── Dockerfile
+└── .env.example</code></pre></section>
+<section id="extension"><p class="section-kicker">09 / EVOLUTION & QUALITY</p><h2>취미가 늘어도 계산 구조를 유지합니다.</h2><div class="grid2"><article class="card"><span class="num">현재 제공</span><h3>가벼운 독립 추천 서비스</h3><p>정해진 규칙, 메모리에 적재한 카탈로그, 명시적인 API 계약으로 동작합니다. 사용자 계정·응답 저장·피드백 학습·가격 수집은 포함하지 않습니다.</p></article><article class="card"><span class="num">다음 확장</span><h3>데이터와 정책을 검증하며 추가</h3><p>저장소 계층, 실제 활동 제공처, 예약·지출 원장, 규칙 실험과 관측을 추가할 수 있습니다. 초기 가중치는 사용자 데이터로 검증한 최적값이 아닙니다.</p></article></div><h3>새 취미 추가 순서</h3><ol class="steps"><li><strong>카탈로그에 안정적인 hobby_id와 활동을 추가합니다.</strong><p>이름, 화면 연결 키, 관심 선택지, 활동 시간·비용·필수 자원·제외 태그를 정의합니다. 태그 누락이 필수 제외 조건을 무력화하지 않게 검토합니다.</p></li><li><strong>점수 행렬의 모든 항목에 새 취미 열을 추가합니다.</strong><p>적합도 범위는 0~1, 가중치 합은 100을 유지합니다. 한 질문 안에서의 평균·최댓값 규칙을 함께 검토합니다.</p></li><li><strong>설문과 클라이언트 문구의 버전을 맞춥니다.</strong><p>선택지를 바꾸면 요청 모델의 설문 버전, 앱 그래픽·화면 키와 클라이언트의 지원 키 목록도 같이 바꿉니다. 문자열 계약을 안정적인 option_id로 전환하는 작업은 별도 API 버전으로 진행할 수 있습니다.</p></li><li><strong>경계조건 테스트와 버전 비교 후 배포합니다.</strong><p>고정된 대표 입력에서 순위·제외·확인 질문을 비교합니다. 규칙과 카탈로그 버전을 올리고 이전 배포를 복원할 수 있게 유지합니다.</p></li></ol><h3>검증해야 하는 동작</h3><div class="table-wrap"><table><thead><tr><th>영역</th><th>검증 관점</th></tr></thead><tbody><tr><td>점수</td><td>직접 관심, 복수 목적 평균, 미응답 50점, 범위 0~100, 동점의 결정성, 설명 합계 일치</td></tr><tr><td>필터</td><td>예산 0원과 미정 구분, 전체 시간 비교, 월 기지출 반영, 조건 태그 충돌, 자원 false와 미확인 구분</td></tr><tr><td>흐름</td><td>시작 의사 없음, 직접 찾기, 미지원 취미, 자유 입력 제외 검토, 활동 없는 no_match</td></tr><tr><td>입력 계약</td><td>원문 선택지, 단일·복수 자료형, 배타 선택, Q03 개수 제한, 직접 입력의 누락·범위·불일치</td></tr><tr><td>화면 계약</td><td>Q11 후보 수, Q12·Q13 순위 영향 없음, 요리·악기·독서 키 연결, 확인 질문 노출</td></tr></tbody></table></div><div class="callout"><strong>제공본 검증 결과</strong>서버 테스트 84개와 클라이언트 테스트 22개, TypeScript 엄격 타입 검사, 실제 HTTP 요청·응답과 클라이언트 변환을 확인했습니다. Expo 화면 조작과 Spring DB 저장까지의 통합 실행은 검증하지 않았습니다. Docker 실행 환경이 없어 컨테이너 이미지 빌드·실행은 검증하지 않았습니다.</div><h3>운영에서 관찰할 지표</h3><p>응답 지연, 422 비율, <code>no_match</code> 비율, 확인 미완료 비율, 취미별 노출·선택·첫 활동 완료·만족도를 설문/규칙/카탈로그 버전별로 비교합니다. 현재 코드가 이 지표를 자동 수집하지는 않습니다. 기록량이 적은 사용자를 실패 사례로 간주하지 않도록 지표 정의가 필요합니다.</p></section>
+<section id="references"><p class="section-kicker">10 / SOURCES & LIMITS</p><h2>설계의 근거와 적용 범위</h2><p>질문 키와 선택지는 제공된 <code>hobbytree/src/data/onboarding.ts</code>의 2026-10-13 기준 정의를 따릅니다. 숫자 가중치와 활동 데이터는 이 프로젝트를 위해 제안한 초기 정책입니다. 악기의 적합도·비용·시간 역시 설계용 예시로 실제 활동 데이터와 함께 검토해야 합니다. 건강·체력 등의 목적 적합도는 임상적 효과를 의미하지 않습니다.</p><p>지원 취미는 요리·악기·독서입니다. 원본에 있는 커피·러닝은 미지원 관심사로 안내하며, 베이킹에 관심이 있더라도 현재 제공되는 구체적인 요리 활동이 베이킹인지까지 보장하지 않습니다. 자유 입력 취미·제외 조건은 자동 의미 분류를 하지 않습니다.</p><ol class="reference"><li><a href="https://fastapi.tiangolo.com/tutorial/bigger-applications/">FastAPI — Bigger Applications: Multiple Files</a> · 라우터·의존성 분리를 위한 공식 문서</li><li><a href="https://fastapi.tiangolo.com/tutorial/cors/">FastAPI — CORS</a> · 웹 앱 출처와 교차 출처 요청 설정</li><li><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic — Models</a> · 입력 모델과 검증의 공식 문서</li></ol><p class="small muted">이 보고서는 로컬 파일만으로 열리며 외부 글꼴·CDN·네트워크 요청 없이 읽을 수 있습니다. 선택지와 카탈로그 표는 함께 제공된 JSON 기준의 스냅샷입니다. 규칙이나 활동 데이터를 바꾸면 보고서의 숫자·예제도 함께 갱신해야 합니다.</p></section>
+</main></div><footer class="footer"><span>HOBBYTREE · 규칙 기반 추천 시스템 설계 보고서</span><span>2026.11.08 · 입력 → 조건 → 점수 → 설명</span></footer>
+<script>
+// 점수에 반영되는 질문과 그 밖의 질문을 필터링할 때 사용하는 키 집합이다.
+const scoreKeys = new Set(['q02', 'q03', 'q08', 'q09Place', 'q10']);
+
+/** 선택한 필터 버튼의 접근성 상태와 질문 표의 표시 여부를 함께 갱신한다. */
+function filterQuestions(button) {
+  const mode = button.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(b => {
+    b.setAttribute('aria-pressed', String(b === button));
+  });
+  document.querySelectorAll('.matrix').forEach(panel => {
+    panel.hidden = mode === 'score' ? !scoreKeys.has(panel.dataset.key)
+      : mode === 'other' ? scoreKeys.has(panel.dataset.key) : false;
+  });
+}
+
+// 각 필터 버튼의 클릭을 해당 버튼 기준의 표 필터 함수에 연결한다.
+document.querySelectorAll('[data-filter]').forEach(button => {
+  button.addEventListener('click', () => filterQuestions(button));
+});
+
+/** 모든 질문 표를 펼친 다음 브라우저 인쇄/PDF 저장 대화상자를 연다. */
+function printReport() {
+  document.querySelectorAll('.matrix').forEach(panel => {
+    panel.hidden = false;
+    panel.open = true;
+  });
+  window.print();
+}
+</script>
+</body></html>
