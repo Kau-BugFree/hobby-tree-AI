@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "aliases": {
+    "cook-dressing": "cook-0-2"
+  },
+  "details": [
+    {
+      "alias": "cook-dressing",
+      "activity_id": "cook-0-2",
+      "matching_rule": "unique_exact_title_and_cooking_hobby",
+      "content_policy": "use_catalog_content_without_merging_home_steps",
+      "catalog_step_count": 4
+    }
+  ],
+  "unresolved": []
+}
