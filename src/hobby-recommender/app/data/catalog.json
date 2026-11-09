@@ -1,0 +1,207 @@
+{
+  "version": "catalog-2.0.0",
+  "resources": {
+    "pantry_ingredients": "드레싱에 쓸 기존 재료(간장·식초·식용유 등)",
+    "bowl": "혼합용 그릇",
+    "measuring_spoon": "계량스푼",
+    "stove": "사용 가능한 가열 조리기구",
+    "pot": "가열용 냄비",
+    "owned_book": "지금 읽을 수 있는 보유 또는 대여한 책·전자책",
+    "smartphone": "무료 전자책을 열 수 있는 스마트폰과 통신 환경",
+    "library_access": "운영 시간·회원 자격·이동·비용을 확인한 도서관",
+    "digital_keyboard": "헤드폰 연결이 가능한 사용 가능한 전자건반",
+    "headphones": "전자건반에 연결해 사용할 수 있는 헤드폰",
+    "acoustic_guitar": "지금 사용할 수 있는 어쿠스틱 기타",
+    "sound_allowed_space": "실제 연주 소리가 허용되는 장소와 시간",
+    "instrument_practice_room": "예약·악기 제공·이동·총비용을 확인한 연습실"
+  },
+  "hobbies": [
+    {
+      "id": "cooking",
+      "name": "요리",
+      "ui_key": "요리",
+      "interest_option": "요리 (한식·중식·양식·일식·제과·제빵)",
+      "activities": [
+        {
+          "id": "cooking-pantry-dressing",
+          "title": "기존 재료를 계량해 드레싱 만들기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "pantry_ingredients",
+            "bowl",
+            "measuring_spoon"
+          ],
+          "exclusion_tags": [],
+          "checks": [
+            "기존 재료·그릇·계량스푼을 실제 사용할 수 있는지 확인해요.",
+            "제외할 재료와 작업 조건을 확인해요.",
+            "재료가 충분해 첫 회와 반복 활동에 추가 지출이 없는 경우의 예시예요."
+          ]
+        },
+        {
+          "id": "cooking-buy-dressing",
+          "title": "재료를 준비해 드레싱 만들기",
+          "total_minutes": 30,
+          "active_minutes": 15,
+          "first_cost_krw": 5000,
+          "repeat_cost_krw": 2000,
+          "required_resources": [
+            "bowl",
+            "measuring_spoon"
+          ],
+          "exclusion_tags": [],
+          "checks": [
+            "기존 그릇·계량스푼을 사용할 수 있는지 확인해요.",
+            "제외할 재료를 확인하고 재료 구입·이동을 포함한 실제 비용과 시간을 확인해요.",
+            "첫 회 5,000원·이후 1회 2,000원은 예시이며 장비 구매비는 포함되지 않아요."
+          ]
+        },
+        {
+          "id": "cooking-warm-soup",
+          "title": "간단한 따뜻한 국 만들기",
+          "total_minutes": 40,
+          "active_minutes": 25,
+          "first_cost_krw": 7000,
+          "repeat_cost_krw": 3000,
+          "required_resources": [
+            "stove",
+            "pot",
+            "measuring_spoon"
+          ],
+          "exclusion_tags": [
+            "화기 사용"
+          ],
+          "checks": [
+            "가열 조리기구·냄비·계량스푼을 안전하게 사용할 수 있는지 확인해요.",
+            "제외할 재료·화기 사용 조건을 확인해요.",
+            "재료 구입·이동을 포함한 첫 회 7,000원과 반복 3,000원은 예시예요."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "instrument",
+      "name": "악기",
+      "ui_key": "악기",
+      "interest_option": "악기 (피아노·기타)",
+      "activities": [
+        {
+          "id": "instrument-keyboard-headphones-15",
+          "title": "헤드폰을 연결해 전자건반 첫 소리 내기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "digital_keyboard",
+            "headphones"
+          ],
+          "exclusion_tags": [],
+          "checks": [
+            "전자건반과 호환되는 헤드폰 연결 및 스피커 음소거를 확인해요.",
+            "헤드폰을 사용해도 타건 소음은 남을 수 있으므로 장소·시간의 소리 조건을 확인해요.",
+            "기존 또는 무료로 빌린 악기·헤드폰을 사용해 추가 지출 없이 전체 15분 안에 가능한 경우의 예시예요."
+          ]
+        },
+        {
+          "id": "instrument-acoustic-guitar-20",
+          "title": "가진 기타로 열린 줄 소리 탐색하기",
+          "total_minutes": 20,
+          "active_minutes": 12,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "acoustic_guitar",
+            "sound_allowed_space"
+          ],
+          "exclusion_tags": [
+            "큰 소음"
+          ],
+          "checks": [
+            "사용 가능한 기타와 연주 소리가 허용되는 장소·시간을 확인해요.",
+            "헤드폰으로 어쿠스틱 기타 자체의 연주 소리를 줄일 수 있다고 가정하지 않아요.",
+            "기존 또는 무료로 빌린 기타를 사용해 추가 지출 없이 전체 20분 안에 가능한 경우의 예시예요."
+          ]
+        },
+        {
+          "id": "instrument-practice-room-40",
+          "title": "연습실에서 피아노 첫 소리 내기",
+          "total_minutes": 40,
+          "active_minutes": 20,
+          "first_cost_krw": 5000,
+          "repeat_cost_krw": 5000,
+          "required_resources": [
+            "instrument_practice_room"
+          ],
+          "exclusion_tags": [
+            "외부 시설",
+            "큰 소음"
+          ],
+          "checks": [
+            "연습실 예약·악기 제공·소리 조건과 이용 가능 시간을 확인해요.",
+            "대여·시설·이동을 포함한 실제 총비용과 시간을 확인해요.",
+            "1회 5,000원·전체 40분은 설계용 예시이며 실제 시설 요금이 아니에요."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reading",
+      "name": "독서",
+      "ui_key": "독서",
+      "interest_option": "독서",
+      "activities": [
+        {
+          "id": "reading-owned-10",
+          "title": "가진 책의 표지와 첫 문장 읽기",
+          "total_minutes": 10,
+          "active_minutes": 8,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "owned_book"
+          ],
+          "exclusion_tags": [],
+          "checks": []
+        },
+        {
+          "id": "reading-free-ebook-15",
+          "title": "무료 공개 전자책 첫 부분 읽기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "smartphone"
+          ],
+          "exclusion_tags": [],
+          "checks": [
+            "스마트폰과 추가 과금 없는 통신 환경을 확인해요.",
+            "합법적으로 무료 제공되는 공개 전자책인지, 별도 결제가 없는지 확인해요."
+          ]
+        },
+        {
+          "id": "reading-library-30",
+          "title": "도서관에서 책 한 권 골라 읽기",
+          "total_minutes": 30,
+          "active_minutes": 15,
+          "first_cost_krw": 0,
+          "repeat_cost_krw": 0,
+          "required_resources": [
+            "library_access"
+          ],
+          "exclusion_tags": [
+            "외부 시설"
+          ],
+          "checks": [
+            "도서관 운영 시간·이용 자격·자료 이용 가능 여부를 확인해요.",
+            "이동·준비를 포함해 30분이며 별도 교통비·이용료가 없는 경우의 예시예요."
+          ]
+        }
+      ]
+    }
+  ]
+}

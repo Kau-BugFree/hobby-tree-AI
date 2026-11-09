@@ -13,3 +13,9 @@ data/cooking_json_data/
 *.json
 *.jsonl
 data/cooking_json_data/
+
+
+# Required recommender runtime data
+!/src/hobby-recommender/app/data/questionnaire.json
+!/src/hobby-recommender/app/data/rules.json
+!/src/hobby-recommender/app/data/catalog.json
