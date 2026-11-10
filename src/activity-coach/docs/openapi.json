@@ -1,0 +1,1233 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "HobbyTree 활동코치",
+  "description": "요리부터 시작하는 검색 우선 활동코치. **로컬 단일 사용자 시연용**입니다. ① 세션 생성 ② 추천 ③ 선택 ④ 설명 ⑤ 완료 기록 순서로 시연합니다. Claude API 키는 서버 .env에만 입력합니다. RAG 검증은 06 RAG 검증의 /rag/ask를 사용합니다.",
+  "version": "3.0.0"
+ },
+ "paths": {
+  "/health": {
+   "get": {
+    "tags": [
+     "01 준비"
+    ],
+    "summary": "서버·검색·Claude 설정 상태 확인",
+    "description": "키 원문은 제외하고 설정 여부, 색인 수, 실제 검색 준비 상태를 반환합니다.",
+    "operationId": "health_health_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/hobbies": {
+   "get": {
+    "tags": [
+     "01 준비"
+    ],
+    "summary": "Hobbies",
+    "description": "hobbies.json에 등록된 취미를 나열합니다. 첫 출시에는 요리만 등록합니다.",
+    "operationId": "hobbies_hobbies_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/sessions": {
+   "post": {
+    "tags": [
+     "01 준비"
+    ],
+    "summary": "1. 새 대화 세션 생성",
+    "description": "허용된 취미의 새 대화를 만들고 후속 요청에 필요한 session_id를 반환합니다.",
+    "operationId": "session_create_sessions_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SessionCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/sessions/{session_id}": {
+   "get": {
+    "tags": [
+     "01 준비"
+    ],
+    "summary": "세션·대화·선택 활동 복원",
+    "description": "앱 재실행 시 대화, 추천 후보, 현재 단계와 실행 ID를 복원합니다.",
+    "operationId": "session_get_sessions__session_id__get",
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/coach/messages": {
+   "post": {
+    "tags": [
+     "02 코치"
+    ],
+    "summary": "2. 질문 보내기 (추천·선택·설명·완료)",
+    "description": "질문을 코치 처리기에 전달합니다. 추천과 조회는 생성 API 없이 처리합니다.",
+    "operationId": "message_coach_messages_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CoachRequest"
+       },
+       "examples": {
+        "recommend": {
+         "summary": "추천: 생성 LLM 호출 0회",
+         "value": {
+          "session_id": "세션 생성 응답의 session_id",
+          "request_id": "demo-1",
+          "message": "오늘 20분 안에 할 요리 활동 추천해줘"
+         }
+        },
+        "select": {
+         "summary": "직전 추천의 두 번째 선택",
+         "value": {
+          "session_id": "같은 session_id",
+          "request_id": "demo-2",
+          "message": "두 번째 걸로 할게"
+         }
+        },
+        "explain": {
+         "summary": "근거 기반 설명 (생성·인용·의미 점검)",
+         "value": {
+          "session_id": "같은 session_id",
+          "request_id": "demo-3",
+          "message": "현재 단계를 쉽게 설명해줘"
+         }
+        },
+        "complete": {
+         "summary": "명시적 완료 선언과 기록",
+         "value": {
+          "session_id": "같은 session_id",
+          "request_id": "demo-4",
+          "message": "완료했어"
+         }
+        },
+        "troubleshoot": {
+         "summary": "V2: 문제 상태와 자료 묶음 조회",
+         "value": {
+          "session_id": "같은 session_id",
+          "request_id": "demo-v2-1",
+          "activity_id": "cook-0-2",
+          "message": "2단계 계량이 잘 안돼"
+         }
+        },
+        "clarification_reply": {
+         "summary": "V2: 직전 확인 질문에 대한 답변",
+         "value": {
+          "session_id": "같은 session_id",
+          "request_id": "demo-v2-2",
+          "message": "1번"
+         }
+        }
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/search": {
+   "post": {
+    "tags": [
+     "02 코치"
+    ],
+    "summary": "조건 필터와 검색 결과 직접 확인",
+    "description": "검색 결과와 필터·검색 방식 진단을 대화 처리와 독립적으로 확인합니다.",
+    "operationId": "search_search_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SearchRequest"
+       },
+       "examples": {
+        "activities": {
+         "summary": "활동 검색: 간장 드레싱",
+         "value": {
+          "query": "간장 드레싱",
+          "scope": "activities",
+          "limit": 3
+         }
+        },
+        "with_time_limit": {
+         "summary": "활동 검색: 20분 이내",
+         "value": {
+          "query": "간장 드레싱",
+          "scope": "activities",
+          "constraints": {
+           "max_minutes": 20
+          },
+          "limit": 3
+         }
+        },
+        "recipes": {
+         "summary": "레시피 검색: 감자 수프 (레시피 색인 필요)",
+         "value": {
+          "query": "감자 수프 레시피",
+          "scope": "recipes",
+          "limit": 3
+         }
+        },
+        "knowledge": {
+         "summary": "코칭 자료 검색: 간장 드레싱 계량",
+         "value": {
+          "query": "간장 드레싱 계량",
+          "scope": "knowledge",
+          "limit": 3
+         }
+        }
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/activities": {
+   "get": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "Activities",
+    "description": "기본 활동 카탈로그의 일부를 조회합니다. total은 이번 반환 건수입니다.",
+    "operationId": "activities_activities_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "",
+       "title": "Q"
+      }
+     },
+     {
+      "name": "hobby_key",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "cooking",
+       "title": "Hobby Key"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 100,
+       "minimum": 1,
+       "default": 20,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/activities/{activity_id}": {
+   "get": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "Activity",
+    "description": "화면 상세 조회에 필요한 정규화된 활동 한 건을 반환합니다.",
+    "operationId": "activity_activities__activity_id__get",
+    "parameters": [
+     {
+      "name": "activity_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Activity Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/sessions/{session_id}/select": {
+   "post": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "Select",
+    "description": "카드에서 선택한 활동을 대화에 반영하고 이전 진행 맥락을 정리합니다.",
+    "operationId": "select_sessions__session_id__select_post",
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SelectRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/sessions/{session_id}/executions": {
+   "post": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "선택 활동 실행 시작 (반복 활동은 새 request_id)",
+    "description": "수행을 생성합니다. 동일 request_id 재전송은 같은 실행을 반환합니다.",
+    "operationId": "execution_start_sessions__session_id__executions_post",
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Session Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExecutionCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/executions/{execution_id}": {
+   "get": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "Execution Get",
+    "description": "진행 화면을 다시 열었을 때 단계 체크 상태와 완료 여부를 읽습니다.",
+    "operationId": "execution_get_executions__execution_id__get",
+    "parameters": [
+     {
+      "name": "execution_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Execution Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "03 활동"
+    ],
+    "summary": "전체 단계 수만큼 true/false 저장",
+    "description": "전체 단계에 대응하는 체크 배열을 검증한 뒤 저장합니다.",
+    "operationId": "execution_patch_executions__execution_id__patch",
+    "parameters": [
+     {
+      "name": "execution_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Execution Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProgressUpdate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/activities/{activity_id}/records": {
+   "post": {
+    "tags": [
+     "04 기록"
+    ],
+    "summary": "완료 저장: 같은 실행의 재전송은 중복 생성 안 함",
+    "description": "전 단계 완료 여부를 검사하고 실행별 하나의 완료 기록만 저장합니다.",
+    "operationId": "record_create_activities__activity_id__records_post",
+    "parameters": [
+     {
+      "name": "activity_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Activity Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RecordCreate"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/records": {
+   "get": {
+    "tags": [
+     "04 기록"
+    ],
+    "summary": "Records",
+    "description": "한 세션의 완료 기록을 조회합니다. 다른 세션의 기록과 ID가 드러나지 않도록 session_id는 필수입니다.",
+    "operationId": "records_records_get",
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80,
+       "title": "Session Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/diagnostics/traces": {
+   "get": {
+    "tags": [
+     "05 진단"
+    ],
+    "summary": "API 키·질문 원문 없이 처리 경로와 호출 수 확인",
+    "description": "한 세션의 실제 LLM 호출 수와 검색 경로를 확인합니다. 검색 순위에는 다른 사용자가 찾은 활동이 드러나므로 session_id는 필수입니다.",
+    "operationId": "traces_diagnostics_traces_get",
+    "parameters": [
+     {
+      "name": "session_id",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80,
+       "title": "Session Id"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 500,
+       "minimum": 1,
+       "default": 100,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/rag/ask": {
+   "post": {
+    "tags": [
+     "06 RAG 검증"
+    ],
+    "summary": "검색 순위·근거·Claude 답변을 한 번에 확인",
+    "description": "대화 분기 없이 검색 → 근거 → Claude 답변 → 검증을 실행하고 단계별 점수와 지연을 반환합니다.",
+    "operationId": "rag_ask_rag_ask_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AskRequest"
+       },
+       "examples": {
+        "basic": {
+         "summary": "조건 없이 질문",
+         "value": {
+          "question": "간장 드레싱 만들 때 큰술과 작은술 계량은 어떻게 해?",
+          "top_k": 3
+         }
+        },
+        "with_time_limit": {
+         "summary": "시간 조건 추가 (20분 이내 활동만 근거로 사용)",
+         "value": {
+          "question": "달걀로 할 수 있는 요리 알려줘",
+          "constraints": {
+           "max_minutes": 20
+          },
+          "top_k": 3
+         }
+        }
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AskRequest": {
+    "properties": {
+     "question": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Question"
+     },
+     "hobby_key": {
+      "type": "string",
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Hobby Key",
+      "default": "cooking"
+     },
+     "constraints": {
+      "$ref": "#/components/schemas/Constraints"
+     },
+     "top_k": {
+      "type": "integer",
+      "maximum": 5.0,
+      "minimum": 1.0,
+      "title": "Top K",
+      "description": "Claude에 근거로 넘길 상위 활동 수",
+      "default": 3
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "question"
+    ],
+    "title": "AskRequest",
+    "description": "RAG 검증용 단일 질문입니다. 대화 세션·분기를 거치지 않습니다."
+   },
+   "CoachRequest": {
+    "properties": {
+     "session_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 80,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Session Id"
+     },
+     "message": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message"
+     },
+     "activity_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 120,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Activity Id"
+     },
+     "current_step": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "maximum": 500.0,
+        "minimum": 1.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Current Step"
+     },
+     "constraints": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Constraints"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "request_id": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 120,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Request Id",
+      "description": "같은 메시지의 재전송에는 동일한 값 사용. session_id 없이 보내는 첫 요청은 UUID 형식일 때만 재전송으로 인식"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "message"
+    ],
+    "title": "CoachRequest",
+    "description": "질문과 화면 맥락입니다. 키나 임의의 검색 근거는 받지 않습니다."
+   },
+   "Constraints": {
+    "properties": {
+     "max_minutes": {
+      "anyOf": [
+       {
+        "type": "number",
+        "maximum": 43200.0,
+        "exclusiveMinimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Minutes",
+      "description": "오늘의 전체 가용 시간. null은 제한 해제"
+     },
+     "available_tools": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string",
+         "maxLength": 100,
+         "minLength": 1
+        },
+        "type": "array",
+        "maxItems": 30
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Available Tools",
+      "description": "쓸 수 있는 도구. null은 도구 제한 없음"
+     },
+     "excluded_tools": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string",
+         "maxLength": 100,
+         "minLength": 1
+        },
+        "type": "array",
+        "maxItems": 30
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Excluded Tools"
+     },
+     "max_difficulty": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "maximum": 5.0,
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max Difficulty",
+      "description": "카탈로그/나무 단계와 다른 별도 난이도. 미지정 자료는 조건 충족으로 보지 않음"
+     },
+     "budget_max": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Budget Max",
+      "description": "현재 자료에는 검증된 비용이 없어 조건 지정 시 확인 안내"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "Constraints",
+    "description": "세션 내 조건입니다. 누락은 유지, 명시한 null은 해제입니다."
+   },
+   "ExecutionCreate": {
+    "properties": {
+     "activity_id": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Activity Id"
+     },
+     "request_id": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Request Id"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "activity_id",
+     "request_id"
+    ],
+    "title": "ExecutionCreate",
+    "description": "중복 방지 요청 ID를 포함한 새 활동 수행 요청입니다."
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "ProgressUpdate": {
+    "properties": {
+     "done": {
+      "items": {
+       "type": "boolean"
+      },
+      "type": "array",
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Done"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "done"
+    ],
+    "title": "ProgressUpdate",
+    "description": "전체 단계 수와 같은 길이의 완료 체크 배열입니다."
+   },
+   "RecordCreate": {
+    "properties": {
+     "execution_id": {
+      "type": "string",
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Execution Id"
+     },
+     "request_id": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Request Id"
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 2000,
+      "title": "Note",
+      "default": ""
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "execution_id",
+     "request_id"
+    ],
+    "title": "RecordCreate",
+    "description": "완료 기록 요청입니다. 중복 판단의 기준은 execution_id입니다."
+   },
+   "SearchRequest": {
+    "properties": {
+     "query": {
+      "type": "string",
+      "maxLength": 1000,
+      "title": "Query",
+      "default": ""
+     },
+     "hobby_key": {
+      "type": "string",
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Hobby Key",
+      "default": "cooking"
+     },
+     "scope": {
+      "type": "string",
+      "enum": [
+       "activities",
+       "recipes",
+       "knowledge"
+      ],
+      "title": "Scope",
+      "default": "activities"
+     },
+     "constraints": {
+      "$ref": "#/components/schemas/Constraints"
+     },
+     "limit": {
+      "type": "integer",
+      "maximum": 20.0,
+      "minimum": 1.0,
+      "title": "Limit",
+      "default": 3
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "SearchRequest",
+    "description": "카탈로그 또는 참고 레시피 범위를 지정하는 검색 요청입니다."
+   },
+   "SelectRequest": {
+    "properties": {
+     "activity_id": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Activity Id"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "activity_id"
+    ],
+    "title": "SelectRequest",
+    "description": "추천 카드에서 선택한 활동 ID입니다."
+   },
+   "SessionCreate": {
+    "properties": {
+     "hobby_key": {
+      "type": "string",
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Hobby Key",
+      "default": "cooking"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "title": "SessionCreate",
+    "description": "새 대화의 취미 선택 요청입니다."
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  }
+ },
+ "tags": [
+  {
+   "name": "01 준비",
+   "description": "상태와 대화 세션"
+  },
+  {
+   "name": "02 코치",
+   "description": "검색·후속 질문·조건부 생성"
+  },
+  {
+   "name": "03 활동",
+   "description": "활동 선택과 단계 진행"
+  },
+  {
+   "name": "04 기록",
+   "description": "저장과 재전송 검증"
+  },
+  {
+   "name": "05 진단",
+   "description": "실제 호출 수와 검색 모드"
+  },
+  {
+   "name": "06 RAG 검증",
+   "description": "검색 순위·근거·Claude 답변을 한 번에 확인"
+  }
+ ]
+}
