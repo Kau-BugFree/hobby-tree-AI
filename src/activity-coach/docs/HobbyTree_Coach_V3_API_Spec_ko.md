@@ -185,11 +185,11 @@ CORS 허용 헤더에 Authorization이 없습니다. 브라우저가 토큰 헤�
 | execution_id | string 또는 null | 진행 중인 실행 |
 | constraints | Constraints | 세션에 저장된 조건. 미지정은 null |
 | messages | Message[] | 최근 100개. `message_id`, `role`(user/assistant), `text`, assistant는 `response`(그 턴의 응답 전체) |
-| search_query / search_scope | string | 직전 검색 주제와 범위 |
+| search_query / search_scope | string | 직전에 활동을 찾은 검색 주제와 범위. '다른 거'가 이어 쓰는 주제 |
 | created_at | string | 생성 시각(UTC) |
 | dialogue | object | 문제 코칭의 내부 상태. 클라이언트가 해석할 필요 없음 |
 
-대화가 진행되면 `shown_ids`, `candidate_selection_pending`, `last_recommendation`, `context_after_message_id`가 추가됩니다. 서버 내부 값인 `origin_request_id`와 `revision`은 응답에 포함하지 않습니다.
+대화가 진행되면 `shown_ids`, `candidate_selection_pending`, `last_recommendation`, `context_after_message_id`가 추가됩니다. 조건이 걸린 상태에서 추천 요청이 주제에 맞는 활동을 찾지 못하면 그 주제가 `unmet_query`에 남습니다. 다음 추천이 성공하거나 활동을 고르면 사라집니다. "시간 제한 없이"처럼 조건만 바꾼 말은 이 주제를 다시 찾습니다. 서버 내부 값인 `origin_request_id`와 `revision`은 응답에 포함하지 않습니다.
 
 `messages`에는 각 턴의 응답 전체(Activity 포함)가 중첩되므로 대화가 길어질수록 세션 응답이 커집니다.
 

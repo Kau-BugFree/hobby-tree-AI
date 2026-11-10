@@ -234,6 +234,12 @@ def apply_constraints(constraints, updates):
     constraints.update(updates)
 
 
+def has_conditions(constraints):
+    """검색 대상을 줄이는 조건이 걸려 있으면 True를 반환합니다. 빈 제외 목록은 아무것도 거르지 않으므로 조건이 아닙니다."""
+    return bool(constraints.get("excluded_tools")) or any(
+        value is not None for name, value in constraints.items() if name != "excluded_tools")
+
+
 def partial_completion(text, activity):
     """완료 문장이 활동 전체가 아니라 단계나 일부 작업을 가리키면 True를 반환합니다.
 
@@ -303,6 +309,8 @@ class Coach:
                 execution_id=None,
                 dialogue=new_dialogue(),
             )
+            # 활동을 골랐으면 못 찾은 주제는 접은 것이다. 뒤의 조건 변경이 그 주제를 되살리지 않게 한다.
+            session.pop("unmet_query", None)
         session["candidate_selection_pending"] = False
         return item
 
@@ -829,12 +837,18 @@ class Coach:
                         apply_constraints(session["constraints"], spoken)
                         changed = True
                     diag["intent"] = "update_constraints" if changed else "recommend"
-                    # '칼이 없어', '다른 거'는 조건과 요청이지 검색 주제가 아니다. 남는 주제가 없으면 직전 주제를 이어 쓴다.
+                    # '칼이 없어', '다른 거'는 조건과 요청이지 검색 주제가 아니다. 남는 주제가 없으면 앞의 주제를 이어 쓴다.
                     other = bool(OTHER_DISHES.search(text))
                     topic = OTHER_DISHES.sub(" ", NO_TOOL.sub(" ", text))
-                    reuse = (other and not names_topic(topic)
-                             or changed and not re.search(r"(추천|레시피|요리)", text))
-                    query = (session.get("search_query", "") if reuse else topic) or topic
+                    if other and not names_topic(topic):
+                        # '다른 거'는 방금 본 후보의 주제를 이어 간다. 못 찾은 주제에는 '다른 것'이 없다.
+                        previous = session.get("search_query", "")
+                    elif changed and not re.search(r"(추천|레시피|요리)", text):
+                        # 조건만 바꾼 말은 가장 최근 요청에 적용한다. 그 요청이 조건에 걸려 못 찾았으면 그 주제를 다시 찾는다.
+                        previous = session.get("unmet_query") or session.get("search_query", "")
+                    else:
+                        previous = ""
+                    query = previous or topic
                     # 후속 시간·도구 조건에서도 직전의 검색 범위를 유지합니다.
                     # 사용자가 레시피 또는 요리 활동을 명시할 때만 범위를 전환합니다.
                     if "레시피" in text:
@@ -853,11 +867,20 @@ class Coach:
                     items, found, starter = await self._candidates(session, query, scope, other, may_fall_back, budget)
                     diag.update(search_performed=True, **found["diagnostics"])
                     diag.update(candidate_ids=[x["activity_id"] for x in items], starter_fallback=starter)
+                    # 찾은 주제와 못 찾은 주제를 따로 기억한다. 못 찾은 주제가 찾은 주제를 덮어쓰면 '다른 거'가 그 주제를 이어 쓰고,
+                    # 못 찾은 주제를 버리면 조건을 푼 뒤에 다시 찾을 수 없다. 입문 목록으로 대신한 요청도 주제는 못 찾은 것이다.
+                    if items and not starter:
+                        session["search_query"] = query
+                        session.pop("unmet_query", None)
+                    elif names_topic(query):
+                        # 조건에 걸려 못 찾았을 수 있는 주제만 기억한다. 조건 없이도 못 찾은 주제는 조건을 바꿔도 못 찾는다.
+                        # 주제 없는 말('다른 거 추천해줘')은 앞서 못 찾은 주제를 바꾸지 않는다.
+                        if has_conditions(session["constraints"]):
+                            session["unmet_query"] = query
+                        else:
+                            session.pop("unmet_query", None)
                     # 결과가 없으면 직전 추천 목록을 남겨 번호 선택을 이어갈 수 있게 한다.
                     if items:
-                        # 맞는 활동을 찾은 주제만 기억한다. 못 찾은 주제가 직전 주제를 덮어쓰면 '다른 거'가 그 주제를 이어 쓴다.
-                        if not starter:
-                            session["search_query"] = query
                         session["candidate_ids"] = [x["activity_id"] for x in items]
                         session["shown_ids"] =list(dict.fromkeys([*session.get("shown_ids", []), *session["candidate_ids"]]))
                         # 새 후보를 받은 뒤의 '1번'은 이전 확인 질문의 답이 아니라 후보 선택이다.

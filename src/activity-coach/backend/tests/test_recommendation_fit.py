@@ -168,6 +168,109 @@ def test_topic_without_match_does_not_replace_previous_topic(client):
     assert client.get(f"/sessions/{sid}").json()["search_query"] == "된장찌개 추천해줘"
 
 
+def test_relaxed_condition_searches_the_topic_that_found_nothing(client):
+    """조건 때문에 못 찾은 주제는 조건을 풀면 다시 찾습니다. '시간 제한 없이'라는 문장을 검색어로 쓰지 않습니다."""
+    sid = create_session(client)
+    assert not message(client, sid, "1분 이내 된장찌개 추천해줘", "tight")["activities"]
+
+    relaxed = message(client, sid, "시간 제한 없이", "relaxed")
+
+    assert ids(relaxed) == ["cook-2-4"]
+
+
+def test_relaxed_condition_applies_to_the_latest_request_not_an_earlier_topic(client):
+    """앞서 찾은 주제가 있어도, 조건만 바꾼 말은 방금 못 찾은 요청에 적용합니다."""
+    sid = create_session(client)
+    message(client, sid, "달걀 요리 추천해줘", "egg")
+    message(client, sid, "1분 이내 된장찌개 추천해줘", "tight")
+
+    relaxed = message(client, sid, "시간 제한 없이", "relaxed")
+
+    assert ids(relaxed) == ["cook-2-4"]
+
+
+def test_relaxed_condition_after_starter_activities_searches_the_asked_topic(client):
+    """주제가 조건에 걸려 입문 목록을 대신 보여 준 뒤에도, 조건을 풀면 물었던 주제를 찾습니다."""
+    sid = create_session(client)
+    starter = message(client, sid, "20분 안에 된장찌개 추천해줘", "tight")
+    assert starter["diagnostics"]["starter_fallback"] and "cook-2-4" not in ids(starter)
+
+    relaxed = message(client, sid, "시간 제한 없이", "relaxed")
+
+    assert ids(relaxed) == ["cook-2-4"]
+
+
+def test_other_request_after_unmatched_topic_continues_the_matched_topic(client):
+    """못 찾은 주제 뒤의 '다른 거'는 못 찾은 주제가 아니라 직전에 찾은 주제를 이어 갑니다."""
+    sid = create_session(client)
+    shown = ids(message(client, sid, "달걀 요리 추천해줘", "egg"))
+    assert not message(client, sid, "양자역학 강의 추천해줘", "none")["activities"]
+
+    other = message(client, sid, "다른 거 추천해줘", "other")
+
+    assert other["activities"] and not set(ids(other)) & set(shown)
+    assert all("달걀" in item["title"] for item in other["activities"])
+
+
+def test_matched_topic_replaces_the_unmatched_one(client):
+    """못 찾은 주제는 다음 추천이 성공하면 잊습니다. 이후의 조건 변경은 성공한 주제에 적용합니다."""
+    sid = create_session(client)
+    message(client, sid, "1분 이내 된장찌개 추천해줘", "tight")
+    message(client, sid, "달걀 요리 추천해줘", "egg", constraints={"max_minutes": None})
+
+    narrowed = message(client, sid, "30분 안에", "narrowed")
+
+    assert narrowed["activities"] and all("달걀" in item["title"] for item in narrowed["activities"])
+
+
+def test_choosing_an_activity_drops_the_unmatched_topic(client):
+    """앞 목록에서 활동을 고르면 못 찾은 주제는 접은 것입니다. 이후의 조건 변경은 찾은 주제에 적용합니다."""
+    sid = create_session(client)
+    message(client, sid, "달걀 요리 추천해줘", "egg")
+    message(client, sid, "1분 이내 된장찌개 추천해줘", "tight")
+    message(client, sid, "1번 할게", "pick")
+
+    narrowed = message(client, sid, "30분 안에 할 수 있는 거", "narrowed")
+
+    assert narrowed["activities"] and all("달걀" in item["title"] for item in narrowed["activities"])
+
+
+def test_other_request_without_topic_keeps_the_unmatched_topic(client):
+    """못 찾은 직후의 '다른 거'에는 새 주제가 없습니다. 조건을 풀면 못 찾았던 주제를 찾습니다."""
+    sid = create_session(client)
+    message(client, sid, "1분 이내 된장찌개 추천해줘", "tight")
+    assert not message(client, sid, "다른 거 추천해줘", "other")["activities"]
+
+    relaxed = message(client, sid, "시간 제한 없이", "relaxed")
+
+    assert ids(relaxed) == ["cook-2-4"]
+
+
+def test_topic_missing_from_the_catalog_is_not_retried_when_the_condition_changes(client):
+    """조건 없이도 못 찾은 주제는 조건을 바꿔도 못 찾습니다. 조건만 바꾼 말은 직전에 찾은 주제에 적용합니다."""
+    sid = create_session(client)
+    message(client, sid, "달걀 요리 추천해줘", "egg")
+    assert not message(client, sid, "양자역학 강의 추천해줘", "none")["activities"]
+
+    narrowed = message(client, sid, "30분 안에", "narrowed")
+
+    assert narrowed["activities"] and all("달걀" in item["title"] for item in narrowed["activities"])
+
+
+@pytest.mark.parametrize("constraints, expected", [
+    ({"max_minutes": None, "available_tools": None, "excluded_tools": None}, False),
+    ({"max_minutes": None, "excluded_tools": []}, False),
+    ({"max_minutes": 20, "excluded_tools": None}, True),
+    ({"max_minutes": None, "excluded_tools": ["칼"]}, True),
+    ({"max_minutes": None, "available_tools": []}, True),
+])
+def test_only_narrowing_conditions_count_as_conditions(constraints, expected):
+    """빈 제외 목록은 아무것도 거르지 않습니다. 빈 사용 가능 도구 목록은 도구가 필요한 활동을 모두 거릅니다."""
+    from app.coach import has_conditions
+
+    assert has_conditions(constraints) is expected
+
+
 def test_starter_fallback_is_skipped_when_retrieval_budget_is_spent(tmp_path):
     settings, retrieval, _ = reranked(tmp_path, -5.0)
     app = create_app(settings, retrieval=retrieval)
