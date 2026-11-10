@@ -1,0 +1,200 @@
+[
+ {
+  "request": {
+   "conversationId": 7,
+   "message": "오늘 20분 안에 할 요리 활동 추천해줘",
+   "requestId": "key-1",
+   "hobbyCode": "cooking"
+  },
+  "status": 200,
+  "body": {
+   "conversationId": 7,
+   "answer": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+   "answerVersion": "coach-v3.0.0",
+   "mode": "direct",
+   "references": [
+    {
+     "sourceType": "ACTIVITY",
+     "sourceCode": "cook-0-1",
+     "activityCode": "cook-0-1",
+     "title": "주방 탐험: 도구 이름과 위생 습관"
+    },
+    {
+     "sourceType": "ACTIVITY",
+     "sourceCode": "cook-0-2",
+     "activityCode": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기"
+    },
+    {
+     "sourceType": "ACTIVITY",
+     "sourceCode": "cook-0-4",
+     "activityCode": "cook-0-4",
+     "title": "전자레인지 달걀찜"
+    }
+   ],
+   "suggestedActivities": [
+    {
+     "activityCode": "cook-0-1",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "reason": "위생·도구 이해"
+    },
+    {
+     "activityCode": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "reason": "계량(큰술·작은술), 맛보기"
+    },
+    {
+     "activityCode": "cook-0-4",
+     "title": "전자레인지 달걀찜",
+     "reason": "재료 비율, 전자레인지 가열"
+    }
+   ],
+   "replayed": false
+  }
+ },
+ {
+  "request": {
+   "conversationId": 7,
+   "message": "두 번째 걸로 할게",
+   "requestId": "key-2"
+  },
+  "status": 200,
+  "body": {
+   "conversationId": 7,
+   "answer": "'계량해서 간장 드레싱 만들기' 활동을 선택했어요. 준비물이나 현재 단계를 물어보세요.",
+   "answerVersion": "coach-v3.0.0",
+   "mode": "direct",
+   "references": [],
+   "suggestedActivities": [
+    {
+     "activityCode": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "reason": "계량(큰술·작은술), 맛보기"
+    }
+   ],
+   "replayed": false
+  }
+ },
+ {
+  "request": {
+   "conversationId": 7,
+   "message": "준비물이 뭐야?",
+   "requestId": "key-3"
+  },
+  "status": 200,
+  "body": {
+   "conversationId": 7,
+   "answer": "준비물: 간장 2큰술 · 식초 2큰술 · 설탕 1큰술 · 올리브유 또는 식용유 2큰술\n도구: 계량스푼 · 작은 볼 · 숟가락",
+   "answerVersion": "coach-v3.0.0",
+   "mode": "direct",
+   "references": [
+    {
+     "sourceType": "ACTIVITY",
+     "sourceCode": "cook-0-2",
+     "activityCode": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기"
+    }
+   ],
+   "suggestedActivities": [],
+   "replayed": false
+  }
+ },
+ {
+  "request": {
+   "conversationId": 7,
+   "message": "준비물이 뭐야?",
+   "requestId": "key-3"
+  },
+  "status": 200,
+  "body": {
+   "conversationId": 7,
+   "answer": "준비물: 간장 2큰술 · 식초 2큰술 · 설탕 1큰술 · 올리브유 또는 식용유 2큰술\n도구: 계량스푼 · 작은 볼 · 숟가락",
+   "answerVersion": "coach-v3.0.0",
+   "mode": "direct",
+   "references": [
+    {
+     "sourceType": "ACTIVITY",
+     "sourceCode": "cook-0-2",
+     "activityCode": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기"
+    }
+   ],
+   "suggestedActivities": [],
+   "replayed": true
+  }
+ },
+ {
+  "request": {
+   "conversationId": 7,
+   "message": "안녕",
+   "requestId": "key-3"
+  },
+  "status": 409,
+  "body": {
+   "detail": "같은 request_id를 다른 질문에 사용할 수 없습니다."
+  }
+ },
+ {
+  "request": {
+   "conversationId": 8,
+   "message": "오늘 날씨 어때?",
+   "requestId": "key-1"
+  },
+  "status": 200,
+  "body": {
+   "conversationId": 8,
+   "answer": "현재는 요리 활동을 지원합니다. 오늘 가능한 시간이나 하고 싶은 요리를 알려주세요.",
+   "answerVersion": "coach-v3.0.0",
+   "mode": "clarify",
+   "references": [],
+   "suggestedActivities": [],
+   "replayed": false
+  }
+ },
+ {
+  "request": {
+   "conversationId": 9,
+   "message": "추천해줘",
+   "requestId": "key-1",
+   "hobbyCode": "reading"
+  },
+  "status": 422,
+  "body": {
+   "detail": "등록되지 않은 취미입니다."
+  }
+ },
+ {
+  "request": {
+   "conversationId": 9,
+   "message": "추천해줘"
+  },
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "missing",
+     "loc": [
+      "body",
+      "requestId"
+     ],
+     "msg": "Field required",
+     "input": {
+      "conversationId": 9,
+      "message": "추천해줘"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "request": {
+   "conversationId": 9,
+   "message": "추천해줘",
+   "requestId": "key-1"
+  },
+  "status": 401,
+  "body": {
+   "detail": "X-Coach-Service-Token이 올바르지 않습니다."
+  }
+ }
+]

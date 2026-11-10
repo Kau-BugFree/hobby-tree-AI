@@ -1,0 +1,1720 @@
+{
+  "selection": "Source SQLite FTS title lookup only, before comparison; no benchmark results used.",
+  "recipes": {
+    "recipe-efe8dd76f6b2a9f76f59daea": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-efe8dd76f6b2a9f76f59daea",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Roast Greek Lamb with Tzatziki, Roasted Vegetables, and Greek Salad",
+      "description": "Sunday roasts and summer are two of my favorite things. But when it's too hot outside, the last thing you want is a full roast with gravy and all the trimmings. It just seems wrong. It's also far too hot to be in a kitchen for long. Greece is famous for its lamb dishes. So what better way to unwind on a warm summer Sunday afternoon than to create this laid-back, slow-roasted Greek lamb feast served with the perfect sides?",
+      "categories": [
+        "Lamb",
+        "Leg Of Lamb"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "1 (3 pound) leg of lamb",
+        "2 cloves garlic, sliced",
+        "3 sprigs fresh rosemary",
+        "5 large bay leaves",
+        "salt",
+        "1 eggplant, cut into 1-inch chunks",
+        "1 zucchini, cut into 1-inch chunks",
+        "1 red onion, cut into 1-inch chunks",
+        "7 large potatoes, thinly sliced",
+        "2 tablespoons olive oil, or as needed",
+        "sea salt to taste"
+      ],
+      "steps": [
+        "Preheat the oven to 400 degrees F (200 degrees C).",
+        "Open the \"pocket\" on the wide end of the leg of lamb and stuff with some garlic slices, 1 rosemary sprig, 1 bay leaf, and salt. Make 3 long incisions on the top of the leg with your knife. Stuff remaining garlic, rosemary sprigs, bay leaves, and some salt into the cuts. Season well with salt all over.",
+        "Season eggplant, zucchini, and 1 red onion with salt and tumble into a roasting pan. Place the leg of lamb on top.",
+        "Roast in the preheated oven for 20 minutes. Reduce oven temperature to 300 degrees F (150 degrees C) and cover pan with aluminum foil. Continue baking until lamb is tender, about 2 hours 30 minutes.",
+        "Spread potatoes on a baking sheet. Drizzle with 2 tablespoons olive oil and season with sea salt. Place in the bottom third of the oven. Bake lamb and potatoes for 30 minutes. Remove lamb and let rest while potatoes finish cooking, about 30 minutes more.",
+        "Combine grated cucumber, mint, oregano, and salt in a bowl. Mix in yogurt until well combined. Refrigerate until ready to serve.",
+        "Combine tomatoes, sliced cucumber, sliced red onion, and black olives in a deep-sided dish. Drizzle 3 tablespoons olive oil and red wine vinegar on top. Place feta on top and cover with dried oregano.",
+        "Carve lamb and serve on a big platter. Scoop out vegetables and juices from the roasting pan and add to the platter. Place roasted potatoes, tzatziki, and Greek salad nearby."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "1 (3 pound) leg of lamb",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cloves garlic, sliced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "3 sprigs fresh rosemary",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "5 large bay leaves",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 eggplant, cut into 1-inch chunks",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 zucchini, cut into 1-inch chunks",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 red onion, cut into 1-inch chunks",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "7 large potatoes, thinly sliced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 tablespoons olive oil, or as needed",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sea salt to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-f94b92b0e295d1283c5ff607": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-f94b92b0e295d1283c5ff607",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Light and Fresh Mexican Gazpacho",
+      "description": "I got this light and fresh Mexican gazpacho recipe from a coworker in Mexico. Since I live in the Southwest, I make this recipe year-round at work, but it is demanded in summer! My customers and anyone else who tries it love it! You can add small shrimp to make this a main course or serve it as a light lunch or appetizer. It keeps refrigerated for one week.",
+      "categories": [
+        "Gazpacho"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "2 (32 ounce) bottles tomato and clam juice cocktail (such as Clamato)",
+        "1 (46 fluid ounce) bottle tomato-vegetable juice cocktail (such as V8)",
+        "4 stalks celery, diced",
+        "4 small avocados, peeled, pitted, and diced",
+        "3 red bell peppers, diced",
+        "3 yellow bell peppers, diced",
+        "2 cucumbers, chopped",
+        "1 (12 ounce) bottle hot pepper sauce (such as Cholula)",
+        "1 bunch green onions, diced",
+        "1 bunch fresh cilantro, chopped",
+        "½ red onion, diced",
+        "⅓ cup red wine vinegar",
+        "⅓ cup lemon juice",
+        "3 cloves garlic, minced, or more to taste",
+        "1 tablespoon garlic powder",
+        "salt and ground black pepper to taste"
+      ],
+      "steps": [
+        "Combine tomato and claim juice cocktail, tomato-vegetable juice cocktail, celery, avocados, bell peppers, cucumbers, hot pepper sauce, green onions, cilantro, red onion, red wine vinegar, lemon juice, minced garlic, and garlic powder in a large nonreactive bowl; season with salt and black pepper. Refrigerate to blend flavors, at least 6 hours."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "2 (32 ounce) bottles tomato and clam juice cocktail (such as Clamato)",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 (46 fluid ounce) bottle tomato-vegetable juice cocktail (such as V8)",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "4 stalks celery, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "4 small avocados, peeled, pitted, and diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "3 red bell peppers, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "3 yellow bell peppers, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cucumbers, chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 (12 ounce) bottle hot pepper sauce (such as Cholula)",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 bunch green onions, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 bunch fresh cilantro, chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ red onion, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "⅓ cup red wine vinegar",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "⅓ cup lemon juice",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "3 cloves garlic, minced, or more to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 tablespoon garlic powder",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt and ground black pepper to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-44ecadd83965be141da605b4": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-44ecadd83965be141da605b4",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Authentic Middle Eastern Hummus (Chummus)",
+      "description": "Authentic chummus is very different and SO much tastier than its American counterpart. This chummus is creamy and delicate in taste rather than overpowered with garlic or thick and pasty. It is eaten warm, fresh, and as a whole meal spread out in a dish and drizzled with fresh olive oil. It is scooped up with pita, raw onion slices, or just a fork. Do NOT use canned chickpeas (garbanzo beans)!",
+      "categories": [
+        "Appetizers And Snacks",
+        "Bean And Pea Appetizers",
+        "Hanukkah",
+        "Hanukkah Appetizers",
+        "Hummus",
+        "Jewish",
+        "Kosher",
+        "Passover",
+        "Passover Recipes",
+        "Seder Appetizers",
+        "Seder Recipes"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "3 cups dry garbanzo beans, soaked overnight",
+        "1 pinch baking soda (Optional)",
+        "½ cup extra-virgin olive oil",
+        "¾ cup tahini paste",
+        "¼ cup fresh lemon juice, or more to taste",
+        "1 large clove garlic, minced, or more to taste",
+        "1 teaspoon ground cumin",
+        "salt to taste",
+        "1 tablespoon extra virgin olive oil, for drizzling"
+      ],
+      "steps": [
+        "Rinse the garbanzo beans and and place in a pot. Fill with enough water to cover by at least 1 inch. Add baking soda, if using. Bring to a boil and then simmer over medium heat until the beans are very soft, 1 1/2 to 2 hours.",
+        "Drain the beans, reserving some of the water to use later. Reserve a small handful of the whole beans for a garnish. Transfer the rest to a blender or if you have a hand blender, a large bowl. Blend the beans until smooth, adding 1/2 cup of olive oil gradually. Add some of the reserved water if needed to help it blend. Add the tahini and blend in along with the lemon juice. Blend in the garlic, cumin, and salt.",
+        "Spread the hummus into a flat serving dish and garnish with the reserved beans and a drizzle of olive oil."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "3 cups dry garbanzo beans, soaked overnight",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 pinch baking soda (Optional)",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ cup extra-virgin olive oil",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "¾ cup tahini paste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "¼ cup fresh lemon juice, or more to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 large clove garlic, minced, or more to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 teaspoon ground cumin",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 tablespoon extra virgin olive oil, for drizzling",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-59c88c07174114c7dd11fb3f": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-59c88c07174114c7dd11fb3f",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Guacamole with Nopales (Mexican Cactus)",
+      "description": "Guacamole is served in many variations in Mexico - here it is combined with nopales, Mexican cactus paddles. [Recipe originally submitted to Allrecipes.com.mx]",
+      "categories": [
+        "Appetizers And Snacks",
+        "Guacamole"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "½ cup diced nopales (Mexican cactus)",
+        "1 large ripe avocado, halved and pitted",
+        "½ lime, juiced",
+        "1 tablespoon olive oil",
+        "salt to taste",
+        "1 plum tomato, seeded and chopped",
+        "1 fresh jalapeno pepper - seeded, deveined, and minced, or to taste",
+        "4 sprigs fresh cilantro, chopped"
+      ],
+      "steps": [
+        "Heat a small nonstick skillet over medium heat. Add nopales and cook, stirring occasionally, until soft, about 10 minutes. Let cool.",
+        "Mash avocado in a bowl with lime juice, olive oil, and salt. Stir in tomato, jalapeno, cilantro, and cooked nopales."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "½ cup diced nopales (Mexican cactus)",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 large ripe avocado, halved and pitted",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ lime, juiced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 tablespoon olive oil",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 plum tomato, seeded and chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 fresh jalapeno pepper - seeded, deveined, and minced, or to taste",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "4 sprigs fresh cilantro, chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-80b614a83d252db1ca25cae6": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-80b614a83d252db1ca25cae6",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Instant Pot Paleo and Keto Egg Shakshuka with Kale",
+      "description": "Try this tasty keto and paleo breakfast shakshuka full of greens! Delicious, quick, and so easy to make in just minutes in your Instant Pot!",
+      "categories": [
+        "Paleo",
+        "Paleo Breakfast And Brunch"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "1 tablespoon olive oil",
+        "½ onion, diced",
+        "½ red bell pepper, diced",
+        "2 cloves garlic, minced",
+        "1 teaspoon chili powder",
+        "½ teaspoon smoked paprika",
+        "½ teaspoon ground cumin",
+        "2 cups baby kale",
+        "1 ½ cups marinara sauce",
+        "½ teaspoon sea salt",
+        "½ teaspoon ground black pepper",
+        "4 eggs",
+        "1 tablespoon chopped fresh parsley"
+      ],
+      "steps": [
+        "Turn on a multi-functional pressure cooker (such as Instant Pot) and select Saute function. Heat olive oil and cook onion, red bell pepper, garlic, chili powder, paprika, and cumin until soft, about 3 minutes. Add kale and cook until soft, about 2 minutes. Stir in marinara sauce and season with salt and pepper; turn off the pot and let cool for 5 minutes.",
+        "Crack eggs carefully in the pot, evenly spaced. Close and lock the lid. Select low pressure according to manufacturer's instructions; set timer for 1 minute. Once it beeps, release pressure carefully using the quick-release method according to manufacturer's instructions, about 2 minutes. Unlock and remove the lid. Sprinkle with parsley."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "1 tablespoon olive oil",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ onion, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ red bell pepper, diced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cloves garlic, minced",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 teaspoon chili powder",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon smoked paprika",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon ground cumin",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cups baby kale",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 ½ cups marinara sauce",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon sea salt",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon ground black pepper",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "4 eggs",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 tablespoon chopped fresh parsley",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-7e425849bea6ed88ae3f44ae": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-7e425849bea6ed88ae3f44ae",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Tabbouleh - Armenian Cracked Wheat Salad",
+      "description": null,
+      "categories": [
+        "Sauces"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 65,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 60,
+        "cook_minutes": 5,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "bulgur",
+        "fresh parsley",
+        "scallion",
+        "tomatoes",
+        "of fresh mint",
+        "dried mint",
+        "olive oil",
+        "lemon juice",
+        "salt"
+      ],
+      "steps": [
+        "Soak bulgur in cold water to cover, for an hour or so.",
+        "Squeeze out the water with hands and mix with other ingredients except oil, lemon juice and salt.",
+        "Mix with olive oil, lemon juice and salt, using proportions agreeable to your taste.",
+        "It is important that vegetables be minced very fine.",
+        "Serve in a bowl or dish surrounded with Romaine leaves or fresh tender grape leaves.",
+        "The leaves are used to scoop up the salad.",
+        "Prepare the mixture early enough so flavors blend."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "bulgur",
+            "name": "bulgur",
+            "quantity_text": "1 1/2",
+            "unit": null
+          },
+          {
+            "text": "fresh parsley",
+            "name": "fresh parsley",
+            "quantity_text": "1",
+            "unit": null
+          },
+          {
+            "text": "scallion",
+            "name": "scallion",
+            "quantity_text": "1",
+            "unit": null
+          },
+          {
+            "text": "tomatoes",
+            "name": "tomatoes",
+            "quantity_text": "4",
+            "unit": null
+          },
+          {
+            "text": "of fresh mint",
+            "name": "of fresh mint",
+            "quantity_text": "1",
+            "unit": null
+          },
+          {
+            "text": "dried mint",
+            "name": "dried mint",
+            "quantity_text": "1/2",
+            "unit": null
+          },
+          {
+            "text": "olive oil",
+            "name": "olive oil",
+            "quantity_text": "1/3",
+            "unit": null
+          },
+          {
+            "text": "lemon juice",
+            "name": "lemon juice",
+            "quantity_text": "1/3",
+            "unit": null
+          },
+          {
+            "text": "salt",
+            "name": "salt",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": 10
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "boilerplate_description_removed",
+          "difficulty_unassigned",
+          "human_review_pending",
+          "quantity_missing",
+          "quantity_units_unverified",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    },
+    "recipe-4212ccba87c488e34c796f2f": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-4212ccba87c488e34c796f2f",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Oi Sobagi (Korean Cucumber Kimchi)",
+      "description": "We have been wanting to do this oi sobagi banchan (cucumber kimchi side dish) for a long time but our local grocery store didn't have the Kirby cucumbers.",
+      "categories": [
+        "Appetizers And Snacks",
+        "Canning And Preserving",
+        "Dill Pickles And Sweet Pickles",
+        "Pickles"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "10 Kirby cucumbers, trimmed and halved",
+        "8 cups water",
+        "1 cup coarse sea salt"
+      ],
+      "steps": [
+        "Place cucumbers onto one end, slice in half down the length to create and x-shape, leaving the last 1/4-inch uncut; place into a bowl. Combine 8 cups water and sea salt in a saucepan over medium heat; bring to a boil. Pour brine mixture onto the cucumbers; brine until flavors combine, about 1 hour.",
+        "Combine red pepper flakes, 1/2 cup water, fish sauce, sugar, garlic, ginger, and fermented shrimp in a bowl; mix until sauce is thoroughly combined.",
+        "Rinse cucumbers in cold water; place in a colander to drain. Sit until semi-dry, about 10 minutes.",
+        "Lather cucumbers with sauce, inside and out, making sure to stuff the x-shaped cut as well. Place cucumbers, chives, radish, and sesame seeds in an air-tight container. Let sit at room temperature until flavors combine, 1 to 2 days; refrigerate until ready to serve."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "10 Kirby cucumbers, trimmed and halved",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "8 cups water",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 cup coarse sea salt",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-3460a9ff5f40254da661a8d5": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-3460a9ff5f40254da661a8d5",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Bibimbap (Korean Vegetarian Noodles)",
+      "description": "This recipe is from a chef who operated the restaurant, Korean Temple Cuisine, in New York, New York. Bibimbap (mixed up rice) history is lost to time but some theories abound. One theory was when royal cooks attempted to assemble something beautiful under less-than-ideal conditions for a 13th-century king on the run from Mongolian invaders. Another theory is that it was a harvest time dish eaten from a communal bowl by farmers working out in the field.",
+      "categories": [
+        "One Dish Meal"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 45,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 20,
+        "cook_minutes": 25,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "miso",
+        "corn syrup",
+        "garlic cloves",
+        "fresh ginger",
+        "rice vinegar",
+        "sesame seeds",
+        "mung bean sprouts",
+        "canola oil",
+        "garlic cloves",
+        "fresh ginger",
+        "squash",
+        "zucchini",
+        "carrots",
+        "daikon radish",
+        "sesame seeds",
+        "firm tofu",
+        "sushi rice",
+        "eggs",
+        "chicory lettuce",
+        "green leaf lettuce",
+        "scallion"
+      ],
+      "steps": [
+        "In a bowl, whisk gochujang, lemon-lime soda, miso, corn syrup, sesame oil, garlic, ginger, vinegar and sesame seeds until smooth. Set aside.",
+        "Bring a 4-qt saucepan of water to a boil and add sprouts. Cook until crisp tender (30 seconds). Transfer to a bowl of ice water, drain and dry with paper towels. Set aside.",
+        "Repeat procedure with spinach (squeeze out as much liquid as possible when draining). When finished, pour boiling water into a bowl and add mushrooms. Let soften for 30 minutes. Drain, remove stems, and slice 1/4 inch thick. Set aside.",
+        "Heat 1 tbsp canola oil and 1/2 tsp sesame oil in a 10 inch nonstick skillet over medium heat. Add 1 tsp garlic, 1/2 tsp ginger and mushrooms. Season with salt and pepper. Cook until hot (2 minutes). Transfer to a bowl. Set aside.",
+        "Repeat procedure, using same amounts of canola oil, sesame oil, garlic, and ginger with the gosari, squash, carrot and radish. Season each with salt and pepper. Set each aside in separate bowls and add 1/4 tsp sesame seeds to radishes.",
+        "Add 1 1/2 tsp garlic, 1/4 tsp sesame oil, salt, and pepper each to sprouts and spinach and stir well.",
+        "Heat remaining canola oil in skillet and add tofu. Cook, turning once, until browned (4-6 minutes). Transfer to a plate and cut each in half.",
+        "When ready to serve, place 1 cup rice each in center of 4 bowls, drizzle a little sesame oil over each mound of rice and top each with a fried egg. Place 1/4 of mushrooms in a mound in each bowl over the rice.",
+        "Working clockwise, arrange 1/4 each squash, carrot, radish, spinach, sprouts, gosari, chicory, and lettuce. Place tofu on lettuces and sprinkle with sesame seeds and scallions. Serve with sauce on the side.",
+        "Each diner should stir their bibimbap vigorously before eating. Bibimbap is considered Korean therapy food which makes sense given that the notion of food as medicine is a fundamental one in Korean cooking and the stirring helps to relieve stress."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "miso",
+            "name": "miso",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "corn syrup",
+            "name": "corn syrup",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "garlic cloves",
+            "name": "garlic cloves",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "fresh ginger",
+            "name": "fresh ginger",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "rice vinegar",
+            "name": "rice vinegar",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sesame seeds",
+            "name": "sesame seeds",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "mung bean sprouts",
+            "name": "mung bean sprouts",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "canola oil",
+            "name": "canola oil",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "garlic cloves",
+            "name": "garlic cloves",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "fresh ginger",
+            "name": "fresh ginger",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "squash",
+            "name": "squash",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "zucchini",
+            "name": "zucchini",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "carrots",
+            "name": "carrots",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "daikon radish",
+            "name": "daikon radish",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sesame seeds",
+            "name": "sesame seeds",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "firm tofu",
+            "name": "firm tofu",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sushi rice",
+            "name": "sushi rice",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "eggs",
+            "name": "eggs",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "chicory lettuce",
+            "name": "chicory lettuce",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "green leaf lettuce",
+            "name": "green leaf lettuce",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "scallion",
+            "name": "scallion",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": 4
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_quantity_count_mismatch",
+          "quantity_missing",
+          "quantity_units_unverified",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    },
+    "recipe-d4b684c94d0e3762836525b2": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-d4b684c94d0e3762836525b2",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Tiramisu - Balducci's in New York City",
+      "description": "This is an adopted recipe. I shall be trying it out and then post any additional information if needs be. If you are going to give any or no stars, please at least give the reason why so that you can help me improve the recipe. Thank you.",
+      "categories": [
+        "Dessert"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 95,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 35,
+        "cook_minutes": 60,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "ladyfingers",
+        "espresso coffee",
+        "eggs",
+        "sugar",
+        "mascarpone",
+        "marsala wine",
+        "triple sec",
+        "brandy",
+        "bittersweet chocolate"
+      ],
+      "steps": [
+        "Arrange the ladyfingers on a plate and lightly soak them with the cooled espresso.",
+        "Put half of the soaked ladyfingers in one layer in a rectangular serving dish.",
+        "While the ladyfingers are soaking, beat the egg yolks with the sugar until the yolks turn pale in color.",
+        "Add the mascarpone, the liquors, and the extract, and stir gently.",
+        "In a separate bowl, beat the egg whites with a wire whisk until they are stiff.",
+        "Gently fold the whites into the mascarpone mixture. Use half of this mixture to make a layer on top of the ladyfingers in the serving dish.",
+        "Sprinkle with half of the chopped chocolate. Repeat the procedure with another layer of soaked ladyfingers, the mascarpone mixture, and chocolate. Cover with tin foil and refrigerate for at least 1 hour before serving."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "ladyfingers",
+            "name": "ladyfingers",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "espresso coffee",
+            "name": "espresso coffee",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "eggs",
+            "name": "eggs",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sugar",
+            "name": "sugar",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "mascarpone",
+            "name": "mascarpone",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "marsala wine",
+            "name": "marsala wine",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "triple sec",
+            "name": "triple sec",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "brandy",
+            "name": "brandy",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "bittersweet chocolate",
+            "name": "bittersweet chocolate",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": 6
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_quantity_count_mismatch",
+          "quantity_units_unverified",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    },
+    "recipe-83e35983a388354a1fbf4ee5": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-83e35983a388354a1fbf4ee5",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Pan-Seared Veal Chop with Roasted Kale Pesto and Butternut Squash and Parsnip Puree",
+      "description": "This is a great dish for a romantic dinner. I made it for our anniversary and my wife loved it.",
+      "categories": [
+        "Beef Recipes",
+        "Veal Recipes"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": null,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": null,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "2 tablespoons olive oil",
+        "2 cups peeled and chopped butternut squash",
+        "1 large parsnip, peeled and chopped",
+        "1 onion, chopped",
+        "2 cloves garlic, crushed",
+        "6 cups water",
+        "1 teaspoon ground coriander",
+        "½ teaspoon salt",
+        "½ teaspoon ground black pepper",
+        "¼ teaspoon cayenne powder",
+        "¼ teaspoon Chinese five-spice powder",
+        "3 tablespoons butter"
+      ],
+      "steps": [
+        "Heat 2 tablespoons olive oil in a large saucepan over medium heat. Add butternut squash, parsnip, and onion; cook and stir until starting to brown, about 3 minutes. Stir in 2 cloves garlic; cook until fragrant, about 2 minutes.",
+        "Pour water into the saucepan. Add coriander, 1/2 teaspoon salt, 1/2 teaspoon black pepper, cayenne powder, and Chinese five-spice powder. Simmer until butternut squash is very soft, about 20 minutes. Remove from heat; drain excess liquid. Let cool slightly, 5 to 10 minutes.",
+        "Stir butter into butternut squash mixture. Puree with an immersion blender until smooth.",
+        "Set oven rack about 6 inches from the heat source and preheat the oven's broiler.",
+        "Toss kale, walnuts, 2 tablespoons olive oil, 1/2 teaspoon salt, and 1/2 teaspoon black pepper together on a rimmed baking sheet.",
+        "Broil in the preheated oven until kale starts to brown, about 5 minutes. Cool slightly, about 5 minutes.",
+        "Combine kale mixture, 1/2 cup light olive oil, lemon juice, 3 cloves garlic, agave nectar, and red pepper flakes in a food processor; blend into a chunky paste.",
+        "Preheat oven to 450 degrees F (230 degrees C).",
+        "Combine 2 tablespoons olive oil, rosemary, and thyme in a large oven-proof skillet; heat over medium-high heat until lightly smoking. Season veal chops with 1/2 teaspoon salt and 1/2 teaspoon black pepper. Cook in the hot oil until browned, about 2 minutes per side.",
+        "Transfer skillet to the preheated oven; roast chops until an instant-read thermometer inserted into the center reads 140 degrees F (60 degrees C), about 10 minutes. Transfer to a cutting board; let rest for 10 minutes.",
+        "Divide butternut squash puree between 2 large serving plates. Place 1 chop on each place; top with a heaping tablespoon of kale pesto."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "2 tablespoons olive oil",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cups peeled and chopped butternut squash",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 large parsnip, peeled and chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 onion, chopped",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "2 cloves garlic, crushed",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "6 cups water",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "1 teaspoon ground coriander",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon salt",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "½ teaspoon ground black pepper",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "¼ teaspoon cayenne powder",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "¼ teaspoon Chinese five-spice powder",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "3 tablespoons butter",
+            "name": null,
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "structural_pass",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured",
+          "tools_unknown",
+          "total_time_missing"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference"
+        ]
+      }
+    },
+    "recipe-b3e547670930ece6326d052a": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-b3e547670930ece6326d052a",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Splendiferous Guacamole With Sour Cream Dip",
+      "description": "Guacamole is, without a doubt, my favorite of dips. :) Note: this recipe is not yet ready for consumption, due to editing difficulties - it will be fixed as soon as possible.",
+      "categories": [
+        "Vegetable"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 5,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 5,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "avocados",
+        "lime juice",
+        "sour cream",
+        "fresh cilantro",
+        "dried cilantro",
+        "sour cream",
+        "fresh cilantro",
+        "yellow onion"
+      ],
+      "steps": [
+        "Peel and pit the avocados, then coarsely mash them in a bowl with a fork.",
+        "Mix in the lime juice, blending well.",
+        "Add the other ingredients (except for garnishes) and combine well.",
+        "Garnish with sour cream and sprinkle a little cilantro on top.",
+        "May be served at room temperature or chilled.",
+        "Serve with warm tortilla chilps or veggie dippers.",
+        "(An adopted recipe.)."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "avocados",
+            "name": "avocados",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "lime juice",
+            "name": "lime juice",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sour cream",
+            "name": "sour cream",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "fresh cilantro",
+            "name": "fresh cilantro",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "dried cilantro",
+            "name": "dried cilantro",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "sour cream",
+            "name": "sour cream",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "fresh cilantro",
+            "name": "fresh cilantro",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "yellow onion",
+            "name": "yellow onion",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": 8
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_quantity_count_mismatch",
+          "quantity_missing",
+          "quantity_units_unverified",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    },
+    "recipe-092a78831457125e9d66413a": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-092a78831457125e9d66413a",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Hummus Bi Tahina Chickpea Spread with Sesame Seed Paste",
+      "description": null,
+      "categories": [
+        "Spreads"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 10,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 10,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "canned chick-peas",
+        "garlic",
+        "olive oil",
+        "salt",
+        "black pepper",
+        "olive oil",
+        "kalamata olive"
+      ],
+      "steps": [
+        "In a food processor, fitted with a metal blade, combine the chickpeas, lemon juice, tahini paste, and garlic.",
+        "Process until smooth.",
+        "With the machine running, add the olive oil, a little at a time.",
+        "Season with salt and pepper.",
+        "Spoon the humus in the center of a large platter.",
+        "Drizzle the hummus with olive oil.",
+        "Arrange the black olives and fresh pita bread around the hummus."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "canned chick-peas",
+            "name": "canned chick-peas",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "garlic",
+            "name": "garlic",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "olive oil",
+            "name": "olive oil",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt",
+            "name": "salt",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "black pepper",
+            "name": "black pepper",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "olive oil",
+            "name": "olive oil",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "kalamata olive",
+            "name": "kalamata olive",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "boilerplate_description_removed",
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_quantity_count_mismatch",
+          "quantity_missing",
+          "quantity_units_unverified",
+          "servings_unknown",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    },
+    "recipe-89d23eb86fbf2a6ca3596741": {
+      "schema_version": "1.0",
+      "activity_id": "recipe-89d23eb86fbf2a6ca3596741",
+      "hobby_key": "cooking",
+      "kind": "recipe",
+      "language": "en",
+      "title": "Cooling Summer Gazpacho One-Step",
+      "description": "Linda was a busy lady-of-the-year, mother of two and embarking on a new career .. she had little time to do much of anything .. but she made a mean gazpacho and had time to entertain friends like me who'd stop by to say hi and stayed for lunch! This is a super easy, delicious soup that will cool down those hot summer nights! You'll beg for more :)",
+      "categories": [
+        "One Dish Meal"
+      ],
+      "catalog_level": null,
+      "difficulty": null,
+      "duration": {
+        "total_minutes": 5,
+        "active_minutes": null,
+        "wait_minutes": null,
+        "prep_minutes": 5,
+        "cook_minutes": null,
+        "is_estimate": false
+      },
+      "tools": [],
+      "materials": [
+        "tomato juice",
+        "cucumber",
+        "green pepper",
+        "red onion",
+        "tomatoes",
+        "fresh garlic",
+        "olive oil",
+        "vinegar",
+        "salt",
+        "pepper",
+        "Tabasco sauce"
+      ],
+      "steps": [
+        "This is super easy to whip together especially if you do it in a food processor.",
+        "You skip the chopping and toss everything into the processor; pulse and viola!",
+        "By hand: Coarsley chop cucumber, peppers, onion, and tomato; set aside.",
+        "Combine tomato juice, garlic, oil, vinegar, salt, pepper& tabasco in a large airtight container.",
+        "Mix in coarsley chopped ingredients and refrigerate until cold.",
+        "Serve with a dollup of plain yogurt or sour cream."
+      ],
+      "checks": [],
+      "safety_notes": [],
+      "lighter_alternative": null,
+      "cooking": {
+        "ingredients": [
+          {
+            "text": "tomato juice",
+            "name": "tomato juice",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "cucumber",
+            "name": "cucumber",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "green pepper",
+            "name": "green pepper",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "red onion",
+            "name": "red onion",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "tomatoes",
+            "name": "tomatoes",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "fresh garlic",
+            "name": "fresh garlic",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "olive oil",
+            "name": "olive oil",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "vinegar",
+            "name": "vinegar",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "salt",
+            "name": "salt",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "pepper",
+            "name": "pepper",
+            "quantity_text": null,
+            "unit": null
+          },
+          {
+            "text": "Tabasco sauce",
+            "name": "Tabasco sauce",
+            "quantity_text": null,
+            "unit": null
+          }
+        ],
+        "servings": null
+      },
+      "quality": {
+        "status": "restricted",
+        "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_quantity_count_mismatch",
+          "quantity_missing",
+          "quantity_units_unverified",
+          "servings_unknown",
+          "tools_unknown"
+        ],
+        "human_reviewed": false,
+        "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_declared"
+        ]
+      }
+    }
+  }
+}

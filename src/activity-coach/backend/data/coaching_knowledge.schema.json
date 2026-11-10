@@ -1,0 +1,105 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "knowledge_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "title": "Knowledge Id",
+      "type": "string"
+    },
+    "activity_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Activity Ids",
+      "type": "array"
+    },
+    "title": {
+      "maxLength": 250,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "checks",
+        "steps",
+        "safety_notes",
+        "principle",
+        "remedy"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "content": {
+      "maxLength": 6000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "applies_when": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Applies When",
+      "type": "string"
+    },
+    "related_knowledge_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Related Knowledge Ids",
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "review_status": {
+      "default": "draft",
+      "enum": [
+        "source_only",
+        "draft",
+        "reviewed"
+      ],
+      "title": "Review Status",
+      "type": "string"
+    },
+    "reviewed_by": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewed By"
+    }
+  },
+  "required": [
+    "knowledge_id",
+    "activity_ids",
+    "title",
+    "kind",
+    "content",
+    "source_refs"
+  ],
+  "title": "KnowledgeRecord",
+  "type": "object"
+}

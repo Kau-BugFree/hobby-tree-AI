@@ -1,0 +1,5028 @@
+[
+ {
+  "label": "health",
+  "method": "GET",
+  "url": "/health",
+  "json": null,
+  "status": 200,
+  "body": {
+   "status": "ok",
+   "version": "3.0.0",
+   "mode": "local_single_user_demo",
+   "llm_configured": false,
+   "llm_model": "claude-opus-5-5",
+   "retrieval": {
+    "documents": {
+     "activities": 162,
+     "knowledge": 486
+    },
+    "embedding_enabled": false,
+    "embedding_model": null,
+    "dense_index_scopes": [],
+    "embedding_error": null,
+    "index_errors": {},
+    "reranker_enabled": false,
+    "reranker_model": null,
+    "reranker_error": null,
+    "rerank_candidates": 20,
+    "index_version": "hobbytree-fts-v2.0"
+   },
+   "supported_hobbies": [
+    "cooking"
+   ]
+  }
+ },
+ {
+  "label": "hobbies",
+  "method": "GET",
+  "url": "/hobbies",
+  "json": null,
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "hobby_key": "cooking",
+     "label": "요리",
+     "scope": "activities",
+     "description": "요리 활동과 레시피 근거를 조회하는 활동코치"
+    }
+   ]
+  }
+ },
+ {
+  "label": "session_create_default",
+  "method": "POST",
+  "url": "/sessions",
+  "json": {},
+  "status": 200,
+  "body": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "hobby_key": "cooking",
+   "candidate_ids": [],
+   "selected_activity_id": null,
+   "current_step": 1,
+   "constraints": {
+    "max_minutes": null,
+    "available_tools": null,
+    "excluded_tools": null,
+    "max_difficulty": null,
+    "budget_max": null
+   },
+   "messages": [],
+   "execution_id": null,
+   "search_query": "",
+   "search_scope": "activities",
+   "created_at": "2026-11-10T16:50:44.519+00:00",
+   "dialogue": {
+    "version": 2,
+    "issue_id": null,
+    "activity_id": null,
+    "execution_id": null,
+    "phase": "idle",
+    "goal": "",
+    "requirements": [],
+    "observations": [],
+    "pending_question": null,
+    "evidence_ids": [],
+    "coverage": [],
+    "clarification_count": 0,
+    "reflection_count": 0,
+    "searched_queries": [],
+    "outcome": null,
+    "step_number": null,
+    "asked_questions": [],
+    "hop_trace": [],
+    "status": "idle"
+   }
+  }
+ },
+ {
+  "label": "session_create_unknown_hobby",
+  "method": "POST",
+  "url": "/sessions",
+  "json": {
+   "hobby_key": "reading"
+  },
+  "status": 422,
+  "body": {
+   "detail": "등록되지 않은 취미입니다."
+  }
+ },
+ {
+  "label": "session_create_extra_field",
+  "method": "POST",
+  "url": "/sessions",
+  "json": {
+   "hobby_key": "cooking",
+   "x": 1
+  },
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "extra_forbidden",
+     "loc": [
+      "body",
+      "x"
+     ],
+     "msg": "Extra inputs are not permitted",
+     "input": 1
+    }
+   ]
+  }
+ },
+ {
+  "label": "session_get_missing",
+  "method": "GET",
+  "url": "/sessions/nope",
+  "json": null,
+  "status": 404,
+  "body": {
+   "detail": "대화 세션을 찾을 수 없습니다. 새 세션을 만들어 주세요."
+  }
+ },
+ {
+  "label": "coach_recommend",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-1",
+   "message": "오늘 20분 안에 할 요리 활동 추천해줘"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "ef936f0d-d747-4c47-88b2-3f2342b94a8f",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "direct",
+   "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+   "activities": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-1",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "description": "위생·도구 이해",
+     "categories": [
+      "공통"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "도마",
+      "칼",
+      "계량컵",
+      "계량스푼",
+      "냄비",
+      "프라이팬",
+      "뒤집개",
+      "행주"
+     ],
+     "materials": [],
+     "steps": [
+      "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+      "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+      "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+      "행주와 수세미를 세척해 말려 두어요"
+     ],
+     "checks": [
+      "도구 8가지의 이름과 용도를 말할 수 있다",
+      "도마 사용 순서를 정했다"
+     ],
+     "safety_notes": [
+      "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+     "cooking": {
+      "ingredients": [],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-4",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "전자레인지 달걀찜",
+     "description": "재료 비율, 전자레인지 가열",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "전자레인지용 그릇",
+      "랩 또는 전자레인지용 뚜껑",
+      "포크",
+      "내열 장갑"
+     ],
+     "materials": [
+      "달걀 2개",
+      "물 150ml",
+      "소금 한 꼬집"
+     ],
+     "steps": [
+      "달걀을 곱게 풀고 물과 소금을 섞어요(달걀 양의 약 1.5배 물)",
+      "그릇에 담고 랩에 구멍을 2~3개 내거나 뚜껑을 살짝 걸쳐요",
+      "700W 기준 1분 30초 돌린 뒤 한 번 젓고 1분 더 돌려요",
+      "중간에 저어 고르게 가열하고, 액체 상태가 남지 않도록 추가 가열해요. 출력과 그릇에 따른 시간을 기록해요"
+     ],
+     "checks": [
+      "가운데까지 익었다",
+      "우리 집 전자레인지에 맞는 시간을 메모했다"
+     ],
+     "safety_notes": [
+      "껍질째 달걀은 전자레인지에 넣지 않아요. 터질 수 있어요",
+      "금속 그릇은 쓰지 않아요"
+     ],
+     "lighter_alternative": "달걀 1개, 물 75ml로 절반만 만들어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "달걀 2개",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "물 150ml",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "소금 한 꼬집",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "activity_id": "cook-0-1",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "kind": "activity",
+     "excerpt": "위생·도구 이해"
+    },
+    {
+     "activity_id": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "kind": "activity",
+     "excerpt": "계량(큰술·작은술), 맛보기"
+    },
+    {
+     "activity_id": "cook-0-4",
+     "title": "전자레인지 달걀찜",
+     "kind": "activity",
+     "excerpt": "재료 비율, 전자레인지 가열"
+    }
+   ],
+   "actions": [
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-1",
+     "label": "주방 탐험: 도구 이름과 위생 습관"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-2",
+     "label": "계량해서 간장 드레싱 만들기"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-4",
+     "label": "전자레인지 달걀찜"
+    }
+   ],
+   "selected_activity_id": null,
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "update_constraints",
+    "search_performed": true,
+    "search_mode": "catalog_browse",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 5.0,
+    "trace_id": "e4c4f568-1ded-4f46-b0d4-9513a1fc89b0",
+    "scope": "activities",
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-1",
+     "cook-0-2",
+     "cook-0-4"
+    ],
+    "ranking": [],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 25,
+    "starter_fallback": false,
+    "decision_calls": 0,
+    "retrieval_calls": 1,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_replay",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-1",
+   "message": "오늘 20분 안에 할 요리 활동 추천해줘"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "ef936f0d-d747-4c47-88b2-3f2342b94a8f",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "direct",
+   "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+   "activities": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-1",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "description": "위생·도구 이해",
+     "categories": [
+      "공통"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "도마",
+      "칼",
+      "계량컵",
+      "계량스푼",
+      "냄비",
+      "프라이팬",
+      "뒤집개",
+      "행주"
+     ],
+     "materials": [],
+     "steps": [
+      "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+      "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+      "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+      "행주와 수세미를 세척해 말려 두어요"
+     ],
+     "checks": [
+      "도구 8가지의 이름과 용도를 말할 수 있다",
+      "도마 사용 순서를 정했다"
+     ],
+     "safety_notes": [
+      "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+     "cooking": {
+      "ingredients": [],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-4",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "전자레인지 달걀찜",
+     "description": "재료 비율, 전자레인지 가열",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "전자레인지용 그릇",
+      "랩 또는 전자레인지용 뚜껑",
+      "포크",
+      "내열 장갑"
+     ],
+     "materials": [
+      "달걀 2개",
+      "물 150ml",
+      "소금 한 꼬집"
+     ],
+     "steps": [
+      "달걀을 곱게 풀고 물과 소금을 섞어요(달걀 양의 약 1.5배 물)",
+      "그릇에 담고 랩에 구멍을 2~3개 내거나 뚜껑을 살짝 걸쳐요",
+      "700W 기준 1분 30초 돌린 뒤 한 번 젓고 1분 더 돌려요",
+      "중간에 저어 고르게 가열하고, 액체 상태가 남지 않도록 추가 가열해요. 출력과 그릇에 따른 시간을 기록해요"
+     ],
+     "checks": [
+      "가운데까지 익었다",
+      "우리 집 전자레인지에 맞는 시간을 메모했다"
+     ],
+     "safety_notes": [
+      "껍질째 달걀은 전자레인지에 넣지 않아요. 터질 수 있어요",
+      "금속 그릇은 쓰지 않아요"
+     ],
+     "lighter_alternative": "달걀 1개, 물 75ml로 절반만 만들어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "달걀 2개",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "물 150ml",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "소금 한 꼬집",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "activity_id": "cook-0-1",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "kind": "activity",
+     "excerpt": "위생·도구 이해"
+    },
+    {
+     "activity_id": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "kind": "activity",
+     "excerpt": "계량(큰술·작은술), 맛보기"
+    },
+    {
+     "activity_id": "cook-0-4",
+     "title": "전자레인지 달걀찜",
+     "kind": "activity",
+     "excerpt": "재료 비율, 전자레인지 가열"
+    }
+   ],
+   "actions": [
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-1",
+     "label": "주방 탐험: 도구 이름과 위생 습관"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-2",
+     "label": "계량해서 간장 드레싱 만들기"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-4",
+     "label": "전자레인지 달걀찜"
+    }
+   ],
+   "selected_activity_id": null,
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "update_constraints",
+    "search_performed": true,
+    "search_mode": "catalog_browse",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 5.0,
+    "trace_id": "e4c4f568-1ded-4f46-b0d4-9513a1fc89b0",
+    "scope": "activities",
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-1",
+     "cook-0-2",
+     "cook-0-4"
+    ],
+    "ranking": [],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 25,
+    "starter_fallback": false,
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {},
+    "replayed": true
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_request_id_reuse",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-1",
+   "message": "다른 질문"
+  },
+  "status": 409,
+  "body": {
+   "detail": "같은 request_id를 다른 질문에 사용할 수 없습니다."
+  }
+ },
+ {
+  "label": "coach_select",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-2",
+   "message": "두 번째 걸로 할게"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "6748b1f1-35e1-4ac9-9e3b-f98a74861fc8",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "direct",
+   "text": "'계량해서 간장 드레싱 만들기' 활동을 선택했어요. 준비물이나 현재 단계를 물어보세요.",
+   "activities": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "sources": [],
+   "actions": [
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-2",
+     "label": "계량해서 간장 드레싱 만들기"
+    }
+   ],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "select",
+    "search_performed": false,
+    "search_mode": "none",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 0.88,
+    "trace_id": "757a0fd5-b9e8-47ff-b33b-bd0f11b6a106",
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_explain_no_key",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-3",
+   "message": "현재 단계를 쉽게 설명해줘"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "ac0ca963-4e17-4e13-a672-bd93cbc98966",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "reference",
+   "text": "다음은 기존 활동 원문의 참고 안내입니다.\n\n계량해서 간장 드레싱 만들기\n1단계: 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+   "activities": [],
+   "sources": [
+    {
+     "evidence_id": "cook-0-2:step:1",
+     "activity_id": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "review_status": "source_only",
+     "kind": "activity",
+     "excerpt": "1단계: 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+     "source_refs": [
+      "cook-0-2"
+     ],
+     "applies_when": ""
+    }
+   ],
+   "actions": [],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "explain",
+    "search_performed": false,
+    "search_mode": "none",
+    "llm_calls": 0,
+    "llm_status": "reference",
+    "latency_ms": 1.92,
+    "trace_id": "8f80702b-f614-4e6e-a703-2a62a83ad174",
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "cited_evidence_ids": [
+    "cook-0-2:step:1"
+   ],
+   "cited_activity_ids": [
+    "cook-0-2"
+   ],
+   "validation_errors": [],
+   "validation": {
+    "format": "not_run",
+    "citations": "not_run",
+    "quantities": "not_run",
+    "semantic_support": "not_run"
+   },
+   "metacognition": {
+    "supported": [],
+    "unresolved": [],
+    "source_review": {
+     "cook-0-2:step:1": "source_only"
+    },
+    "stop_reason": null,
+    "next_action": "원문 확인 또는 미확인 항목 설명"
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_out_of_scope",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-5",
+   "message": "오늘 날씨 어때?"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "4a327988-77c5-4bf2-9d75-7de8b2788ca0",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "clarify",
+   "text": "현재는 요리 활동을 지원합니다. 오늘 가능한 시간이나 하고 싶은 요리를 알려주세요.",
+   "activities": [],
+   "sources": [],
+   "actions": [],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "out_of_scope",
+    "search_performed": false,
+    "search_mode": "none",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 0.82,
+    "trace_id": "87470a25-17a7-483c-bc7a-c2879f8a7712",
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_budget",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-6",
+   "message": "요리 활동 추천해줘",
+   "constraints": {
+    "budget_max": 5000
+   }
+  },
+  "status": 200,
+  "body": {
+   "message_id": "1fc82a88-c25b-4d15-8c0b-bbbbd7474b69",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "clarify",
+   "text": "검증된 비용 정보가 없어 예산 조건의 충족을 확인할 수 없어요. 조건을 바꾸거나 다른 활동을 요청해 주세요.",
+   "activities": [],
+   "sources": [],
+   "actions": [],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "update_constraints",
+    "search_performed": true,
+    "search_mode": "bm25",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 3.19,
+    "trace_id": "7a120b24-35c9-4e80-9f04-aba2a567b49c",
+    "scope": "activities",
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [],
+    "ranking": [],
+    "missing_filter_fields": [
+     "budget_max"
+    ],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 0,
+    "empty_reason": "no_eligible_documents",
+    "starter_fallback": false,
+    "decision_calls": 0,
+    "retrieval_calls": 1,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_string_number",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "request_id": "demo-7",
+   "message": "요리 활동 추천해줘",
+   "constraints": {
+    "budget_max": null,
+    "max_minutes": "20"
+   }
+  },
+  "status": 200,
+  "body": {
+   "message_id": "f67926aa-2697-45db-a8ee-34bbbba77cea",
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "mode": "direct",
+   "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+   "activities": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-1",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "description": "위생·도구 이해",
+     "categories": [
+      "공통"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "도마",
+      "칼",
+      "계량컵",
+      "계량스푼",
+      "냄비",
+      "프라이팬",
+      "뒤집개",
+      "행주"
+     ],
+     "materials": [],
+     "steps": [
+      "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+      "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+      "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+      "행주와 수세미를 세척해 말려 두어요"
+     ],
+     "checks": [
+      "도구 8가지의 이름과 용도를 말할 수 있다",
+      "도마 사용 순서를 정했다"
+     ],
+     "safety_notes": [
+      "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+     "cooking": {
+      "ingredients": [],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-4",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "전자레인지 달걀찜",
+     "description": "재료 비율, 전자레인지 가열",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "전자레인지용 그릇",
+      "랩 또는 전자레인지용 뚜껑",
+      "포크",
+      "내열 장갑"
+     ],
+     "materials": [
+      "달걀 2개",
+      "물 150ml",
+      "소금 한 꼬집"
+     ],
+     "steps": [
+      "달걀을 곱게 풀고 물과 소금을 섞어요(달걀 양의 약 1.5배 물)",
+      "그릇에 담고 랩에 구멍을 2~3개 내거나 뚜껑을 살짝 걸쳐요",
+      "700W 기준 1분 30초 돌린 뒤 한 번 젓고 1분 더 돌려요",
+      "중간에 저어 고르게 가열하고, 액체 상태가 남지 않도록 추가 가열해요. 출력과 그릇에 따른 시간을 기록해요"
+     ],
+     "checks": [
+      "가운데까지 익었다",
+      "우리 집 전자레인지에 맞는 시간을 메모했다"
+     ],
+     "safety_notes": [
+      "껍질째 달걀은 전자레인지에 넣지 않아요. 터질 수 있어요",
+      "금속 그릇은 쓰지 않아요"
+     ],
+     "lighter_alternative": "달걀 1개, 물 75ml로 절반만 만들어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "달걀 2개",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "물 150ml",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "소금 한 꼬집",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "sources": [
+    {
+     "activity_id": "cook-0-1",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "kind": "activity",
+     "excerpt": "위생·도구 이해"
+    },
+    {
+     "activity_id": "cook-0-2",
+     "title": "계량해서 간장 드레싱 만들기",
+     "kind": "activity",
+     "excerpt": "계량(큰술·작은술), 맛보기"
+    },
+    {
+     "activity_id": "cook-0-4",
+     "title": "전자레인지 달걀찜",
+     "kind": "activity",
+     "excerpt": "재료 비율, 전자레인지 가열"
+    }
+   ],
+   "actions": [
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-1",
+     "label": "주방 탐험: 도구 이름과 위생 습관"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-2",
+     "label": "계량해서 간장 드레싱 만들기"
+    },
+    {
+     "type": "open_activity",
+     "activity_id": "cook-0-4",
+     "label": "전자레인지 달걀찜"
+    }
+   ],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "update_constraints",
+    "search_performed": true,
+    "search_mode": "catalog_browse",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 3.74,
+    "trace_id": "36cc2f0c-c679-4bc9-b248-fa4a5d73ee5c",
+    "scope": "activities",
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-1",
+     "cook-0-2",
+     "cook-0-4"
+    ],
+    "ranking": [],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 25,
+    "starter_fallback": false,
+    "decision_calls": 0,
+    "retrieval_calls": 1,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_no_session_plain_id",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "request_id": "demo-1",
+   "message": "안녕"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "515f8aa4-e28e-4794-82e8-4f4385726912",
+   "session_id": "e31556ec-f760-45df-9139-01285089987b",
+   "mode": "direct",
+   "text": "요리 활동을 함께 진행할게요. 오늘 할 활동을 추천받거나 선택한 활동의 준비물·순서를 물어보세요.",
+   "activities": [],
+   "sources": [],
+   "actions": [],
+   "selected_activity_id": null,
+   "current_step": 1,
+   "execution_id": null,
+   "diagnostics": {
+    "intent": "greeting",
+    "search_performed": false,
+    "search_mode": "none",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 0.08,
+    "trace_id": "c938d3d0-eebf-42b6-933b-9c5fdff62ecf",
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "coach_missing_session",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "nope",
+   "message": "안녕"
+  },
+  "status": 404,
+  "body": {
+   "detail": "대화 세션을 찾을 수 없습니다. 새 세션을 만들어 주세요."
+  }
+ },
+ {
+  "label": "coach_empty_message",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "message": ""
+  },
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "string_too_short",
+     "loc": [
+      "body",
+      "message"
+     ],
+     "msg": "String should have at least 1 character",
+     "input": "",
+     "ctx": {
+      "min_length": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "label": "session_get",
+  "method": "GET",
+  "url": "/sessions/b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+  "json": null,
+  "status": 200,
+  "body": {
+   "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+   "hobby_key": "cooking",
+   "candidate_ids": [
+    "cook-0-1",
+    "cook-0-2",
+    "cook-0-4"
+   ],
+   "selected_activity_id": "cook-0-2",
+   "current_step": 1,
+   "constraints": {
+    "max_minutes": 20.0,
+    "available_tools": null,
+    "excluded_tools": null,
+    "max_difficulty": null,
+    "budget_max": null
+   },
+   "messages": [
+    {
+     "message_id": "09a583e4-cfd6-4217-bc93-604d5f68da80",
+     "role": "user",
+     "text": "오늘 20분 안에 할 요리 활동 추천해줘"
+    },
+    {
+     "message_id": "ef936f0d-d747-4c47-88b2-3f2342b94a8f",
+     "role": "assistant",
+     "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+     "response": {
+      "message_id": "ef936f0d-d747-4c47-88b2-3f2342b94a8f",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "direct",
+      "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+      "activities": [
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-1",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "주방 탐험: 도구 이름과 위생 습관",
+        "description": "위생·도구 이해",
+        "categories": [
+         "공통"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "도마",
+         "칼",
+         "계량컵",
+         "계량스푼",
+         "냄비",
+         "프라이팬",
+         "뒤집개",
+         "행주"
+        ],
+        "materials": [],
+        "steps": [
+         "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+         "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+         "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+         "행주와 수세미를 세척해 말려 두어요"
+        ],
+        "checks": [
+         "도구 8가지의 이름과 용도를 말할 수 있다",
+         "도마 사용 순서를 정했다"
+        ],
+        "safety_notes": [
+         "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+         "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+        ],
+        "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+        "cooking": {
+         "ingredients": [],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       },
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-2",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "계량해서 간장 드레싱 만들기",
+        "description": "계량(큰술·작은술), 맛보기",
+        "categories": [
+         "한식"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "계량스푼",
+         "작은 볼",
+         "숟가락"
+        ],
+        "materials": [
+         "간장 2큰술",
+         "식초 2큰술",
+         "설탕 1큰술",
+         "올리브유 또는 식용유 2큰술"
+        ],
+        "steps": [
+         "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+         "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+         "설탕이 녹을 때까지 저어요",
+         "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+        ],
+        "checks": [
+         "가루와 액체를 각각 알맞은 방법으로 계량했다",
+         "맛의 특징을 한 줄로 메모했다"
+        ],
+        "safety_notes": [
+         "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+         "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+        ],
+        "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+        "cooking": {
+         "ingredients": [
+          {
+           "text": "간장 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "식초 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "설탕 1큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "올리브유 또는 식용유 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          }
+         ],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       },
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-4",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "전자레인지 달걀찜",
+        "description": "재료 비율, 전자레인지 가열",
+        "categories": [
+         "한식"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "전자레인지용 그릇",
+         "랩 또는 전자레인지용 뚜껑",
+         "포크",
+         "내열 장갑"
+        ],
+        "materials": [
+         "달걀 2개",
+         "물 150ml",
+         "소금 한 꼬집"
+        ],
+        "steps": [
+         "달걀을 곱게 풀고 물과 소금을 섞어요(달걀 양의 약 1.5배 물)",
+         "그릇에 담고 랩에 구멍을 2~3개 내거나 뚜껑을 살짝 걸쳐요",
+         "700W 기준 1분 30초 돌린 뒤 한 번 젓고 1분 더 돌려요",
+         "중간에 저어 고르게 가열하고, 액체 상태가 남지 않도록 추가 가열해요. 출력과 그릇에 따른 시간을 기록해요"
+        ],
+        "checks": [
+         "가운데까지 익었다",
+         "우리 집 전자레인지에 맞는 시간을 메모했다"
+        ],
+        "safety_notes": [
+         "껍질째 달걀은 전자레인지에 넣지 않아요. 터질 수 있어요",
+         "금속 그릇은 쓰지 않아요"
+        ],
+        "lighter_alternative": "달걀 1개, 물 75ml로 절반만 만들어요",
+        "cooking": {
+         "ingredients": [
+          {
+           "text": "달걀 2개",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "물 150ml",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "소금 한 꼬집",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          }
+         ],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       }
+      ],
+      "sources": [
+       {
+        "activity_id": "cook-0-1",
+        "title": "주방 탐험: 도구 이름과 위생 습관",
+        "kind": "activity",
+        "excerpt": "위생·도구 이해"
+       },
+       {
+        "activity_id": "cook-0-2",
+        "title": "계량해서 간장 드레싱 만들기",
+        "kind": "activity",
+        "excerpt": "계량(큰술·작은술), 맛보기"
+       },
+       {
+        "activity_id": "cook-0-4",
+        "title": "전자레인지 달걀찜",
+        "kind": "activity",
+        "excerpt": "재료 비율, 전자레인지 가열"
+       }
+      ],
+      "actions": [
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-1",
+        "label": "주방 탐험: 도구 이름과 위생 습관"
+       },
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-2",
+        "label": "계량해서 간장 드레싱 만들기"
+       },
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-4",
+        "label": "전자레인지 달걀찜"
+       }
+      ],
+      "selected_activity_id": null,
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "update_constraints",
+       "search_performed": true,
+       "search_mode": "catalog_browse",
+       "llm_calls": 0,
+       "llm_status": "not_needed",
+       "latency_ms": 5.0,
+       "trace_id": "e4c4f568-1ded-4f46-b0d4-9513a1fc89b0",
+       "scope": "activities",
+       "reranker": "rule_based",
+       "reranker_model": null,
+       "reranker_error": null,
+       "embedding_error": null,
+       "rerank_min_score": -2.0,
+       "rrf_k": 60,
+       "bm25_candidates": 0,
+       "dense_candidates": 0,
+       "candidate_ids": [
+        "cook-0-1",
+        "cook-0-2",
+        "cook-0-4"
+       ],
+       "ranking": [],
+       "missing_filter_fields": [],
+       "dense_available": false,
+       "minimum_dense_similarity": 0.4,
+       "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+       "total_documents": 162,
+       "eligible_documents": 25,
+       "starter_fallback": false,
+       "decision_calls": 0,
+       "retrieval_calls": 1,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    },
+    {
+     "message_id": "f8122c79-a4c8-4200-817a-3fc1a704fe6d",
+     "role": "user",
+     "text": "두 번째 걸로 할게"
+    },
+    {
+     "message_id": "6748b1f1-35e1-4ac9-9e3b-f98a74861fc8",
+     "role": "assistant",
+     "text": "'계량해서 간장 드레싱 만들기' 활동을 선택했어요. 준비물이나 현재 단계를 물어보세요.",
+     "response": {
+      "message_id": "6748b1f1-35e1-4ac9-9e3b-f98a74861fc8",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "direct",
+      "text": "'계량해서 간장 드레싱 만들기' 활동을 선택했어요. 준비물이나 현재 단계를 물어보세요.",
+      "activities": [
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-2",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "계량해서 간장 드레싱 만들기",
+        "description": "계량(큰술·작은술), 맛보기",
+        "categories": [
+         "한식"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "계량스푼",
+         "작은 볼",
+         "숟가락"
+        ],
+        "materials": [
+         "간장 2큰술",
+         "식초 2큰술",
+         "설탕 1큰술",
+         "올리브유 또는 식용유 2큰술"
+        ],
+        "steps": [
+         "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+         "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+         "설탕이 녹을 때까지 저어요",
+         "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+        ],
+        "checks": [
+         "가루와 액체를 각각 알맞은 방법으로 계량했다",
+         "맛의 특징을 한 줄로 메모했다"
+        ],
+        "safety_notes": [
+         "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+         "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+        ],
+        "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+        "cooking": {
+         "ingredients": [
+          {
+           "text": "간장 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "식초 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "설탕 1큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "올리브유 또는 식용유 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          }
+         ],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       }
+      ],
+      "sources": [],
+      "actions": [
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-2",
+        "label": "계량해서 간장 드레싱 만들기"
+       }
+      ],
+      "selected_activity_id": "cook-0-2",
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "select",
+       "search_performed": false,
+       "search_mode": "none",
+       "llm_calls": 0,
+       "llm_status": "not_needed",
+       "latency_ms": 0.88,
+       "trace_id": "757a0fd5-b9e8-47ff-b33b-bd0f11b6a106",
+       "decision_calls": 0,
+       "retrieval_calls": 0,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    },
+    {
+     "message_id": "634881f6-dd04-4cd0-9839-97a4c0d1a54a",
+     "role": "user",
+     "text": "현재 단계를 쉽게 설명해줘"
+    },
+    {
+     "message_id": "ac0ca963-4e17-4e13-a672-bd93cbc98966",
+     "role": "assistant",
+     "text": "다음은 기존 활동 원문의 참고 안내입니다.\n\n계량해서 간장 드레싱 만들기\n1단계: 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+     "response": {
+      "message_id": "ac0ca963-4e17-4e13-a672-bd93cbc98966",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "reference",
+      "text": "다음은 기존 활동 원문의 참고 안내입니다.\n\n계량해서 간장 드레싱 만들기\n1단계: 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "activities": [],
+      "sources": [
+       {
+        "evidence_id": "cook-0-2:step:1",
+        "activity_id": "cook-0-2",
+        "title": "계량해서 간장 드레싱 만들기",
+        "review_status": "source_only",
+        "kind": "activity",
+        "excerpt": "1단계: 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+        "source_refs": [
+         "cook-0-2"
+        ],
+        "applies_when": ""
+       }
+      ],
+      "actions": [],
+      "selected_activity_id": "cook-0-2",
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "explain",
+       "search_performed": false,
+       "search_mode": "none",
+       "llm_calls": 0,
+       "llm_status": "reference",
+       "latency_ms": 1.92,
+       "trace_id": "8f80702b-f614-4e6e-a703-2a62a83ad174",
+       "decision_calls": 0,
+       "retrieval_calls": 0,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "cited_evidence_ids": [
+       "cook-0-2:step:1"
+      ],
+      "cited_activity_ids": [
+       "cook-0-2"
+      ],
+      "validation_errors": [],
+      "validation": {
+       "format": "not_run",
+       "citations": "not_run",
+       "quantities": "not_run",
+       "semantic_support": "not_run"
+      },
+      "metacognition": {
+       "supported": [],
+       "unresolved": [],
+       "source_review": {
+        "cook-0-2:step:1": "source_only"
+       },
+       "stop_reason": null,
+       "next_action": "원문 확인 또는 미확인 항목 설명"
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    },
+    {
+     "message_id": "05941249-699a-4b84-8f2f-f7792fe8bd08",
+     "role": "user",
+     "text": "오늘 날씨 어때?"
+    },
+    {
+     "message_id": "4a327988-77c5-4bf2-9d75-7de8b2788ca0",
+     "role": "assistant",
+     "text": "현재는 요리 활동을 지원합니다. 오늘 가능한 시간이나 하고 싶은 요리를 알려주세요.",
+     "response": {
+      "message_id": "4a327988-77c5-4bf2-9d75-7de8b2788ca0",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "clarify",
+      "text": "현재는 요리 활동을 지원합니다. 오늘 가능한 시간이나 하고 싶은 요리를 알려주세요.",
+      "activities": [],
+      "sources": [],
+      "actions": [],
+      "selected_activity_id": "cook-0-2",
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "out_of_scope",
+       "search_performed": false,
+       "search_mode": "none",
+       "llm_calls": 0,
+       "llm_status": "not_needed",
+       "latency_ms": 0.82,
+       "trace_id": "87470a25-17a7-483c-bc7a-c2879f8a7712",
+       "decision_calls": 0,
+       "retrieval_calls": 0,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    },
+    {
+     "message_id": "50e2fae2-3504-4d72-938b-e74a049ad45a",
+     "role": "user",
+     "text": "요리 활동 추천해줘"
+    },
+    {
+     "message_id": "1fc82a88-c25b-4d15-8c0b-bbbbd7474b69",
+     "role": "assistant",
+     "text": "검증된 비용 정보가 없어 예산 조건의 충족을 확인할 수 없어요. 조건을 바꾸거나 다른 활동을 요청해 주세요.",
+     "response": {
+      "message_id": "1fc82a88-c25b-4d15-8c0b-bbbbd7474b69",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "clarify",
+      "text": "검증된 비용 정보가 없어 예산 조건의 충족을 확인할 수 없어요. 조건을 바꾸거나 다른 활동을 요청해 주세요.",
+      "activities": [],
+      "sources": [],
+      "actions": [],
+      "selected_activity_id": "cook-0-2",
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "update_constraints",
+       "search_performed": true,
+       "search_mode": "bm25",
+       "llm_calls": 0,
+       "llm_status": "not_needed",
+       "latency_ms": 3.19,
+       "trace_id": "7a120b24-35c9-4e80-9f04-aba2a567b49c",
+       "scope": "activities",
+       "reranker": "rule_based",
+       "reranker_model": null,
+       "reranker_error": null,
+       "embedding_error": null,
+       "rerank_min_score": -2.0,
+       "rrf_k": 60,
+       "bm25_candidates": 0,
+       "dense_candidates": 0,
+       "candidate_ids": [],
+       "ranking": [],
+       "missing_filter_fields": [
+        "budget_max"
+       ],
+       "dense_available": false,
+       "minimum_dense_similarity": 0.4,
+       "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+       "total_documents": 162,
+       "eligible_documents": 0,
+       "empty_reason": "no_eligible_documents",
+       "starter_fallback": false,
+       "decision_calls": 0,
+       "retrieval_calls": 1,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    },
+    {
+     "message_id": "ac67c520-dccf-48b2-a9e3-126fcac28979",
+     "role": "user",
+     "text": "요리 활동 추천해줘"
+    },
+    {
+     "message_id": "f67926aa-2697-45db-a8ee-34bbbba77cea",
+     "role": "assistant",
+     "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+     "response": {
+      "message_id": "f67926aa-2697-45db-a8ee-34bbbba77cea",
+      "session_id": "b716b814-c6d0-4e5d-a6c8-a1e452a91231",
+      "mode": "direct",
+      "text": "다음 활동을 찾았어요. 번호로 선택하면 준비물과 순서를 이어서 안내할게요.\n1. 주방 탐험: 도구 이름과 위생 습관\n2. 계량해서 간장 드레싱 만들기\n3. 전자레인지 달걀찜",
+      "activities": [
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-1",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "주방 탐험: 도구 이름과 위생 습관",
+        "description": "위생·도구 이해",
+        "categories": [
+         "공통"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "도마",
+         "칼",
+         "계량컵",
+         "계량스푼",
+         "냄비",
+         "프라이팬",
+         "뒤집개",
+         "행주"
+        ],
+        "materials": [],
+        "steps": [
+         "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+         "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+         "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+         "행주와 수세미를 세척해 말려 두어요"
+        ],
+        "checks": [
+         "도구 8가지의 이름과 용도를 말할 수 있다",
+         "도마 사용 순서를 정했다"
+        ],
+        "safety_notes": [
+         "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+         "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+        ],
+        "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+        "cooking": {
+         "ingredients": [],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       },
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-2",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "계량해서 간장 드레싱 만들기",
+        "description": "계량(큰술·작은술), 맛보기",
+        "categories": [
+         "한식"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "계량스푼",
+         "작은 볼",
+         "숟가락"
+        ],
+        "materials": [
+         "간장 2큰술",
+         "식초 2큰술",
+         "설탕 1큰술",
+         "올리브유 또는 식용유 2큰술"
+        ],
+        "steps": [
+         "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+         "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+         "설탕이 녹을 때까지 저어요",
+         "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+        ],
+        "checks": [
+         "가루와 액체를 각각 알맞은 방법으로 계량했다",
+         "맛의 특징을 한 줄로 메모했다"
+        ],
+        "safety_notes": [
+         "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+         "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+        ],
+        "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+        "cooking": {
+         "ingredients": [
+          {
+           "text": "간장 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "식초 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "설탕 1큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "올리브유 또는 식용유 2큰술",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          }
+         ],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       },
+       {
+        "schema_version": "1.0",
+        "activity_id": "cook-0-4",
+        "hobby_key": "cooking",
+        "kind": "activity",
+        "language": "ko",
+        "title": "전자레인지 달걀찜",
+        "description": "재료 비율, 전자레인지 가열",
+        "categories": [
+         "한식"
+        ],
+        "catalog_level": 0,
+        "difficulty": null,
+        "duration": {
+         "total_minutes": 15,
+         "active_minutes": 15,
+         "wait_minutes": 0,
+         "prep_minutes": null,
+         "cook_minutes": null,
+         "is_estimate": true
+        },
+        "tools": [
+         "전자레인지용 그릇",
+         "랩 또는 전자레인지용 뚜껑",
+         "포크",
+         "내열 장갑"
+        ],
+        "materials": [
+         "달걀 2개",
+         "물 150ml",
+         "소금 한 꼬집"
+        ],
+        "steps": [
+         "달걀을 곱게 풀고 물과 소금을 섞어요(달걀 양의 약 1.5배 물)",
+         "그릇에 담고 랩에 구멍을 2~3개 내거나 뚜껑을 살짝 걸쳐요",
+         "700W 기준 1분 30초 돌린 뒤 한 번 젓고 1분 더 돌려요",
+         "중간에 저어 고르게 가열하고, 액체 상태가 남지 않도록 추가 가열해요. 출력과 그릇에 따른 시간을 기록해요"
+        ],
+        "checks": [
+         "가운데까지 익었다",
+         "우리 집 전자레인지에 맞는 시간을 메모했다"
+        ],
+        "safety_notes": [
+         "껍질째 달걀은 전자레인지에 넣지 않아요. 터질 수 있어요",
+         "금속 그릇은 쓰지 않아요"
+        ],
+        "lighter_alternative": "달걀 1개, 물 75ml로 절반만 만들어요",
+        "cooking": {
+         "ingredients": [
+          {
+           "text": "달걀 2개",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "물 150ml",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          },
+          {
+           "text": "소금 한 꼬집",
+           "name": null,
+           "quantity_text": null,
+           "unit": null
+          }
+         ],
+         "servings": null
+        },
+        "quality": {
+         "status": "structural_pass",
+         "flags": [
+          "difficulty_unassigned",
+          "human_review_pending",
+          "ingredient_fields_unstructured"
+         ],
+         "human_reviewed": false,
+         "capabilities": [
+          "discovery",
+          "step_reference",
+          "time_filter_estimate"
+         ]
+        }
+       }
+      ],
+      "sources": [
+       {
+        "activity_id": "cook-0-1",
+        "title": "주방 탐험: 도구 이름과 위생 습관",
+        "kind": "activity",
+        "excerpt": "위생·도구 이해"
+       },
+       {
+        "activity_id": "cook-0-2",
+        "title": "계량해서 간장 드레싱 만들기",
+        "kind": "activity",
+        "excerpt": "계량(큰술·작은술), 맛보기"
+       },
+       {
+        "activity_id": "cook-0-4",
+        "title": "전자레인지 달걀찜",
+        "kind": "activity",
+        "excerpt": "재료 비율, 전자레인지 가열"
+       }
+      ],
+      "actions": [
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-1",
+        "label": "주방 탐험: 도구 이름과 위생 습관"
+       },
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-2",
+        "label": "계량해서 간장 드레싱 만들기"
+       },
+       {
+        "type": "open_activity",
+        "activity_id": "cook-0-4",
+        "label": "전자레인지 달걀찜"
+       }
+      ],
+      "selected_activity_id": "cook-0-2",
+      "current_step": 1,
+      "execution_id": null,
+      "diagnostics": {
+       "intent": "update_constraints",
+       "search_performed": true,
+       "search_mode": "catalog_browse",
+       "llm_calls": 0,
+       "llm_status": "not_needed",
+       "latency_ms": 3.74,
+       "trace_id": "36cc2f0c-c679-4bc9-b248-fa4a5d73ee5c",
+       "scope": "activities",
+       "reranker": "rule_based",
+       "reranker_model": null,
+       "reranker_error": null,
+       "embedding_error": null,
+       "rerank_min_score": -2.0,
+       "rrf_k": 60,
+       "bm25_candidates": 0,
+       "dense_candidates": 0,
+       "candidate_ids": [
+        "cook-0-1",
+        "cook-0-2",
+        "cook-0-4"
+       ],
+       "ranking": [],
+       "missing_filter_fields": [],
+       "dense_available": false,
+       "minimum_dense_similarity": 0.4,
+       "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+       "total_documents": 162,
+       "eligible_documents": 25,
+       "starter_fallback": false,
+       "decision_calls": 0,
+       "retrieval_calls": 1,
+       "generation_calls": 0,
+       "verification_calls": 0,
+       "usage": {}
+      },
+      "issue_id": null,
+      "issue_phase": "idle"
+     }
+    }
+   ],
+   "execution_id": null,
+   "search_query": "요리 활동 추천해줘",
+   "search_scope": "activities",
+   "created_at": "2026-11-10T16:50:44.519+00:00",
+   "dialogue": {
+    "version": 2,
+    "issue_id": null,
+    "activity_id": null,
+    "execution_id": null,
+    "phase": "idle",
+    "goal": "",
+    "requirements": [],
+    "observations": [],
+    "pending_question": null,
+    "evidence_ids": [],
+    "coverage": [],
+    "clarification_count": 0,
+    "reflection_count": 0,
+    "searched_queries": [],
+    "outcome": null,
+    "step_number": null,
+    "asked_questions": [],
+    "hop_trace": [],
+    "status": "idle"
+   },
+   "shown_ids": [
+    "cook-0-1",
+    "cook-0-2",
+    "cook-0-4"
+   ],
+   "candidate_selection_pending": true,
+   "last_recommendation": {
+    "message_id": "f67926aa-2697-45db-a8ee-34bbbba77cea",
+    "query": "요리 활동 추천해줘",
+    "scope": "activities",
+    "constraints": {
+     "max_minutes": 20.0,
+     "available_tools": null,
+     "excluded_tools": null,
+     "max_difficulty": null,
+     "budget_max": null
+    },
+    "candidate_ids": [
+     "cook-0-1",
+     "cook-0-2",
+     "cook-0-4"
+    ],
+    "ranking": [],
+    "search_mode": "catalog_browse"
+   },
+   "context_after_message_id": "ef936f0d-d747-4c47-88b2-3f2342b94a8f"
+  }
+ },
+ {
+  "label": "search_activities",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "간장 드레싱",
+   "scope": "activities",
+   "limit": 3
+  },
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-2-13",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "간장비빔국수",
+     "description": "물이 흥건하지 않고 간이 고르다",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 2,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 40,
+      "active_minutes": 40,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량 도구",
+      "작업용 그릇",
+      "도마",
+      "조리용 칼 또는 가위",
+      "냄비",
+      "체",
+      "집게"
+     ],
+     "materials": [
+      "소면",
+      "오이",
+      "간장",
+      "참기름"
+     ],
+     "steps": [
+      "오이를 썰어 양념 준비하기",
+      "삶아 헹군 면의 물기 빼기",
+      "양념을 나눠 넣으며 버무리기"
+     ],
+     "checks": [
+      "물이 흥건하지 않고 간이 고르다"
+     ],
+     "safety_notes": [
+      "손과 도구를 씻고 생재료와 완성 음식의 작업 구역을 분리한다.",
+      "칼날과 뜨거운 증기가 손과 몸을 향하지 않게 한다."
+     ],
+     "lighter_alternative": "양을 절반으로 줄여 한 가지 기술부터 연습한다.",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "소면",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "오이",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "간장",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "참기름",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-1-5",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "파스타 삶기와 버터간장 파스타",
+     "description": "면 삶기(소금물·시간), 면수 활용",
+     "categories": [
+      "양식"
+     ],
+     "catalog_level": 1,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 25,
+      "active_minutes": 25,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "큰 냄비",
+      "집게",
+      "프라이팬",
+      "컵"
+     ],
+     "materials": [
+      "스파게티 100g",
+      "버터 10g",
+      "간장 1큰술",
+      "소금 2작은술"
+     ],
+     "steps": [
+      "물 1L에 소금 2작은술(약 10g)을 넣고 끓여요",
+      "면을 넣고 포장지 시간보다 1분 짧게 삶아요",
+      "건지기 전에 면수 반 컵을 따로 덜어 둬요",
+      "팬에 버터를 녹이고 면·간장·면수 2큰술을 넣어 버무려요"
+     ],
+     "checks": [
+      "면 가운데 심이 아주 살짝 남은 식감이다",
+      "면수로 윤기를 냈다"
+     ],
+     "safety_notes": [
+      "면을 건질 때 끓는 물을 몸 반대쪽으로 부어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "삶은 면에 시판 소스를 얹어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "스파게티 100g",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "버터 10g",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "간장 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "소금 2작은술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "diagnostics": {
+    "search_mode": "bm25",
+    "scope": "activities",
+    "query_aliases": [],
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 22,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-2",
+     "cook-2-13",
+     "cook-1-5"
+    ],
+    "ranking": [
+     {
+      "final_rank": 1,
+      "activity_id": "cook-0-2",
+      "title": "계량해서 간장 드레싱 만들기",
+      "bm25_rank": 1,
+      "dense_score": null,
+      "rrf_score": 0.01639,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 2,
+      "activity_id": "cook-2-13",
+      "title": "간장비빔국수",
+      "bm25_rank": 3,
+      "dense_score": null,
+      "rrf_score": 0.01587,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 3,
+      "activity_id": "cook-1-5",
+      "title": "파스타 삶기와 버터간장 파스타",
+      "bm25_rank": 4,
+      "dense_score": null,
+      "rrf_score": 0.01562,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 4,
+      "activity_id": "cook-0-3",
+      "title": "씻고 뜯어 만드는 샐러드",
+      "bm25_rank": 2,
+      "dense_score": null,
+      "rrf_score": 0.01613,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 5,
+      "activity_id": "cn-0-1",
+      "title": "중식 양념 소량 계량",
+      "bm25_rank": 5,
+      "dense_score": null,
+      "rrf_score": 0.01538,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 6,
+      "activity_id": "cook-3-13",
+      "title": "두부구이와 달래장",
+      "bm25_rank": 6,
+      "dense_score": null,
+      "rrf_score": 0.01515,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 7,
+      "activity_id": "cook-2-1",
+      "title": "콩나물국으로 간 맞추기",
+      "bm25_rank": 7,
+      "dense_score": null,
+      "rrf_score": 0.01493,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 8,
+      "activity_id": "cook-3-15",
+      "title": "돼지고기장조림",
+      "bm25_rank": 8,
+      "dense_score": null,
+      "rrf_score": 0.01471,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 9,
+      "activity_id": "cook-2-2",
+      "title": "김치볶음밥",
+      "bm25_rank": 9,
+      "dense_score": null,
+      "rrf_score": 0.01449,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 10,
+      "activity_id": "cook-3-1",
+      "title": "멸치·다시마 육수와 어묵국",
+      "bm25_rank": 10,
+      "dense_score": null,
+      "rrf_score": 0.01429,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 11,
+      "activity_id": "cook-3-14",
+      "title": "깻잎찜",
+      "bm25_rank": 11,
+      "dense_score": null,
+      "rrf_score": 0.01408,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 12,
+      "activity_id": "cook-2-12",
+      "title": "두부조림",
+      "bm25_rank": 12,
+      "dense_score": null,
+      "rrf_score": 0.01389,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 13,
+      "activity_id": "cn-3-2",
+      "title": "전분물로 농도 잡는 채소 덮밥",
+      "bm25_rank": 13,
+      "dense_score": null,
+      "rrf_score": 0.0137,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 14,
+      "activity_id": "jp-3-1",
+      "title": "완숙 오야코동",
+      "bm25_rank": 14,
+      "dense_score": null,
+      "rrf_score": 0.01351,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 15,
+      "activity_id": "jp-4-1",
+      "title": "가라아게 소량 튀김",
+      "bm25_rank": 15,
+      "dense_score": null,
+      "rrf_score": 0.01333,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 16,
+      "activity_id": "jp-3-2",
+      "title": "다시마키 달걀말이",
+      "bm25_rank": 16,
+      "dense_score": null,
+      "rrf_score": 0.01316,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 17,
+      "activity_id": "cook-4-16",
+      "title": "잡채 재료별 익힘",
+      "bm25_rank": 17,
+      "dense_score": null,
+      "rrf_score": 0.01299,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 18,
+      "activity_id": "cn-5-2",
+      "title": "두 가지 소스로 만드는 나만의 덮밥",
+      "bm25_rank": 18,
+      "dense_score": null,
+      "rrf_score": 0.01282,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 19,
+      "activity_id": "cook-2-5",
+      "title": "토마토 파스타",
+      "bm25_rank": 19,
+      "dense_score": null,
+      "rrf_score": 0.01266,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 20,
+      "activity_id": "cook-4-6",
+      "title": "만두 빚어 군만두",
+      "bm25_rank": 20,
+      "dense_score": null,
+      "rrf_score": 0.0125,
+      "rerank_score": null,
+      "passed": true
+     }
+    ],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 162,
+    "lexical_rejected_without_topic": 0,
+    "latency_ms": 1.69
+   }
+  }
+ },
+ {
+  "label": "search_time_limit",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "간장 드레싱",
+   "constraints": {
+    "max_minutes": 20
+   },
+   "limit": 3
+  },
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-3",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "씻고 뜯어 만드는 샐러드",
+     "description": "채소 세척·물기 제거",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 20,
+      "active_minutes": 20,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "볼",
+      "체 또는 키친타월",
+      "접시"
+     ],
+     "materials": [
+      "샐러드 채소 1봉",
+      "방울토마토 5개",
+      "간장 드레싱 활동에서 만든 드레싱"
+     ],
+     "steps": [
+      "채소를 찬물에 잠시 담갔다가 흐르는 물에 헹궈요",
+      "체에 받치거나 키친타월로 물기를 빼요. 물기가 남으면 드레싱이 겉돌아요",
+      "손으로 한입 크기로 뜯고 방울토마토를 올려요",
+      "먹기 직전에 드레싱을 버무려요"
+     ],
+     "checks": [
+      "물기를 충분히 뺐다",
+      "먹기 직전에 드레싱을 버무렸다"
+     ],
+     "safety_notes": [
+      "손을 씻고 시작해요. 이 활동은 칼을 쓰지 않아요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "세척된 샐러드 채소를 그대로 써요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "샐러드 채소 1봉",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "방울토마토 5개",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "간장 드레싱 활동에서 만든 드레싱",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cn-0-1",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "중식 양념 소량 계량",
+     "description": "간장과 굴소스의 역할을 구분한다",
+     "categories": [
+      "중식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 20,
+      "active_minutes": 20,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "저울·계량 도구",
+      "작업용 볼"
+     ],
+     "materials": [
+      "간장",
+      "굴소스",
+      "물"
+     ],
+     "steps": [
+      "제품 표시에서 염분과 알레르기 확인",
+      "각 양념을 별도 계량",
+      "소량을 희석해 맛의 차이 기록"
+     ],
+     "checks": [
+      "간장과 굴소스의 역할을 구분한다"
+     ],
+     "safety_notes": [
+      "손·도구를 씻고 생재료와 완성 음식의 작업 구역을 나눈다.",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "한 번에 다루는 양을 줄여 핵심 기술부터 연습한다.",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "굴소스",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "물",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "diagnostics": {
+    "search_mode": "bm25",
+    "scope": "activities",
+    "query_aliases": [],
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 3,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-2",
+     "cook-0-3",
+     "cn-0-1"
+    ],
+    "ranking": [
+     {
+      "final_rank": 1,
+      "activity_id": "cook-0-2",
+      "title": "계량해서 간장 드레싱 만들기",
+      "bm25_rank": 1,
+      "dense_score": null,
+      "rrf_score": 0.01639,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 2,
+      "activity_id": "cook-0-3",
+      "title": "씻고 뜯어 만드는 샐러드",
+      "bm25_rank": 2,
+      "dense_score": null,
+      "rrf_score": 0.01613,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 3,
+      "activity_id": "cn-0-1",
+      "title": "중식 양념 소량 계량",
+      "bm25_rank": 3,
+      "dense_score": null,
+      "rrf_score": 0.01587,
+      "rerank_score": null,
+      "passed": true
+     }
+    ],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 25,
+    "lexical_rejected_without_topic": 0,
+    "latency_ms": 1.2
+   }
+  }
+ },
+ {
+  "label": "search_knowledge",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "간장 드레싱 계량",
+   "scope": "knowledge",
+   "limit": 2
+  },
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "schema_version": "2.0",
+     "knowledge_id": "cook-0-2:checks",
+     "activity_ids": [
+      "cook-0-2"
+     ],
+     "title": "계량해서 간장 드레싱 만들기 · checks",
+     "kind": "checks",
+     "content": "가루와 액체를 각각 알맞은 방법으로 계량했다\n맛의 특징을 한 줄로 메모했다",
+     "applies_when": "원문 활동의 참고 안내; 원인 확정 불가",
+     "related_knowledge_ids": [
+      "cook-0-2:steps",
+      "cook-0-2:safety_notes"
+     ],
+     "source_refs": [
+      "cook-0-2/checks"
+     ],
+     "review_status": "source_only",
+     "reviewed_by": null,
+     "activity_id": "cook-0-2:checks",
+     "hobby_key": "cooking",
+     "description": "가루와 액체를 각각 알맞은 방법으로 계량했다\n맛의 특징을 한 줄로 메모했다",
+     "steps": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다\n맛의 특징을 한 줄로 메모했다"
+     ],
+     "tools": [],
+     "quality": {
+      "status": "structural_pass"
+     }
+    },
+    {
+     "schema_version": "2.0",
+     "knowledge_id": "cook-0-2:safety_notes",
+     "activity_ids": [
+      "cook-0-2"
+     ],
+     "title": "계량해서 간장 드레싱 만들기 · safety_notes",
+     "kind": "safety_notes",
+     "content": "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요\n생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.",
+     "applies_when": "원문 활동의 참고 안내; 원인 확정 불가",
+     "related_knowledge_ids": [
+      "cook-0-2:checks",
+      "cook-0-2:steps"
+     ],
+     "source_refs": [
+      "cook-0-2/safety_notes"
+     ],
+     "review_status": "source_only",
+     "reviewed_by": null,
+     "activity_id": "cook-0-2:safety_notes",
+     "hobby_key": "cooking",
+     "description": "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요\n생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.",
+     "steps": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요\n생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "tools": [],
+     "quality": {
+      "status": "structural_pass"
+     }
+    }
+   ],
+   "diagnostics": {
+    "search_mode": "bm25",
+    "scope": "knowledge",
+    "query_aliases": [],
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 40,
+    "dense_candidates": 0,
+    "candidate_ids": [
+     "cook-0-2:checks",
+     "cook-0-2:safety_notes"
+    ],
+    "ranking": [
+     {
+      "final_rank": 1,
+      "activity_id": "cook-0-2:checks",
+      "title": "계량해서 간장 드레싱 만들기 · checks",
+      "bm25_rank": 1,
+      "dense_score": null,
+      "rrf_score": 0.01639,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 2,
+      "activity_id": "cook-0-2:safety_notes",
+      "title": "계량해서 간장 드레싱 만들기 · safety_notes",
+      "bm25_rank": 2,
+      "dense_score": null,
+      "rrf_score": 0.01613,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 3,
+      "activity_id": "cook-0-2:steps",
+      "title": "계량해서 간장 드레싱 만들기 · steps",
+      "bm25_rank": 3,
+      "dense_score": null,
+      "rrf_score": 0.01587,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 4,
+      "activity_id": "cn-0-1:checks",
+      "title": "중식 양념 소량 계량 · checks",
+      "bm25_rank": 6,
+      "dense_score": null,
+      "rrf_score": 0.01515,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 5,
+      "activity_id": "cook-2-13:checks",
+      "title": "간장비빔국수 · checks",
+      "bm25_rank": 7,
+      "dense_score": null,
+      "rrf_score": 0.01493,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 6,
+      "activity_id": "cook-1-5:checks",
+      "title": "파스타 삶기와 버터간장 파스타 · checks",
+      "bm25_rank": 8,
+      "dense_score": null,
+      "rrf_score": 0.01471,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 7,
+      "activity_id": "cook-2-13:steps",
+      "title": "간장비빔국수 · steps",
+      "bm25_rank": 9,
+      "dense_score": null,
+      "rrf_score": 0.01449,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 8,
+      "activity_id": "cook-1-5:steps",
+      "title": "파스타 삶기와 버터간장 파스타 · steps",
+      "bm25_rank": 10,
+      "dense_score": null,
+      "rrf_score": 0.01429,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 9,
+      "activity_id": "cook-2-13:safety_notes",
+      "title": "간장비빔국수 · safety_notes",
+      "bm25_rank": 11,
+      "dense_score": null,
+      "rrf_score": 0.01408,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 10,
+      "activity_id": "cook-1-5:safety_notes",
+      "title": "파스타 삶기와 버터간장 파스타 · safety_notes",
+      "bm25_rank": 12,
+      "dense_score": null,
+      "rrf_score": 0.01389,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 11,
+      "activity_id": "pastry-0-1:steps",
+      "title": "베이킹 저울 영점과 소량 계량 · steps",
+      "bm25_rank": 19,
+      "dense_score": null,
+      "rrf_score": 0.01266,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 12,
+      "activity_id": "jp-0-1:steps",
+      "title": "다시 재료와 물 계량 · steps",
+      "bm25_rank": 20,
+      "dense_score": null,
+      "rrf_score": 0.0125,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 13,
+      "activity_id": "cook-0-10:steps",
+      "title": "쌀 씻고 물 계량하기 · steps",
+      "bm25_rank": 21,
+      "dense_score": null,
+      "rrf_score": 0.01235,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 14,
+      "activity_id": "cook-0-10:checks",
+      "title": "쌀 씻고 물 계량하기 · checks",
+      "bm25_rank": 22,
+      "dense_score": null,
+      "rrf_score": 0.0122,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 15,
+      "activity_id": "cn-0-1:steps",
+      "title": "중식 양념 소량 계량 · steps",
+      "bm25_rank": 23,
+      "dense_score": null,
+      "rrf_score": 0.01205,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 16,
+      "activity_id": "bread-0-1:steps",
+      "title": "밀가루·이스트·소금 구분과 계량 · steps",
+      "bm25_rank": 24,
+      "dense_score": null,
+      "rrf_score": 0.0119,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 17,
+      "activity_id": "jp-0-1:checks",
+      "title": "다시 재료와 물 계량 · checks",
+      "bm25_rank": 25,
+      "dense_score": null,
+      "rrf_score": 0.01176,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 18,
+      "activity_id": "pastry-0-1:checks",
+      "title": "베이킹 저울 영점과 소량 계량 · checks",
+      "bm25_rank": 26,
+      "dense_score": null,
+      "rrf_score": 0.01163,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 19,
+      "activity_id": "bread-0-1:checks",
+      "title": "밀가루·이스트·소금 구분과 계량 · checks",
+      "bm25_rank": 27,
+      "dense_score": null,
+      "rrf_score": 0.01149,
+      "rerank_score": null,
+      "passed": true
+     },
+     {
+      "final_rank": 20,
+      "activity_id": "cook-0-10:safety_notes",
+      "title": "쌀 씻고 물 계량하기 · safety_notes",
+      "bm25_rank": 28,
+      "dense_score": null,
+      "rrf_score": 0.01136,
+      "rerank_score": null,
+      "passed": true
+     }
+    ],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "19a09c5517720a4baa8e0f33fb52bd2be4877457f7f7df10d0b39cc38e2483fe",
+    "total_documents": 486,
+    "eligible_documents": 486,
+    "lexical_rejected_without_topic": 0,
+    "latency_ms": 2.46
+   }
+  }
+ },
+ {
+  "label": "search_recipes",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "감자 수프 레시피",
+   "scope": "recipes",
+   "limit": 2
+  },
+  "status": 200,
+  "body": {
+   "items": [],
+   "diagnostics": {
+    "search_mode": "bm25",
+    "scope": "recipes",
+    "query_aliases": [
+     "potato",
+     "potatoes",
+     "soup"
+    ],
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [],
+    "ranking": [],
+    "missing_filter_fields": [],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": null,
+    "total_documents": 0,
+    "eligible_documents": 0,
+    "empty_reason": "no_eligible_documents",
+    "latency_ms": 1.57
+   }
+  }
+ },
+ {
+  "label": "search_budget",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "간장 드레싱",
+   "constraints": {
+    "budget_max": 5000
+   }
+  },
+  "status": 200,
+  "body": {
+   "items": [],
+   "diagnostics": {
+    "search_mode": "bm25",
+    "scope": "activities",
+    "query_aliases": [],
+    "reranker": "rule_based",
+    "reranker_model": null,
+    "reranker_error": null,
+    "embedding_error": null,
+    "rerank_min_score": -2.0,
+    "rrf_k": 60,
+    "bm25_candidates": 0,
+    "dense_candidates": 0,
+    "candidate_ids": [],
+    "ranking": [],
+    "missing_filter_fields": [
+     "budget_max"
+    ],
+    "dense_available": false,
+    "minimum_dense_similarity": 0.4,
+    "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+    "total_documents": 162,
+    "eligible_documents": 0,
+    "empty_reason": "no_eligible_documents",
+    "latency_ms": 0.56
+   }
+  }
+ },
+ {
+  "label": "search_bad_scope",
+  "method": "POST",
+  "url": "/search",
+  "json": {
+   "query": "x",
+   "scope": "all"
+  },
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "literal_error",
+     "loc": [
+      "body",
+      "scope"
+     ],
+     "msg": "Input should be 'activities', 'recipes' or 'knowledge'",
+     "input": "all",
+     "ctx": {
+      "expected": "'activities', 'recipes' or 'knowledge'"
+     }
+    }
+   ]
+  }
+ },
+ {
+  "label": "activities_list",
+  "method": "GET",
+  "url": "/activities?limit=2",
+  "json": null,
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-1",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "주방 탐험: 도구 이름과 위생 습관",
+     "description": "위생·도구 이해",
+     "categories": [
+      "공통"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "도마",
+      "칼",
+      "계량컵",
+      "계량스푼",
+      "냄비",
+      "프라이팬",
+      "뒤집개",
+      "행주"
+     ],
+     "materials": [],
+     "steps": [
+      "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+      "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+      "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+      "행주와 수세미를 세척해 말려 두어요"
+     ],
+     "checks": [
+      "도구 8가지의 이름과 용도를 말할 수 있다",
+      "도마 사용 순서를 정했다"
+     ],
+     "safety_notes": [
+      "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+     "cooking": {
+      "ingredients": [],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    },
+    {
+     "schema_version": "1.0",
+     "activity_id": "cook-0-2",
+     "hobby_key": "cooking",
+     "kind": "activity",
+     "language": "ko",
+     "title": "계량해서 간장 드레싱 만들기",
+     "description": "계량(큰술·작은술), 맛보기",
+     "categories": [
+      "한식"
+     ],
+     "catalog_level": 0,
+     "difficulty": null,
+     "duration": {
+      "total_minutes": 15,
+      "active_minutes": 15,
+      "wait_minutes": 0,
+      "prep_minutes": null,
+      "cook_minutes": null,
+      "is_estimate": true
+     },
+     "tools": [
+      "계량스푼",
+      "작은 볼",
+      "숟가락"
+     ],
+     "materials": [
+      "간장 2큰술",
+      "식초 2큰술",
+      "설탕 1큰술",
+      "올리브유 또는 식용유 2큰술"
+     ],
+     "steps": [
+      "물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요",
+      "가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요",
+      "설탕이 녹을 때까지 저어요",
+      "맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요"
+     ],
+     "checks": [
+      "가루와 액체를 각각 알맞은 방법으로 계량했다",
+      "맛의 특징을 한 줄로 메모했다"
+     ],
+     "safety_notes": [
+      "남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요",
+      "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+     ],
+     "lighter_alternative": "간장과 식초 두 가지만 1:1로 섞어요",
+     "cooking": {
+      "ingredients": [
+       {
+        "text": "간장 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "식초 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "설탕 1큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       },
+       {
+        "text": "올리브유 또는 식용유 2큰술",
+        "name": null,
+        "quantity_text": null,
+        "unit": null
+       }
+      ],
+      "servings": null
+     },
+     "quality": {
+      "status": "structural_pass",
+      "flags": [
+       "difficulty_unassigned",
+       "human_review_pending",
+       "ingredient_fields_unstructured"
+      ],
+      "human_reviewed": false,
+      "capabilities": [
+       "discovery",
+       "step_reference",
+       "time_filter_estimate"
+      ]
+     }
+    }
+   ],
+   "total": 2
+  }
+ },
+ {
+  "label": "activities_limit_range",
+  "method": "GET",
+  "url": "/activities?limit=0",
+  "json": null,
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "greater_than_equal",
+     "loc": [
+      "query",
+      "limit"
+     ],
+     "msg": "Input should be greater than or equal to 1",
+     "input": "0",
+     "ctx": {
+      "ge": 1
+     }
+    }
+   ]
+  }
+ },
+ {
+  "label": "activity_get",
+  "method": "GET",
+  "url": "/activities/cook-0-1",
+  "json": null,
+  "status": 200,
+  "body": {
+   "schema_version": "1.0",
+   "activity_id": "cook-0-1",
+   "hobby_key": "cooking",
+   "kind": "activity",
+   "language": "ko",
+   "title": "주방 탐험: 도구 이름과 위생 습관",
+   "description": "위생·도구 이해",
+   "categories": [
+    "공통"
+   ],
+   "catalog_level": 0,
+   "difficulty": null,
+   "duration": {
+    "total_minutes": 15,
+    "active_minutes": 15,
+    "wait_minutes": 0,
+    "prep_minutes": null,
+    "cook_minutes": null,
+    "is_estimate": true
+   },
+   "tools": [
+    "도마",
+    "칼",
+    "계량컵",
+    "계량스푼",
+    "냄비",
+    "프라이팬",
+    "뒤집개",
+    "행주"
+   ],
+   "materials": [],
+   "steps": [
+    "주방 도구를 꺼내 이름과 용도를 체크리스트에 표시해요",
+    "흐르는 물에 비누로 30초 손 씻기를 연습해요",
+    "생고기용 도구를 구분해요. 같은 도구를 쓰면 생고기 접촉 뒤 세제로 세척하고 적절히 소독한 다음 다른 식품에 써요",
+    "행주와 수세미를 세척해 말려 두어요"
+   ],
+   "checks": [
+    "도구 8가지의 이름과 용도를 말할 수 있다",
+    "도마 사용 순서를 정했다"
+   ],
+   "safety_notes": [
+    "칼은 물이 담긴 개수대에 넣어 두지 않아요. 보이지 않아 베일 수 있어요",
+    "생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요."
+   ],
+   "lighter_alternative": "도구 3가지만 확인하되 손 씻기와 작업대 청결은 그대로 지켜요",
+   "cooking": {
+    "ingredients": [],
+    "servings": null
+   },
+   "quality": {
+    "status": "structural_pass",
+    "flags": [
+     "difficulty_unassigned",
+     "human_review_pending"
+    ],
+    "human_reviewed": false,
+    "capabilities": [
+     "discovery",
+     "step_reference",
+     "time_filter_estimate"
+    ]
+   }
+  }
+ },
+ {
+  "label": "activity_get_missing",
+  "method": "GET",
+  "url": "/activities/cooking-pantry-dressing",
+  "json": null,
+  "status": 404,
+  "body": {
+   "detail": "활동을 찾을 수 없습니다. 다른 활동을 선택해 주세요."
+  }
+ },
+ {
+  "label": "session_create_2",
+  "method": "POST",
+  "url": "/sessions",
+  "json": {
+   "hobby_key": "cooking"
+  },
+  "status": 200,
+  "body": {
+   "session_id": "be54943d-71ca-4dda-bc94-784d2b8841fd",
+   "hobby_key": "cooking",
+   "candidate_ids": [],
+   "selected_activity_id": null,
+   "current_step": 1,
+   "constraints": {
+    "max_minutes": null,
+    "available_tools": null,
+    "excluded_tools": null,
+    "max_difficulty": null,
+    "budget_max": null
+   },
+   "messages": [],
+   "execution_id": null,
+   "search_query": "",
+   "search_scope": "activities",
+   "created_at": "2026-11-10T16:50:44.706+00:00",
+   "dialogue": {
+    "version": 2,
+    "issue_id": null,
+    "activity_id": null,
+    "execution_id": null,
+    "phase": "idle",
+    "goal": "",
+    "requirements": [],
+    "observations": [],
+    "pending_question": null,
+    "evidence_ids": [],
+    "coverage": [],
+    "clarification_count": 0,
+    "reflection_count": 0,
+    "searched_queries": [],
+    "outcome": null,
+    "step_number": null,
+    "asked_questions": [],
+    "hop_trace": [],
+    "status": "idle"
+   }
+  }
+ },
+ {
+  "label": "select",
+  "method": "POST",
+  "url": "/sessions/be54943d-71ca-4dda-bc94-784d2b8841fd/select",
+  "json": {
+   "activity_id": "cook-0-1"
+  },
+  "status": 200,
+  "body": {
+   "session_id": "be54943d-71ca-4dda-bc94-784d2b8841fd",
+   "hobby_key": "cooking",
+   "candidate_ids": [],
+   "selected_activity_id": "cook-0-1",
+   "current_step": 1,
+   "constraints": {
+    "max_minutes": null,
+    "available_tools": null,
+    "excluded_tools": null,
+    "max_difficulty": null,
+    "budget_max": null
+   },
+   "messages": [],
+   "execution_id": null,
+   "search_query": "",
+   "search_scope": "activities",
+   "created_at": "2026-11-10T16:50:44.706+00:00",
+   "dialogue": {
+    "version": 2,
+    "issue_id": null,
+    "activity_id": null,
+    "execution_id": null,
+    "phase": "idle",
+    "goal": "",
+    "requirements": [],
+    "observations": [],
+    "pending_question": null,
+    "evidence_ids": [],
+    "coverage": [],
+    "clarification_count": 0,
+    "reflection_count": 0,
+    "searched_queries": [],
+    "outcome": null,
+    "step_number": null,
+    "asked_questions": [],
+    "hop_trace": [],
+    "status": "idle"
+   },
+   "context_after_message_id": null,
+   "candidate_selection_pending": false
+  }
+ },
+ {
+  "label": "select_missing_activity",
+  "method": "POST",
+  "url": "/sessions/be54943d-71ca-4dda-bc94-784d2b8841fd/select",
+  "json": {
+   "activity_id": "nope"
+  },
+  "status": 404,
+  "body": {
+   "detail": "활동을 찾을 수 없습니다. 다른 활동을 선택해 주세요."
+  }
+ },
+ {
+  "label": "execution_start",
+  "method": "POST",
+  "url": "/sessions/be54943d-71ca-4dda-bc94-784d2b8841fd/executions",
+  "json": {
+   "activity_id": "cook-0-1",
+   "request_id": "run-1"
+  },
+  "status": 200,
+  "body": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "done": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "status": "in_progress",
+   "record_id": null,
+   "created_at": "2026-11-10T16:50:44.738+00:00"
+  }
+ },
+ {
+  "label": "execution_start_replay",
+  "method": "POST",
+  "url": "/sessions/be54943d-71ca-4dda-bc94-784d2b8841fd/executions",
+  "json": {
+   "activity_id": "cook-0-1",
+   "request_id": "run-1"
+  },
+  "status": 200,
+  "body": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "done": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "status": "in_progress",
+   "record_id": null,
+   "created_at": "2026-11-10T16:50:44.738+00:00"
+  }
+ },
+ {
+  "label": "execution_start_id_reuse",
+  "method": "POST",
+  "url": "/sessions/be54943d-71ca-4dda-bc94-784d2b8841fd/executions",
+  "json": {
+   "activity_id": "cook-0-2",
+   "request_id": "run-1"
+  },
+  "status": 409,
+  "body": {
+   "detail": "같은 시작 요청 ID를 다른 활동에 사용할 수 없습니다."
+  }
+ },
+ {
+  "label": "execution_get",
+  "method": "GET",
+  "url": "/executions/dd311b2f-485d-42f2-b4b7-835561e36d79",
+  "json": null,
+  "status": 200,
+  "body": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "done": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "status": "in_progress",
+   "record_id": null,
+   "created_at": "2026-11-10T16:50:44.738+00:00"
+  }
+ },
+ {
+  "label": "execution_patch_wrong_length",
+  "method": "PATCH",
+  "url": "/executions/dd311b2f-485d-42f2-b4b7-835561e36d79",
+  "json": {
+   "done": [
+    true
+   ]
+  },
+  "status": 422,
+  "body": {
+   "detail": "진행 상태의 개수는 활동의 전체 단계 수와 같아야 합니다."
+  }
+ },
+ {
+  "label": "record_before_done",
+  "method": "POST",
+  "url": "/activities/cook-0-1/records",
+  "json": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "request_id": "rec-1"
+  },
+  "status": 409,
+  "body": {
+   "detail": "모든 단계를 마친 뒤 완료를 기록해 주세요."
+  }
+ },
+ {
+  "label": "execution_patch",
+  "method": "PATCH",
+  "url": "/executions/dd311b2f-485d-42f2-b4b7-835561e36d79",
+  "json": {
+   "done": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  "status": 200,
+  "body": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "done": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "status": "in_progress",
+   "record_id": null,
+   "created_at": "2026-11-10T16:50:44.738+00:00"
+  }
+ },
+ {
+  "label": "record_wrong_activity",
+  "method": "POST",
+  "url": "/activities/cook-0-2/records",
+  "json": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "request_id": "rec-1"
+  },
+  "status": 409,
+  "body": {
+   "detail": "실행 중인 활동과 기록 대상이 다릅니다."
+  }
+ },
+ {
+  "label": "record_create",
+  "method": "POST",
+  "url": "/activities/cook-0-1/records",
+  "json": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "request_id": "rec-1",
+   "note": "잘 됨"
+  },
+  "status": 200,
+  "body": {
+   "record_id": "a523231a-f79c-4e5a-b2e5-d6aa0e611da8",
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "completed_at": "2026-11-10T16:50:44.782+00:00",
+   "note": "잘 됨",
+   "created": true
+  }
+ },
+ {
+  "label": "record_replay",
+  "method": "POST",
+  "url": "/activities/cook-0-1/records",
+  "json": {
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "request_id": "rec-2"
+  },
+  "status": 200,
+  "body": {
+   "record_id": "a523231a-f79c-4e5a-b2e5-d6aa0e611da8",
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "activity_id": "cook-0-1",
+   "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+   "completed_at": "2026-11-10T16:50:44.782+00:00",
+   "note": "잘 됨",
+   "created": false
+  }
+ },
+ {
+  "label": "execution_patch_after_complete",
+  "method": "PATCH",
+  "url": "/executions/dd311b2f-485d-42f2-b4b7-835561e36d79",
+  "json": {
+   "done": [
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  "status": 409,
+  "body": {
+   "detail": "이미 완료된 실행의 진행 상태는 변경할 수 없습니다."
+  }
+ },
+ {
+  "label": "coach_complete_declared",
+  "method": "POST",
+  "url": "/coach/messages",
+  "json": {
+   "session_id": "be54943d-71ca-4dda-bc94-784d2b8841fd",
+   "request_id": "demo-9",
+   "message": "완료했어"
+  },
+  "status": 200,
+  "body": {
+   "message_id": "092d096c-a5a1-412d-8eaf-eb1249f80eb6",
+   "session_id": "be54943d-71ca-4dda-bc94-784d2b8841fd",
+   "mode": "action",
+   "text": "이미 완료 기록이 저장되어 있어요.",
+   "activities": [],
+   "sources": [],
+   "actions": [
+    {
+     "type": "view_records",
+     "label": "완료 기록 보기"
+    }
+   ],
+   "selected_activity_id": "cook-0-1",
+   "current_step": 1,
+   "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+   "diagnostics": {
+    "intent": "complete",
+    "search_performed": false,
+    "search_mode": "none",
+    "llm_calls": 0,
+    "llm_status": "not_needed",
+    "latency_ms": 4.02,
+    "trace_id": "ae688128-749f-4678-b943-b6ca870a896e",
+    "decision_calls": 0,
+    "retrieval_calls": 0,
+    "generation_calls": 0,
+    "verification_calls": 0,
+    "usage": {}
+   },
+   "record": {
+    "record_id": "a523231a-f79c-4e5a-b2e5-d6aa0e611da8",
+    "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+    "activity_id": "cook-0-1",
+    "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+    "session_id": "be54943d-71ca-4dda-bc94-784d2b8841fd",
+    "completed_at": "2026-11-10T16:50:44.782+00:00",
+    "note": "잘 됨",
+    "created": false
+   },
+   "issue_id": null,
+   "issue_phase": "idle"
+  }
+ },
+ {
+  "label": "records",
+  "method": "GET",
+  "url": "/records?session_id=be54943d-71ca-4dda-bc94-784d2b8841fd",
+  "json": null,
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "record_id": "a523231a-f79c-4e5a-b2e5-d6aa0e611da8",
+     "execution_id": "dd311b2f-485d-42f2-b4b7-835561e36d79",
+     "activity_id": "cook-0-1",
+     "activity_title": "주방 탐험: 도구 이름과 위생 습관",
+     "completed_at": "2026-11-10T16:50:44.782+00:00",
+     "note": "잘 됨"
+    }
+   ],
+   "total": 1
+  }
+ },
+ {
+  "label": "records_no_session",
+  "method": "GET",
+  "url": "/records",
+  "json": null,
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "missing",
+     "loc": [
+      "query",
+      "session_id"
+     ],
+     "msg": "Field required",
+     "input": null
+    }
+   ]
+  }
+ },
+ {
+  "label": "records_missing_session",
+  "method": "GET",
+  "url": "/records?session_id=nope",
+  "json": null,
+  "status": 404,
+  "body": {
+   "detail": "대화 세션을 찾을 수 없습니다. 새 세션을 만들어 주세요."
+  }
+ },
+ {
+  "label": "traces",
+  "method": "GET",
+  "url": "/diagnostics/traces?session_id=b716b814-c6d0-4e5d-a6c8-a1e452a91231&limit=2",
+  "json": null,
+  "status": 200,
+  "body": {
+   "items": [
+    {
+     "intent": "update_constraints",
+     "search_performed": true,
+     "search_mode": "catalog_browse",
+     "llm_calls": 0,
+     "llm_status": "not_needed",
+     "latency_ms": 3.74,
+     "trace_id": "36cc2f0c-c679-4bc9-b248-fa4a5d73ee5c",
+     "scope": "activities",
+     "reranker": "rule_based",
+     "reranker_model": null,
+     "reranker_error": null,
+     "embedding_error": null,
+     "rerank_min_score": -2.0,
+     "rrf_k": 60,
+     "bm25_candidates": 0,
+     "dense_candidates": 0,
+     "candidate_ids": [
+      "cook-0-1",
+      "cook-0-2",
+      "cook-0-4"
+     ],
+     "ranking": [],
+     "missing_filter_fields": [],
+     "dense_available": false,
+     "minimum_dense_similarity": 0.4,
+     "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+     "total_documents": 162,
+     "eligible_documents": 25,
+     "starter_fallback": false,
+     "decision_calls": 0,
+     "retrieval_calls": 1,
+     "generation_calls": 0,
+     "verification_calls": 0,
+     "usage": {}
+    },
+    {
+     "intent": "update_constraints",
+     "search_performed": true,
+     "search_mode": "bm25",
+     "llm_calls": 0,
+     "llm_status": "not_needed",
+     "latency_ms": 3.19,
+     "trace_id": "7a120b24-35c9-4e80-9f04-aba2a567b49c",
+     "scope": "activities",
+     "reranker": "rule_based",
+     "reranker_model": null,
+     "reranker_error": null,
+     "embedding_error": null,
+     "rerank_min_score": -2.0,
+     "rrf_k": 60,
+     "bm25_candidates": 0,
+     "dense_candidates": 0,
+     "candidate_ids": [],
+     "ranking": [],
+     "missing_filter_fields": [
+      "budget_max"
+     ],
+     "dense_available": false,
+     "minimum_dense_similarity": 0.4,
+     "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+     "total_documents": 162,
+     "eligible_documents": 0,
+     "empty_reason": "no_eligible_documents",
+     "starter_fallback": false,
+     "decision_calls": 0,
+     "retrieval_calls": 1,
+     "generation_calls": 0,
+     "verification_calls": 0,
+     "usage": {}
+    }
+   ]
+  }
+ },
+ {
+  "label": "rag_ask_no_key",
+  "method": "POST",
+  "url": "/rag/ask",
+  "json": {
+   "question": "간장 드레싱 만들 때 큰술과 작은술 계량은 어떻게 해?",
+   "top_k": 3
+  },
+  "status": 200,
+  "body": {
+   "question": "간장 드레싱 만들 때 큰술과 작은술 계량은 어떻게 해?",
+   "answer": "다음은 기존 활동 원문의 참고 안내입니다.\n\n계량해서 간장 드레싱 만들기\n활동 요약: 계량(큰술·작은술), 맛보기\n준비물: 간장 2큰술, 식초 2큰술, 설탕 1큰술, 올리브유 또는 식용유 2큰술\n예상 소요 시간: 15분 (추정)\n1. 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요\n2. 가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요\n3. 설탕이 녹을 때까지 저어요\n4. 맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요\n자기 점검: 가루와 액체를 각각 알맞은 방법으로 계량했다 / 맛의 특징을 한 줄로 메모했다\n안전 안내: 남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요 / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)\n\n파스타 삶기와 버터간장 파스타\n활동 요약: 면 삶기(소금물·시간), 면수 활용\n준비물: 스파게티 100g, 버터 10g, 간장 1큰술, 소금 2작은술\n예상 소요 시간: 25분 (추정)\n1. 물 1L에 소금 2작은술(약 10g)을 넣고 끓여요\n2. 면을 넣고 포장지 시간보다 1분 짧게 삶아요\n3. 건지기 전에 면수 반 컵을 따로 덜어 둬요\n4. 팬에 버터를 녹이고 면·간장·면수 2큰술을 넣어 버무려요\n자기 점검: 면 가운데 심이 아주 살짝 남은 식감이다 / 면수로 윤기를 냈다\n안전 안내: 면을 건질 때 끓는 물을 몸 반대쪽으로 부어요 / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)\n\n중식 양념 소량 계량\n활동 요약: 간장과 굴소스의 역할을 구분한다\n준비물: 간장, 굴소스, 물\n예상 소요 시간: 20분 (추정)\n1. 제품 표시에서 염분과 알레르기 확인\n2. 각 양념을 별도 계량\n3. 소량을 희석해 맛의 차이 기록\n자기 점검: 간장과 굴소스의 역할을 구분한다\n안전 안내: 손·도구를 씻고 생재료와 완성 음식의 작업 구역을 나눈다. / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)",
+   "status": "reference",
+   "cited_activity_ids": [
+    "cook-0-2",
+    "cook-1-5",
+    "cn-0-1"
+   ],
+   "validation_errors": [],
+   "validation": {
+    "format": "not_run",
+    "citations": "not_run",
+    "quantities": "not_run",
+    "semantic_support": "not_run"
+   },
+   "metacognition": {
+    "supported": [],
+    "unresolved": [],
+    "source_review": {
+     "cook-0-2:source": "source_only",
+     "cook-1-5:source": "source_only",
+     "cn-0-1:source": "source_only"
+    },
+    "stop_reason": null,
+    "next_action": "원문 확인 또는 미확인 항목 설명"
+   },
+   "retrieval": {
+    "items": [
+     {
+      "rank": 1,
+      "activity_id": "cook-0-2",
+      "title": "계량해서 간장 드레싱 만들기"
+     },
+     {
+      "rank": 2,
+      "activity_id": "cook-1-5",
+      "title": "파스타 삶기와 버터간장 파스타"
+     },
+     {
+      "rank": 3,
+      "activity_id": "cn-0-1",
+      "title": "중식 양념 소량 계량"
+     }
+    ],
+    "diagnostics": {
+     "search_mode": "bm25",
+     "scope": "activities",
+     "query_aliases": [],
+     "reranker": "rule_based",
+     "reranker_model": null,
+     "reranker_error": null,
+     "embedding_error": null,
+     "rerank_min_score": -2.0,
+     "rrf_k": 60,
+     "bm25_candidates": 39,
+     "dense_candidates": 0,
+     "candidate_ids": [
+      "cook-0-2",
+      "cook-1-5",
+      "cn-0-1"
+     ],
+     "ranking": [
+      {
+       "final_rank": 1,
+       "activity_id": "cook-0-2",
+       "title": "계량해서 간장 드레싱 만들기",
+       "bm25_rank": 1,
+       "dense_score": null,
+       "rrf_score": 0.01639,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 2,
+       "activity_id": "cook-1-5",
+       "title": "파스타 삶기와 버터간장 파스타",
+       "bm25_rank": 2,
+       "dense_score": null,
+       "rrf_score": 0.01613,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 3,
+       "activity_id": "cn-0-1",
+       "title": "중식 양념 소량 계량",
+       "bm25_rank": 10,
+       "dense_score": null,
+       "rrf_score": 0.01429,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 4,
+       "activity_id": "cook-2-13",
+       "title": "간장비빔국수",
+       "bm25_rank": 11,
+       "dense_score": null,
+       "rrf_score": 0.01408,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 5,
+       "activity_id": "cook-0-3",
+       "title": "씻고 뜯어 만드는 샐러드",
+       "bm25_rank": 3,
+       "dense_score": null,
+       "rrf_score": 0.01587,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 6,
+       "activity_id": "cook-0-5",
+       "title": "참치마요 주먹밥",
+       "bm25_rank": 4,
+       "dense_score": null,
+       "rrf_score": 0.01562,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 7,
+       "activity_id": "cook-4-3",
+       "title": "손반죽 수제비",
+       "bm25_rank": 5,
+       "dense_score": null,
+       "rrf_score": 0.01538,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 8,
+       "activity_id": "cook-4-4",
+       "title": "첫 발효빵: 팬에 굽는 난",
+       "bm25_rank": 6,
+       "dense_score": null,
+       "rrf_score": 0.01515,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 9,
+       "activity_id": "cook-2-1",
+       "title": "콩나물국으로 간 맞추기",
+       "bm25_rank": 7,
+       "dense_score": null,
+       "rrf_score": 0.01493,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 10,
+       "activity_id": "cook-3-2",
+       "title": "양념장 비율과 제육볶음",
+       "bm25_rank": 8,
+       "dense_score": null,
+       "rrf_score": 0.01471,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 11,
+       "activity_id": "cook-2-4",
+       "title": "된장찌개",
+       "bm25_rank": 9,
+       "dense_score": null,
+       "rrf_score": 0.01449,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 12,
+       "activity_id": "coo-6-10",
+       "title": "작은 구움과자 나눔 설계",
+       "bm25_rank": 12,
+       "dense_score": null,
+       "rrf_score": 0.01389,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 13,
+       "activity_id": "cook-2-8",
+       "title": "양파 잘게 다지기",
+       "bm25_rank": 13,
+       "dense_score": null,
+       "rrf_score": 0.0137,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 14,
+       "activity_id": "cook-2-5",
+       "title": "토마토 파스타",
+       "bm25_rank": 14,
+       "dense_score": null,
+       "rrf_score": 0.01351,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 15,
+       "activity_id": "cook-3-13",
+       "title": "두부구이와 달래장",
+       "bm25_rank": 15,
+       "dense_score": null,
+       "rrf_score": 0.01333,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 16,
+       "activity_id": "west-0-1",
+       "title": "비네그레트 흔들어 섞기",
+       "bm25_rank": 16,
+       "dense_score": null,
+       "rrf_score": 0.01316,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 17,
+       "activity_id": "cook-3-15",
+       "title": "돼지고기장조림",
+       "bm25_rank": 17,
+       "dense_score": null,
+       "rrf_score": 0.01299,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 18,
+       "activity_id": "cook-3-10",
+       "title": "감자전",
+       "bm25_rank": 18,
+       "dense_score": null,
+       "rrf_score": 0.01282,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 19,
+       "activity_id": "jp-2-1",
+       "title": "두부 미소시루",
+       "bm25_rank": 19,
+       "dense_score": null,
+       "rrf_score": 0.01266,
+       "rerank_score": null,
+       "passed": true
+      },
+      {
+       "final_rank": 20,
+       "activity_id": "cook-2-9",
+       "title": "사과 껍질 벗기기",
+       "bm25_rank": 20,
+       "dense_score": null,
+       "rrf_score": 0.0125,
+       "rerank_score": null,
+       "passed": true
+      }
+     ],
+     "missing_filter_fields": [],
+     "dense_available": false,
+     "minimum_dense_similarity": 0.4,
+     "index_version": "de9ab3846e0adb7fbc8b57efdc2a938605075130e0fa340569448d978e4fb5d3",
+     "total_documents": 162,
+     "eligible_documents": 162,
+     "lexical_rejected_without_topic": 1,
+     "latency_ms": 2.77
+    }
+   },
+   "evidence": [
+    {
+     "activity_id": "cook-0-2",
+     "evidence_id": "cook-0-2:source",
+     "review_status": "source_only",
+     "source_refs": [
+      "cook-0-2"
+     ],
+     "applies_when": "",
+     "title": "계량해서 간장 드레싱 만들기",
+     "kind": "activity",
+     "excerpt": "활동 요약: 계량(큰술·작은술), 맛보기\n준비물: 간장 2큰술, 식초 2큰술, 설탕 1큰술, 올리브유 또는 식용유 2큰술\n예상 소요 시간: 15분 (추정)\n1. 물로 큰술(15ml)과 작은술(5ml)의 차이를 먼저 확인해요\n2. 가루 재료는 깎아서, 액체는 계량스푼을 수평으로 잡아 눈금에 맞춰요\n3. 설탕이 녹을 때까지 저어요\n4. 맛을 보고 신맛과 단맛 중 어느 쪽이 강한지 메모해요\n자기 점검: 가루와 액체를 각각 알맞은 방법으로 계량했다 / 맛의 특징을 한 줄로 메모했다\n안전 안내: 남은 드레싱은 밀폐해 냉장 보관하고 3일 안에 먹어요 / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)"
+    },
+    {
+     "activity_id": "cook-1-5",
+     "evidence_id": "cook-1-5:source",
+     "review_status": "source_only",
+     "source_refs": [
+      "cook-1-5"
+     ],
+     "applies_when": "",
+     "title": "파스타 삶기와 버터간장 파스타",
+     "kind": "activity",
+     "excerpt": "활동 요약: 면 삶기(소금물·시간), 면수 활용\n준비물: 스파게티 100g, 버터 10g, 간장 1큰술, 소금 2작은술\n예상 소요 시간: 25분 (추정)\n1. 물 1L에 소금 2작은술(약 10g)을 넣고 끓여요\n2. 면을 넣고 포장지 시간보다 1분 짧게 삶아요\n3. 건지기 전에 면수 반 컵을 따로 덜어 둬요\n4. 팬에 버터를 녹이고 면·간장·면수 2큰술을 넣어 버무려요\n자기 점검: 면 가운데 심이 아주 살짝 남은 식감이다 / 면수로 윤기를 냈다\n안전 안내: 면을 건질 때 끓는 물을 몸 반대쪽으로 부어요 / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)"
+    },
+    {
+     "activity_id": "cn-0-1",
+     "evidence_id": "cn-0-1:source",
+     "review_status": "source_only",
+     "source_refs": [
+      "cn-0-1"
+     ],
+     "applies_when": "",
+     "title": "중식 양념 소량 계량",
+     "kind": "activity",
+     "excerpt": "활동 요약: 간장과 굴소스의 역할을 구분한다\n준비물: 간장, 굴소스, 물\n예상 소요 시간: 20분 (추정)\n1. 제품 표시에서 염분과 알레르기 확인\n2. 각 양념을 별도 계량\n3. 소량을 희석해 맛의 차이 기록\n자기 점검: 간장과 굴소스의 역할을 구분한다\n안전 안내: 손·도구를 씻고 생재료와 완성 음식의 작업 구역을 나눈다. / 생재료와 바로 먹는 식품의 도구를 구분하고 손과 작업대를 씻어요. 가열·보관은 식품 안전 안내를 지켜요.\n검토 상태: 사람 검토 전 자료(참고용)"
+    }
+   ],
+   "llm": {
+    "model": null,
+    "calls": 0,
+    "usage": {}
+   },
+   "latency_ms": {
+    "retrieval": 3.01,
+    "llm": 0.33,
+    "total": 3.34
+   }
+  }
+ },
+ {
+  "label": "rag_ask_top_k_range",
+  "method": "POST",
+  "url": "/rag/ask",
+  "json": {
+   "question": "x",
+   "top_k": 6
+  },
+  "status": 422,
+  "body": {
+   "detail": [
+    {
+     "type": "less_than_equal",
+     "loc": [
+      "body",
+      "top_k"
+     ],
+     "msg": "Input should be less than or equal to 5",
+     "input": 6,
+     "ctx": {
+      "le": 5
+     }
+    }
+   ]
+  }
+ },
+ {
+  "label": "bad_host",
+  "method": "GET",
+  "url": "/health",
+  "json": null,
+  "status": 400,
+  "body": "Invalid host header"
+ }
+]

@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "EvidenceQuote": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "quote"
+      ],
+      "title": "EvidenceQuote",
+      "type": "object"
+    },
+    "RequirementCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "status": {
+          "default": "unassessed",
+          "enum": [
+            "supported",
+            "missing_observation",
+            "missing_knowledge",
+            "conflicting",
+            "unassessed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "quotes": {
+          "items": {
+            "$ref": "#/$defs/EvidenceQuote"
+          },
+          "maxItems": 10,
+          "title": "Quotes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "requirement_id"
+      ],
+      "title": "RequirementCoverage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "next_action": {
+      "enum": [
+        "clarify",
+        "retrieve",
+        "answer",
+        "abstain"
+      ],
+      "title": "Next Action",
+      "type": "string"
+    },
+    "query": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Query",
+      "type": "string"
+    },
+    "depends_on": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Depends On",
+      "type": "array"
+    },
+    "question": {
+      "default": "",
+      "maxLength": 400,
+      "title": "Question",
+      "type": "string"
+    },
+    "options": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4,
+      "title": "Options",
+      "type": "array"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "reset_issue": {
+      "default": false,
+      "title": "Reset Issue",
+      "type": "boolean"
+    },
+    "target_requirement_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 8,
+      "title": "Target Requirement Ids",
+      "type": "array"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/RequirementCoverage"
+      },
+      "maxItems": 8,
+      "title": "Coverage",
+      "type": "array"
+    },
+    "question_purpose": {
+      "default": "clarification",
+      "enum": [
+        "clarification",
+        "reflection",
+        "transition"
+      ],
+      "title": "Question Purpose",
+      "type": "string"
+    }
+  },
+  "required": [
+    "next_action"
+  ],
+  "title": "Decision",
+  "type": "object"
+}

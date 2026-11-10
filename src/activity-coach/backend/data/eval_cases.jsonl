@@ -1,0 +1,32 @@
+{"case_id": "dressing_soy", "question": "15분 안에 간장으로 샐러드 소스 만들고 싶어", "expected_ids": ["cook-0-2"], "constraints": {"max_minutes": 15}}
+{"case_id": "egg_microwave", "question": "전자레인지로 달걀찜 만들기", "expected_ids": ["cook-0-4"], "constraints": {"max_minutes": 15}}
+{"case_id": "egg_fry_scramble", "question": "달걀프라이랑 스크램블 연습하고 싶어", "expected_ids": ["cook-1-3"], "constraints": {"max_minutes": 20}}
+{"case_id": "knife_fruit", "question": "처음 칼질 배우면서 과일을 깎고 싶어요", "expected_ids": ["cook-0-6"], "constraints": {"max_minutes": 25}}
+{"case_id": "tomato_pasta", "question": "토마토 파스타를 30분 안에 만들고 싶어", "expected_ids": ["cook-2-5"], "constraints": {"max_minutes": 30}}
+{"case_id": "kimchi_rice_no_oven", "question": "오븐 없이 김치볶음밥 만들기", "expected_ids": ["cook-2-2"], "constraints": {"max_minutes": 30, "excluded_tools": ["오븐"]}}
+{"case_id": "pot_rice", "question": "밥을 냄비로 지어보고 싶어요", "expected_ids": ["cook-1-4"], "constraints": {"max_minutes": 80}}
+{"case_id": "sujebi_dough", "question": "손으로 수제비 반죽 해보고 싶어", "expected_ids": ["cook-4-3"], "constraints": {"max_minutes": 90}}
+{"case_id": "dressing_tools", "question": "간장 드레싱을 계량해서 만들기", "expected_ids": ["cook-0-2"], "constraints": {"available_tools": ["계량스푼", "볼", "숟가락"]}}
+{"case_id": "doenjang_stew", "question": "된장찌개 끓이는 법 알려줘", "expected_ids": ["cook-2-4"], "constraints": {}}
+{"case_id": "tteokbokki", "question": "떡볶이 만들고 싶어", "expected_ids": ["cook-2-15"], "constraints": {}}
+{"case_id": "mapo_tofu_particle", "question": "마파두부는 어떻게 만들어?", "expected_ids": ["cn-3-1"], "constraints": {}}
+{"case_id": "egg_roll", "question": "계란말이 잘 마는 방법", "expected_ids": ["cook-2-3", "jp-3-2"], "constraints": {}}
+{"case_id": "tonkatsu", "question": "돈가스 튀기는 법", "expected_ids": ["cook-4-2"], "constraints": {}}
+{"case_id": "fried_dumpling", "question": "만두를 빚어서 구워 먹고 싶어", "expected_ids": ["cook-4-6"], "constraints": {}}
+{"case_id": "bechamel", "question": "베샤멜 소스 만드는 법", "expected_ids": ["west-3-1"], "constraints": {}}
+{"case_id": "croissant", "question": "크루아상 반죽에 버터 접는 법", "expected_ids": ["bread-4-2"], "constraints": {}}
+{"case_id": "white_bread", "question": "식빵 만들어 보고 싶어", "expected_ids": ["bread-3-1"], "constraints": {}}
+{"case_id": "kkakdugi", "question": "깍두기 담그는 방법 알려줘", "expected_ids": ["cook-4-9"], "constraints": {}}
+{"case_id": "rice_cooker", "question": "밥솥으로 밥 하는 법", "expected_ids": ["cook-1-15"], "constraints": {}}
+{"case_id": "anchovy_broth", "question": "멸치 육수 내는 법", "expected_ids": ["cook-3-1"], "constraints": {}}
+{"case_id": "mince_onion", "question": "양파 다지는 방법", "expected_ids": ["cook-2-8"], "constraints": {}}
+{"case_id": "blanch_sprouts", "question": "콩나물 데치는 법", "expected_ids": ["cook-1-12"], "constraints": {}}
+{"case_id": "chicken_doneness", "question": "닭고기를 속까지 안전하게 익히고 싶어", "expected_ids": ["cook-3-3", "west-3-2"], "constraints": {}}
+{"case_id": "easy_rice_ball", "question": "아이랑 같이 할 수 있는 쉬운 주먹밥", "expected_ids": ["cook-0-5", "jp-2-2"], "constraints": {}}
+{"case_id": "aglio_olio_paraphrase", "question": "마늘이랑 올리브유만으로 만드는 파스타", "expected_ids": ["west-2-2"], "constraints": {}}
+{"case_id": "miso_soup_paraphrase", "question": "일본식 된장국 끓이기", "expected_ids": ["jp-2-1"], "constraints": {}}
+{"case_id": "neg_car_oil", "question": "자동차 엔진오일 교체 방법", "expected_ids": [], "constraints": {}}
+{"case_id": "neg_english_words", "question": "영어 단어 외우는 법", "expected_ids": [], "constraints": {}}
+{"case_id": "neg_hiking", "question": "등산 갈 때 챙길 것", "expected_ids": [], "constraints": {}}
+{"case_id": "neg_laptop_battery", "question": "노트북 배터리 오래 쓰는 법", "expected_ids": [], "constraints": {}}
+{"case_id": "neg_moving", "question": "이사 준비 체크리스트 만들어줘", "expected_ids": [], "constraints": {}}
