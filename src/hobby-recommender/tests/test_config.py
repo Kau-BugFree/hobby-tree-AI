@@ -16,9 +16,9 @@ def changed_bundle(tmp_path, filename, mutate):
     directory = tmp_path / "data"
     shutil.copytree(DATA, directory)
     target = directory / filename
-    payload = json.loads(target.read_text())
+    payload = json.loads(target.read_text(encoding="utf-8"))
     mutate(payload)
-    target.write_text(json.dumps(payload, ensure_ascii=False))
+    target.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     return directory
 
 

@@ -246,7 +246,7 @@ def test_fire_exclusion_preserves_no_fire_cooking_options(client):
 
 def test_no_available_resources_returns_no_match(client):
     """모든 필수 자원을 사용할 수 없을 때 후보 없음 상태인지 확인한다."""
-    resource_keys = json.loads((DATA / "catalog.json").read_text())["resources"]
+    resource_keys = json.loads((DATA / "catalog.json").read_text(encoding="utf-8"))["resources"]
     result = recommend(client, resources={key: False for key in resource_keys})
     assert result["status"] == "no_match"
     assert result["recommendations"] == []
@@ -405,7 +405,7 @@ def test_spring_create_request_is_not_silently_accepted(client):
 
 def test_questionnaire_matches_pinned_frontend_contract(client):
     """실제 공개 프론트엔드 커밋의 14개 그룹과 서버의 선택지·선택 제약을 비교한다."""
-    fixture = json.loads((Path(__file__).parent / "fixtures/frontend_onboarding.json").read_text())
+    fixture = json.loads((Path(__file__).parent / "fixtures/frontend_onboarding.json").read_text(encoding="utf-8"))
     actual = {group["key"]: group for group in client.get("/api/v1/questionnaire").json()["groups"]}
     assert set(actual) == {group["key"] for group in fixture["groups"]}
     for group in fixture["groups"]:
