@@ -1,0 +1,735 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "HobbyTree Recommendation API",
+    "description": "온보딩 답변에 따른 설명 가능한 규칙 기반 추천. 점수는 확률이 아닙니다.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/recommendations": {
+      "post": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Recommend",
+        "description": "설문을 계산하고 입력 오류·명시적 HTTP 오류·예상하지 못한 예외를 구분한다.",
+        "operationId": "recommend_api_v1_recommendations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecommendationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "추천 서비스가 준비되지 않아 일시적으로 이용할 수 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "추천 처리 중 서버 내부 오류가 발생했습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalog": {
+      "get": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Catalog",
+        "description": "현재 엔진의 취미·활동 코드와 자원 목록을 반환한다(DB ID 목록이 아님).",
+        "operationId": "catalog_api_v1_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "추천 서비스가 준비되지 않아 일시적으로 이용할 수 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/questionnaire": {
+      "get": {
+        "tags": [
+          "recommendations"
+        ],
+        "summary": "Questionnaire",
+        "description": "클라이언트가 제출할 수 있는 정확한 질문 키와 선택지 규칙을 반환한다.",
+        "operationId": "questionnaire_api_v1_questionnaire_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "추천 서비스가 준비되지 않아 일시적으로 이용할 수 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "description": "엔진 준비 상태와 로드된 규칙·카탈로그 버전을 반환한다.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "추천 서비스가 준비되지 않아 일시적으로 이용할 수 없습니다.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityResult": {
+        "properties": {
+          "activity_id": {
+            "type": "string",
+            "title": "Activity Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "total_minutes": {
+            "type": "integer",
+            "title": "Total Minutes"
+          },
+          "active_minutes": {
+            "type": "integer",
+            "title": "Active Minutes"
+          },
+          "estimated_first_cost_krw": {
+            "type": "integer",
+            "title": "Estimated First Cost Krw"
+          },
+          "estimated_repeat_cost_krw": {
+            "type": "integer",
+            "title": "Estimated Repeat Cost Krw"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "eligible",
+              "needs_confirmation"
+            ],
+            "title": "Status"
+          },
+          "confirmation_required": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Confirmation Required"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activity_id",
+          "title",
+          "total_minutes",
+          "active_minutes",
+          "estimated_first_cost_krw",
+          "estimated_repeat_cost_krw",
+          "status",
+          "confirmation_required"
+        ],
+        "title": "ActivityResult",
+        "description": "조건 필터를 통과한 활동의 비용·시간과 아직 확인해야 할 사항."
+      },
+      "Coverage": {
+        "properties": {
+          "weighted_answer_coverage": {
+            "type": "number",
+            "title": "Weighted Answer Coverage"
+          },
+          "answered_groups": {
+            "type": "integer",
+            "title": "Answered Groups"
+          },
+          "total_groups": {
+            "type": "integer",
+            "title": "Total Groups"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "weighted_answer_coverage",
+          "answered_groups",
+          "total_groups"
+        ],
+        "title": "Coverage",
+        "description": "점수에 사용된 답변의 가중치 합과 응답한 설문 그룹 수."
+      },
+      "CustomValues": {
+        "properties": {
+          "q04_amount_krw": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q04 Amount Krw"
+          },
+          "q05_amount_krw": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q05 Amount Krw"
+          },
+          "q06_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1440.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q06 Minutes"
+          },
+          "q02_other": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q02 Other"
+          },
+          "q09_exclude_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Q09 Exclude Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "CustomValues",
+        "description": "Q02·Q04·Q05·Q06·Q09의 직접 입력 선택과 함께 보내는 실제 값."
+      },
+      "ErrorResponse": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponse",
+        "description": "500·503에서 내부 예외 대신 클라이언트에 전달하는 안내 메시지."
+      },
+      "ExcludedHobby": {
+        "properties": {
+          "hobby_id": {
+            "type": "string",
+            "title": "Hobby Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hobby_id",
+          "name",
+          "reasons"
+        ],
+        "title": "ExcludedHobby",
+        "description": "모든 활동이 필수 조건에서 탈락한 취미와 구체적인 제외 이유."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Preferences": {
+        "properties": {
+          "selection_mode": {
+            "type": "string",
+            "title": "Selection Mode"
+          },
+          "recording_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recording Mode"
+          },
+          "burdens": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Burdens"
+          },
+          "weekly_frequency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Frequency"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "selection_mode",
+          "recording_mode",
+          "burdens",
+          "weekly_frequency"
+        ],
+        "title": "Preferences",
+        "description": "점수 계산과 별개로 앱이 표시·기록·계획에 사용하는 사용자 선호."
+      },
+      "Recommendation": {
+        "properties": {
+          "hobby_id": {
+            "type": "string",
+            "title": "Hobby Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "ui_key": {
+            "type": "string",
+            "title": "Ui Key"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "breakdown": {
+            "items": {
+              "$ref": "#/components/schemas/ScorePart"
+            },
+            "type": "array",
+            "title": "Breakdown"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityResult"
+            },
+            "type": "array",
+            "title": "Activities"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "hobby_id",
+          "name",
+          "ui_key",
+          "rank",
+          "score",
+          "breakdown",
+          "reasons",
+          "activities"
+        ],
+        "title": "Recommendation",
+        "description": "취미별 순위·설명·활동 후보. hobby_id는 엔진 코드이며 DB 숫자 ID가 아니다."
+      },
+      "RecommendationRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "onboarding-2026-10-13",
+            "title": "Schema Version",
+            "default": "onboarding-2026-10-13"
+          },
+          "answers": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "maxProperties": 14,
+            "title": "Answers"
+          },
+          "custom_values": {
+            "$ref": "#/components/schemas/CustomValues"
+          },
+          "context_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Text"
+          },
+          "resources": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "maxProperties": 100,
+            "title": "Resources"
+          },
+          "monthly_committed_krw": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Committed Krw"
+          },
+          "top_k": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top K"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RecommendationRequest",
+        "description": "추천 엔진 입력. 화면 전용 상태와 Spring의 추천 생성 요청은 포함하지 않는다."
+      },
+      "RecommendationResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "recommended",
+              "browse",
+              "needs_review",
+              "no_match"
+            ],
+            "title": "Status"
+          },
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version"
+          },
+          "rules_version": {
+            "type": "string",
+            "title": "Rules Version"
+          },
+          "catalog_version": {
+            "type": "string",
+            "title": "Catalog Version"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/Recommendation"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "excluded": {
+            "items": {
+              "$ref": "#/components/schemas/ExcludedHobby"
+            },
+            "type": "array",
+            "title": "Excluded"
+          },
+          "unsupported_interests": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unsupported Interests"
+          },
+          "notices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notices"
+          },
+          "follow_up_questions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Follow Up Questions"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/Preferences"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/Coverage"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "schema_version",
+          "rules_version",
+          "catalog_version",
+          "recommendations",
+          "excluded",
+          "unsupported_interests",
+          "notices",
+          "follow_up_questions",
+          "preferences",
+          "coverage"
+        ],
+        "title": "RecommendationResponse",
+        "description": "추천·탐색·검토·후보 없음 상태를 구분하는 엔진 응답 전체."
+      },
+      "ScorePart": {
+        "properties": {
+          "question_key": {
+            "type": "string",
+            "title": "Question Key"
+          },
+          "weight": {
+            "type": "number",
+            "title": "Weight"
+          },
+          "fit": {
+            "type": "number",
+            "title": "Fit"
+          },
+          "points": {
+            "type": "number",
+            "title": "Points"
+          },
+          "answered": {
+            "type": "boolean",
+            "title": "Answered"
+          },
+          "selected": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Selected"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question_key",
+          "weight",
+          "fit",
+          "points",
+          "answered",
+          "selected"
+        ],
+        "title": "ScorePart",
+        "description": "한 질문이 특정 취미의 점수에 기여한 가중치·적합도·선택 근거."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

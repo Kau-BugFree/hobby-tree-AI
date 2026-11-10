@@ -1,0 +1,348 @@
+{
+  "status": "recommended",
+  "schema_version": "onboarding-2026-10-13",
+  "rules_version": "rules-2.0.0",
+  "catalog_version": "catalog-2.0.0",
+  "recommendations": [
+    {
+      "hobby_id": "reading",
+      "name": "독서",
+      "ui_key": "독서",
+      "rank": 1,
+      "score": 100.0,
+      "breakdown": [
+        {
+          "question_key": "q02",
+          "weight": 40.0,
+          "fit": 1.0,
+          "points": 40.0,
+          "answered": true,
+          "selected": [
+            "요리 (한식·중식·양식·일식·제과·제빵)",
+            "독서"
+          ]
+        },
+        {
+          "question_key": "q03",
+          "weight": 30.0,
+          "fit": 1.0,
+          "points": 30.0,
+          "answered": true,
+          "selected": [
+            "휴식·기분 전환",
+            "새로운 경험·호기심"
+          ]
+        },
+        {
+          "question_key": "q08",
+          "weight": 10.0,
+          "fit": 1.0,
+          "points": 10.0,
+          "answered": true,
+          "selected": [
+            "스마트폰",
+            "읽을 책·전자책",
+            "주방 도구"
+          ]
+        },
+        {
+          "question_key": "q09Place",
+          "weight": 15.0,
+          "fit": 1.0,
+          "points": 15.0,
+          "answered": true,
+          "selected": [
+            "집"
+          ]
+        },
+        {
+          "question_key": "q10",
+          "weight": 5.0,
+          "fit": 1.0,
+          "points": 5.0,
+          "answered": true,
+          "selected": [
+            "혼자"
+          ]
+        }
+      ],
+      "reasons": [
+        "지금 해보고 싶거나 이어가고 싶은 취미가 있나요? → 요리 (한식·중식·양식·일식·제과·제빵), 독서: 40/40점",
+        "취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 30/30점",
+        "지금 사용할 수 있는 물건은 무엇인가요? → 스마트폰, 읽을 책·전자책, 주방 도구: 10/10점",
+        "어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점",
+        "처음에는 누구와 하고 싶나요? → 혼자: 5/5점"
+      ],
+      "activities": [
+        {
+          "activity_id": "reading-owned-10",
+          "title": "가진 책의 표지와 첫 문장 읽기",
+          "total_minutes": 10,
+          "active_minutes": 8,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "eligible",
+          "confirmation_required": []
+        },
+        {
+          "activity_id": "reading-free-ebook-15",
+          "title": "무료 공개 전자책 첫 부분 읽기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "스마트폰과 추가 과금 없는 통신 환경을 확인해요.",
+            "합법적으로 무료 제공되는 공개 전자책인지, 별도 결제가 없는지 확인해요."
+          ]
+        },
+        {
+          "activity_id": "reading-library-30",
+          "title": "도서관에서 책 한 권 골라 읽기",
+          "total_minutes": 30,
+          "active_minutes": 15,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "도서관 운영 시간·이용 자격·자료 이용 가능 여부를 확인해요.",
+            "이동·준비를 포함해 30분이며 별도 교통비·이용료가 없는 경우의 예시예요.",
+            "운영 시간·회원 자격·이동·비용을 확인한 도서관 사용 가능 여부를 확인해 주세요."
+          ]
+        }
+      ]
+    },
+    {
+      "hobby_id": "cooking",
+      "name": "요리",
+      "ui_key": "요리",
+      "rank": 2,
+      "score": 95.75,
+      "breakdown": [
+        {
+          "question_key": "q02",
+          "weight": 40.0,
+          "fit": 1.0,
+          "points": 40.0,
+          "answered": true,
+          "selected": [
+            "요리 (한식·중식·양식·일식·제과·제빵)",
+            "독서"
+          ]
+        },
+        {
+          "question_key": "q03",
+          "weight": 30.0,
+          "fit": 0.875,
+          "points": 26.25,
+          "answered": true,
+          "selected": [
+            "휴식·기분 전환",
+            "새로운 경험·호기심"
+          ]
+        },
+        {
+          "question_key": "q08",
+          "weight": 10.0,
+          "fit": 1.0,
+          "points": 10.0,
+          "answered": true,
+          "selected": [
+            "스마트폰",
+            "읽을 책·전자책",
+            "주방 도구"
+          ]
+        },
+        {
+          "question_key": "q09Place",
+          "weight": 15.0,
+          "fit": 1.0,
+          "points": 15.0,
+          "answered": true,
+          "selected": [
+            "집"
+          ]
+        },
+        {
+          "question_key": "q10",
+          "weight": 5.0,
+          "fit": 0.9,
+          "points": 4.5,
+          "answered": true,
+          "selected": [
+            "혼자"
+          ]
+        }
+      ],
+      "reasons": [
+        "지금 해보고 싶거나 이어가고 싶은 취미가 있나요? → 요리 (한식·중식·양식·일식·제과·제빵), 독서: 40/40점",
+        "취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 26.25/30점",
+        "지금 사용할 수 있는 물건은 무엇인가요? → 스마트폰, 읽을 책·전자책, 주방 도구: 10/10점",
+        "어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점",
+        "처음에는 누구와 하고 싶나요? → 혼자: 4.5/5점"
+      ],
+      "activities": [
+        {
+          "activity_id": "cooking-pantry-dressing",
+          "title": "기존 재료를 계량해 드레싱 만들기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "기존 재료·그릇·계량스푼을 실제 사용할 수 있는지 확인해요.",
+            "제외할 재료와 작업 조건을 확인해요.",
+            "재료가 충분해 첫 회와 반복 활동에 추가 지출이 없는 경우의 예시예요."
+          ]
+        },
+        {
+          "activity_id": "cooking-buy-dressing",
+          "title": "재료를 준비해 드레싱 만들기",
+          "total_minutes": 30,
+          "active_minutes": 15,
+          "estimated_first_cost_krw": 5000,
+          "estimated_repeat_cost_krw": 2000,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "기존 그릇·계량스푼을 사용할 수 있는지 확인해요.",
+            "제외할 재료를 확인하고 재료 구입·이동을 포함한 실제 비용과 시간을 확인해요.",
+            "첫 회 5,000원·이후 1회 2,000원은 예시이며 장비 구매비는 포함되지 않아요."
+          ]
+        }
+      ]
+    },
+    {
+      "hobby_id": "instrument",
+      "name": "악기",
+      "ui_key": "악기",
+      "rank": 3,
+      "score": 70.5,
+      "breakdown": [
+        {
+          "question_key": "q02",
+          "weight": 40.0,
+          "fit": 0.5,
+          "points": 20.0,
+          "answered": true,
+          "selected": [
+            "요리 (한식·중식·양식·일식·제과·제빵)",
+            "독서"
+          ]
+        },
+        {
+          "question_key": "q03",
+          "weight": 30.0,
+          "fit": 0.85,
+          "points": 25.5,
+          "answered": true,
+          "selected": [
+            "휴식·기분 전환",
+            "새로운 경험·호기심"
+          ]
+        },
+        {
+          "question_key": "q08",
+          "weight": 10.0,
+          "fit": 0.5,
+          "points": 5.0,
+          "answered": true,
+          "selected": [
+            "스마트폰",
+            "읽을 책·전자책",
+            "주방 도구"
+          ]
+        },
+        {
+          "question_key": "q09Place",
+          "weight": 15.0,
+          "fit": 1.0,
+          "points": 15.0,
+          "answered": true,
+          "selected": [
+            "집"
+          ]
+        },
+        {
+          "question_key": "q10",
+          "weight": 5.0,
+          "fit": 1.0,
+          "points": 5.0,
+          "answered": true,
+          "selected": [
+            "혼자"
+          ]
+        }
+      ],
+      "reasons": [
+        "취미를 통해 가장 얻고 싶은 것은 무엇인가요? → 휴식·기분 전환, 새로운 경험·호기심: 25.5/30점",
+        "어디서 하고 싶고, 꼭 피해야 할 조건은 무엇인가요? → 집: 15/15점",
+        "처음에는 누구와 하고 싶나요? → 혼자: 5/5점"
+      ],
+      "activities": [
+        {
+          "activity_id": "instrument-keyboard-headphones-15",
+          "title": "헤드폰을 연결해 전자건반 첫 소리 내기",
+          "total_minutes": 15,
+          "active_minutes": 10,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "전자건반과 호환되는 헤드폰 연결 및 스피커 음소거를 확인해요.",
+            "헤드폰을 사용해도 타건 소음은 남을 수 있으므로 장소·시간의 소리 조건을 확인해요.",
+            "기존 또는 무료로 빌린 악기·헤드폰을 사용해 추가 지출 없이 전체 15분 안에 가능한 경우의 예시예요.",
+            "헤드폰 연결이 가능한 사용 가능한 전자건반 사용 가능 여부를 확인해 주세요.",
+            "전자건반에 연결해 사용할 수 있는 헤드폰 사용 가능 여부를 확인해 주세요."
+          ]
+        },
+        {
+          "activity_id": "instrument-acoustic-guitar-20",
+          "title": "가진 기타로 열린 줄 소리 탐색하기",
+          "total_minutes": 20,
+          "active_minutes": 12,
+          "estimated_first_cost_krw": 0,
+          "estimated_repeat_cost_krw": 0,
+          "status": "needs_confirmation",
+          "confirmation_required": [
+            "사용 가능한 기타와 연주 소리가 허용되는 장소·시간을 확인해요.",
+            "헤드폰으로 어쿠스틱 기타 자체의 연주 소리를 줄일 수 있다고 가정하지 않아요.",
+            "기존 또는 무료로 빌린 기타를 사용해 추가 지출 없이 전체 20분 안에 가능한 경우의 예시예요.",
+            "지금 사용할 수 있는 어쿠스틱 기타 사용 가능 여부를 확인해 주세요.",
+            "실제 연주 소리가 허용되는 장소와 시간 사용 가능 여부를 확인해 주세요."
+          ]
+        }
+      ]
+    }
+  ],
+  "excluded": [],
+  "unsupported_interests": [],
+  "notices": [
+    "점수는 규칙상 선호 적합도이며 성공 확률이나 검증된 추천 정확도가 아닙니다.",
+    "활동의 비용·시간은 예시 추정치입니다. 후보를 동시에 실행하는 월간 예산 계획은 계산하지 않습니다."
+  ],
+  "follow_up_questions": [
+    "기존 재료·그릇·계량스푼을 실제 사용할 수 있는지 확인해요.",
+    "제외할 재료와 작업 조건을 확인해요.",
+    "재료가 충분해 첫 회와 반복 활동에 추가 지출이 없는 경우의 예시예요.",
+    "전자건반과 호환되는 헤드폰 연결 및 스피커 음소거를 확인해요.",
+    "헤드폰을 사용해도 타건 소음은 남을 수 있으므로 장소·시간의 소리 조건을 확인해요.",
+    "기존 또는 무료로 빌린 악기·헤드폰을 사용해 추가 지출 없이 전체 15분 안에 가능한 경우의 예시예요.",
+    "헤드폰 연결이 가능한 사용 가능한 전자건반 사용 가능 여부를 확인해 주세요.",
+    "전자건반에 연결해 사용할 수 있는 헤드폰 사용 가능 여부를 확인해 주세요."
+  ],
+  "preferences": {
+    "selection_mode": "2~3개 후보 중 직접 고르기",
+    "recording_mode": "한 번 누르기",
+    "burdens": [
+      "없음"
+    ],
+    "weekly_frequency": "주 2~3회"
+  },
+  "coverage": {
+    "weighted_answer_coverage": 100.0,
+    "answered_groups": 14,
+    "total_groups": 14
+  }
+}
