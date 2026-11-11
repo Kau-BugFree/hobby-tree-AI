@@ -1,0 +1,29 @@
+{
+  "schema_version": "onboarding-2026-10-13",
+  "answers": {
+    "q01": "해보고 싶지만 아직 시작하지 못했어요",
+    "q02": ["요리 (한식·중식·양식·일식·제과·제빵)", "독서"],
+    "q03": ["휴식·기분 전환", "새로운 경험·호기심"],
+    "q04": "1만 원까지",
+    "q05": "3만 원까지",
+    "q06": "30분",
+    "q07": "주 2~3회",
+    "q08": ["스마트폰", "읽을 책·전자책", "주방 도구"],
+    "q09Place": ["집"],
+    "q09Exclude": ["많은 신체 활동", "화기 사용"],
+    "q10": "혼자",
+    "q11": "2~3개 후보 중 직접 고르기",
+    "q12": "한 번 누르기",
+    "q13": ["없음"]
+  },
+  "custom_values": {},
+  "resources": {
+    "owned_book": true,
+    "smartphone": true,
+    "pantry_ingredients": true,
+    "bowl": true,
+    "measuring_spoon": true
+  },
+  "monthly_committed_krw": 10000,
+  "top_k": 3
+}

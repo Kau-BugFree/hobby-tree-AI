@@ -1,0 +1,11 @@
+# 서버·검색·생성 직접 의존성. Python 3.12, CUDA 12.8(torch cu128)에서 검증합니다.
+# 설치: uv pip install -r requirements-dev.txt --extra-index-url https://download.pytorch.org/whl/cu128 --index-strategy unsafe-best-match
+fastapi==0.162.0
+uvicorn==0.54.0
+httpx==0.28.1
+python-dotenv==1.2.4
+numpy==2.5.4
+torch==2.11.0+cu128
+sentence-transformers==6.2.0
+transformers==5.20.2
+anthropic==2.4.0

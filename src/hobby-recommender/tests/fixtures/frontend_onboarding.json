@@ -1,0 +1,238 @@
+{
+  "repository": "https://github.com/Kau-BugFree/hobby_tree_frontend",
+  "commit": "92247153181f311556503bd5033c7e95deeecb25",
+  "source": "src/data/onboarding.ts",
+  "groups": [
+    {
+      "key": "q01",
+      "kind": "single",
+      "options": [
+        "해보고 싶지만 아직 시작하지 못했어요",
+        "무엇을 할지 모르겠어요",
+        "최근 시작해 이어가고 있어요",
+        "쉬거나 그만둔 취미가 있어요",
+        "오래 해온 취미를 계속하고 싶어요",
+        "지금은 취미를 시작할 생각이 없어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q02",
+      "kind": "multi",
+      "options": [
+        "커피",
+        "요리 (한식·중식·양식·일식·제과·제빵)",
+        "악기 (피아노·기타)",
+        "독서",
+        "러닝·걷기",
+        "다른 취미 직접 입력",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [
+        "아직 모르겠어요"
+      ],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q03",
+      "kind": "multi",
+      "options": [
+        "휴식·기분 전환",
+        "건강·체력",
+        "실력 향상·성취감",
+        "창작·자기표현",
+        "사람과의 교류",
+        "새로운 경험·호기심",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [
+        "아직 모르겠어요"
+      ],
+      "max": 2,
+      "custom_option": null
+    },
+    {
+      "key": "q04",
+      "kind": "single",
+      "options": [
+        "0원",
+        "1만 원까지",
+        "3만 원까지",
+        "5만 원까지",
+        "직접 금액 입력",
+        "나와 맞는지 확인한 뒤 결정",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": "직접 금액 입력"
+    },
+    {
+      "key": "q05",
+      "kind": "single",
+      "options": [
+        "0원",
+        "1만 원까지",
+        "3만 원까지",
+        "5만 원까지",
+        "10만 원까지",
+        "직접 금액 입력",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": "직접 금액 입력"
+    },
+    {
+      "key": "q06",
+      "kind": "single",
+      "options": [
+        "10분",
+        "15분",
+        "30분",
+        "1시간",
+        "2시간",
+        "직접 시간 입력",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": "직접 시간 입력"
+    },
+    {
+      "key": "q07",
+      "kind": "single",
+      "options": [
+        "주 1회 미만",
+        "주 1회",
+        "주 2~3회",
+        "주 4회 이상",
+        "주마다 달라요",
+        "아직 모르겠어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q08",
+      "kind": "multi",
+      "options": [
+        "스마트폰",
+        "읽을 책·전자책",
+        "필기구",
+        "운동화·운동복",
+        "주방 도구",
+        "커피 도구",
+        "피아노·건반",
+        "기타",
+        "그 밖의 물건",
+        "해당 없음",
+        "확인이 필요해요"
+      ],
+      "exclusive": [
+        "해당 없음",
+        "확인이 필요해요"
+      ],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q09Place",
+      "kind": "multi",
+      "options": [
+        "집",
+        "가까운 실내 공간",
+        "야외",
+        "상관없어요"
+      ],
+      "exclusive": [
+        "상관없어요"
+      ],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q09Exclude",
+      "kind": "multi",
+      "options": [
+        "새 장비 구매",
+        "야외",
+        "외부 시설",
+        "많은 신체 활동",
+        "다른 사람 필수",
+        "큰 소음",
+        "화기 사용",
+        "없음",
+        "직접 입력"
+      ],
+      "exclusive": [
+        "없음"
+      ],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q10",
+      "kind": "single",
+      "options": [
+        "혼자",
+        "아는 사람과",
+        "새로운 사람도 괜찮아요",
+        "상관없어요"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q11",
+      "kind": "single",
+      "options": [
+        "2~3개 후보 중 직접 고르기",
+        "한 개를 제안받기",
+        "전체 단계를 보며 고르기",
+        "안내 없이 직접 찾기"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q12",
+      "kind": "single",
+      "options": [
+        "한 번 누르기",
+        "누르기와 아쉬웠던 점 1개",
+        "만족도·난이도·시간",
+        "사진·짧은 메모",
+        "기록하지 않기"
+      ],
+      "exclusive": [],
+      "max": null,
+      "custom_option": null
+    },
+    {
+      "key": "q13",
+      "kind": "multi",
+      "options": [
+        "매일 알림",
+        "연속 기록 끊김 표시",
+        "나무가 시드는 표현",
+        "사용자 순위·비교",
+        "긴 전체 로드맵",
+        "여러 항목 기록",
+        "기한 목표",
+        "없음"
+      ],
+      "exclusive": [
+        "없음"
+      ],
+      "max": null,
+      "custom_option": null
+    }
+  ]
+}

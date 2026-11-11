@@ -1,0 +1,140 @@
+{
+  "version": "rules-2.0.0",
+  "criteria": [
+    {
+      "key": "q02",
+      "weight": 40,
+      "aggregation": "max",
+      "scores": {
+        "요리 (한식·중식·양식·일식·제과·제빵)": {
+          "cooking": 1,
+          "instrument": 0.5,
+          "reading": 0.5
+        },
+        "악기 (피아노·기타)": {
+          "cooking": 0.5,
+          "instrument": 1,
+          "reading": 0.5
+        },
+        "독서": {
+          "cooking": 0.5,
+          "instrument": 0.5,
+          "reading": 1
+        }
+      }
+    },
+    {
+      "key": "q03",
+      "weight": 30,
+      "aggregation": "mean",
+      "scores": {
+        "휴식·기분 전환": {
+          "cooking": 0.8,
+          "instrument": 0.8,
+          "reading": 1
+        },
+        "건강·체력": {
+          "cooking": 0.65,
+          "instrument": 0.3,
+          "reading": 0.35
+        },
+        "실력 향상·성취감": {
+          "cooking": 1,
+          "instrument": 1,
+          "reading": 0.8
+        },
+        "창작·자기표현": {
+          "cooking": 1,
+          "instrument": 1,
+          "reading": 0.7
+        },
+        "사람과의 교류": {
+          "cooking": 0.8,
+          "instrument": 0.8,
+          "reading": 0.55
+        },
+        "새로운 경험·호기심": {
+          "cooking": 0.95,
+          "instrument": 0.9,
+          "reading": 1
+        }
+      }
+    },
+    {
+      "key": "q08",
+      "weight": 10,
+      "aggregation": "max",
+      "scores": {
+        "스마트폰": {
+          "cooking": 0.5,
+          "instrument": 0.5,
+          "reading": 0.7
+        },
+        "읽을 책·전자책": {
+          "cooking": 0.5,
+          "instrument": 0.5,
+          "reading": 1
+        },
+        "주방 도구": {
+          "cooking": 1,
+          "instrument": 0.5,
+          "reading": 0.5
+        },
+        "피아노·건반": {
+          "cooking": 0.5,
+          "instrument": 1,
+          "reading": 0.5
+        },
+        "기타": {
+          "cooking": 0.5,
+          "instrument": 1,
+          "reading": 0.5
+        }
+      }
+    },
+    {
+      "key": "q09Place",
+      "weight": 15,
+      "aggregation": "max",
+      "scores": {
+        "집": {
+          "cooking": 1,
+          "instrument": 1,
+          "reading": 1
+        },
+        "가까운 실내 공간": {
+          "cooking": 0.75,
+          "instrument": 0.9,
+          "reading": 0.9
+        },
+        "야외": {
+          "cooking": 0.4,
+          "instrument": 0.3,
+          "reading": 0.65
+        }
+      }
+    },
+    {
+      "key": "q10",
+      "weight": 5,
+      "aggregation": "max",
+      "scores": {
+        "혼자": {
+          "cooking": 0.9,
+          "instrument": 1,
+          "reading": 1
+        },
+        "아는 사람과": {
+          "cooking": 0.9,
+          "instrument": 0.8,
+          "reading": 0.6
+        },
+        "새로운 사람도 괜찮아요": {
+          "cooking": 0.8,
+          "instrument": 0.7,
+          "reading": 0.65
+        }
+      }
+    }
+  ]
+}
