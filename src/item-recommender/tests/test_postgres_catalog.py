@@ -9,6 +9,7 @@ import os
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from threading import Barrier
 
 import pytest
 
@@ -94,12 +95,21 @@ def test_postgres_migration_and_database_scheduler_window(pg_store):
     assert store.read_snapshot(prefix + "스푼").offers == (product(),)
 
 
-def test_postgres_concurrent_enqueue_and_skip_locked_claims(pg_store):
+@pytest.mark.parametrize("_attempt", range(10))
+def test_postgres_concurrent_enqueue_and_skip_locked_claims(pg_store, _attempt):
     store, prefix, _ = pg_store
     store.register_queries([prefix + str(index) for index in range(8)], NOW)
-    with ThreadPoolExecutor(max_workers=4) as workers:
-        inserted = list(workers.map(lambda _: store.enqueue_due(NOW), range(4)))
+    # Start competing schedulers together to exercise both unique indexes.
+    start = Barrier(8, timeout=10)
+
+    def enqueue(_):
+        start.wait()
+        return store.enqueue_due(NOW)
+
+    with ThreadPoolExecutor(max_workers=8) as workers:
+        inserted = list(workers.map(enqueue, range(8)))
     assert sum(inserted) == 8
+    assert store.enqueue_due(NOW) == 0
     with ThreadPoolExecutor(max_workers=12) as workers:
         results = list(workers.map(lambda _: store.claim_job(NOW), range(12)))
     jobs = [job for job in results if job is not None]

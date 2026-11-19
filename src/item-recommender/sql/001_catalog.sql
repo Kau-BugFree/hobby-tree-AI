@@ -109,7 +109,9 @@ BEGIN
       FROM item_recommender.catalog_queries q
      WHERE q.active = 1
      ORDER BY q.query_key
-    ON CONFLICT (query_key, run_date) DO NOTHING;
+    -- The deterministic job_id and (query_key, run_date) are both unique.
+    -- Concurrent schedulers may collide on either index, so handle both.
+    ON CONFLICT DO NOTHING;
     GET DIAGNOSTICS inserted = ROW_COUNT;
     RETURN inserted;
 END;
