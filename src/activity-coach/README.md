@@ -2,10 +2,11 @@
 
 > **저장소 사본 안내 (hobby-tree-AI)**
 >
-> 이 폴더는 전달 패키지에서 실행 코드(`backend/app`), 테스트(`backend/tests`), 도구(`backend/scripts`), 활동·코칭·평가 자료(`backend/data`의 작은 파일), API 명세(`docs/`)만 옮긴 것입니다.
+> 이 폴더는 전달 패키지에서 실행 코드(`backend/app`), 테스트(`backend/tests`), 도구(`backend/scripts`), 활동·코칭·평가 자료(`backend/data`의 작은 파일), 구조 설명과 API 명세(`docs/`)만 옮긴 것입니다.
 >
-> 동봉 Python(`runtime/`), 검색 모델(`models/`), 레시피 원자료와 색인(`backend/data/recipes`, `backend/var`), 구조·검증 문서(`verification/` 등), `package_manifest.json`은 들어 있지 않습니다. 그래서 아래 본문의 배치 파일과 일부 문서 링크는 전달 패키지에서만 동작합니다.
+> 동봉 Python(`runtime/`), 검색 모델(`models/`), 레시피 원자료와 색인(`backend/data/recipes`, `backend/var`), 검증 기록(`verification/`)과 그 밖의 문서, `package_manifest.json`은 들어 있지 않습니다. 그래서 아래 본문의 배치 파일과 일부 문서 링크는 전달 패키지에서만 동작합니다.
 >
+> - 구조(2026-11-20 반영): [현재 구조](docs/ARCHITECTURE.md). 요청 분류는 규칙 표(`backend/app/intent_rules.py`)가 맡고, 설정을 켜면 Claude가 턴마다 행동 하나를 고르는 에이전트 진입점(`backend/app/agent.py`, 기본 꺼짐)이 앞에 섭니다. 두 경로는 같은 실행 함수(`backend/app/action_executors.py`)를 씁니다.
 > - 설치: `backend/requirements.txt` 첫머리의 안내를 따릅니다(Python 3.12).
 > - 테스트: `backend`에서 `python -m pytest tests -q`. 모델과 색인 없이 실행되며, 레시피 색인이 필요한 대조 1건은 건너뜁니다.
 > - 서버: `backend`에서 `python -m uvicorn app.main:create_app --factory --port 8003`. 모델이 없으면 `backend/.env`에 `COACH_EMBEDDING_ENABLED=false`, `COACH_RERANKER_ENABLED=false`를 넣습니다.

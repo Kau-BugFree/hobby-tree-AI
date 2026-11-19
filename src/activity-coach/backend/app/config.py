@@ -66,6 +66,11 @@ class Settings:
     claude_max_tokens: int = 16000
     claude_timeout_seconds: float = 120.0
     claude_max_retries: int = 2
+    # 켜면 Claude가 턴마다 행동 하나를 고른다. 꺼져 있으면 지금의 규칙 경로만 쓴다.
+    agent_enabled: bool = False
+    agent_timeout_seconds: float = 10.0
+    # 판단 호출(choose_action)에만 쓰는 노력 수준. 빈 값이면 claude_effort를 따른다.
+    agent_effort: str = ""
     cors_origins: tuple[str, ...] = (
         "http://localhost:8081",
         "http://127.0.0.1:8081",
@@ -75,6 +80,10 @@ class Settings:
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
     # Spring 백엔드가 /backend 경로를 부를 때 보내는 공유 토큰. 비어 있으면 그 경로는 닫혀 있다.
     backend_token: str = field(default="", repr=False)
+    # /backend 경로의 한 턴 제한(초). Spring이 AI 응답을 기다리는 시간(coach.ai.request-timeout, 기본 45초)보다
+    # 짧아야 한다. 길면 Spring이 먼저 504로 끊고, 그 대화의 새 질문은 COACH409_1로 막힌다.
+    # 세션 조회와 답 저장은 이 제한 밖이라 Spring의 대기 시간과 5초의 여유를 둔다.
+    backend_turn_seconds: float = 40.0
 
     @classmethod
     def from_env(cls):
@@ -98,6 +107,9 @@ class Settings:
             claude_max_tokens=number_env("CLAUDE_MAX_TOKENS", "16000", int, 1, 1_000_000),
             claude_timeout_seconds=number_env("CLAUDE_TIMEOUT_SECONDS", "120", float, 1, 3600),
             claude_max_retries=number_env("CLAUDE_MAX_RETRIES", "2", int, 0, 10),
+            agent_enabled=flag_env("COACH_AGENT_ENABLED", "false"),
+            agent_timeout_seconds=number_env("COACH_AGENT_TIMEOUT_SECONDS", "10", float, 1, 60),
+            agent_effort=os.getenv("COACH_AGENT_EFFORT", "").strip(),
             cors_origins=tuple(
                 x.strip()
                 for x in os.getenv(
@@ -110,4 +122,6 @@ class Settings:
                 x.strip() for x in os.getenv("COACH_ALLOWED_HOSTS", "").split(",") if x.strip()
             ) or cls.allowed_hosts,
             backend_token=token_env("COACH_BACKEND_TOKEN"),
+            # Spring의 대기 시간 상한이 120초라 그보다 짧은 값만 받는다.
+            backend_turn_seconds=number_env("COACH_BACKEND_TURN_SECONDS", "40", float, 1, 115),
         )

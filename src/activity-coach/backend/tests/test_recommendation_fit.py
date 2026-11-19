@@ -148,7 +148,7 @@ def test_unrelated_question_is_not_answered_with_starter_activities(tmp_path):
     assert not reply["activities"]
 
 
-@pytest.mark.parametrize("text", ["다른 거 추천해 주세요", "다른 거 보여줘", "다른 거 좀 추천해줘", "다른 건 없어?"])
+@pytest.mark.parametrize("text", ["다른 거 추천해 주세요", "다른 거 보여줘", "다른 거 좀 추천해줘"])
 def test_other_request_in_everyday_wording_continues_previous_topic(client, text):
     sid = create_session(client)
     shown = ids(message(client, sid, BROWSE, "browse-1"))
@@ -157,6 +157,17 @@ def test_other_request_in_everyday_wording_continues_previous_topic(client, text
 
     assert len(other["activities"]) == 3 and not set(ids(other)) & set(shown)
     assert client.get(f"/sessions/{sid}").json()["search_query"] == BROWSE
+
+
+def test_other_question_without_request_word_is_asked_back_without_model(client):
+    # 설계 6절 5번: '다른 건 없어?'는 어느 규칙에도 안 걸린다. 모델 없이는 추천 검색으로 넘기지 않고 되묻는다.
+    sid = create_session(client)
+    shown = ids(message(client, sid, BROWSE, "browse-1"))
+
+    other = message(client, sid, "다른 건 없어?", "other-1")
+
+    assert other["mode"] == "clarify" and other["diagnostics"]["intent"] == "ambiguous"
+    assert client.get(f"/sessions/{sid}").json()["candidate_ids"] == shown
 
 
 def test_topic_without_match_does_not_replace_previous_topic(client):

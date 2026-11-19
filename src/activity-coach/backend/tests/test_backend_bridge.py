@@ -5,7 +5,10 @@
 
 from dataclasses import replace
 import importlib
+import json
 from pathlib import Path
+import threading
+import time
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,6 +17,48 @@ from app.config import Settings
 
 TOKEN = "test-service-token"
 URL = "/backend/coach/chat"
+DATA = Path(__file__).resolve().parents[1] / "data"
+# 백엔드 DB의 요리 활동 코드는 이 카탈로그의 activity_id와 같습니다(프런트 카탈로그 162건과 동일).
+CATALOG = {json.loads(line)["activity_id"] for line in (DATA / "activities.jsonl").open(encoding="utf-8") if line.strip()}
+
+
+def java_length(text):
+    """Java의 String.length()처럼 UTF-16 단위로 셉니다. 이모지 한 글자가 2입니다."""
+    return len(text.encode("utf-16-le")) // 2
+
+
+def filled(value, limit):
+    """Spring 검증기의 text(): null·공백뿐·길이 초과는 거절입니다.
+
+    공백 판정은 Java보다 넓습니다(줄바꿈 없는 공백 U+00A0도 공백으로 봄). 놓치는 쪽이 아니라 더 엄격한 쪽입니다.
+    """
+    return isinstance(value, str) and bool(value.strip()) and java_length(value) <= limit
+
+
+def spring_rejections(conversation_id, reply):
+    """백엔드의 CoachAiResponseValidator와 CoachTurnTransactions.finish가 502로 바꾸는 사유를 모읍니다."""
+    found = [] if reply["conversationId"] == conversation_id else ["conversationId"]
+    found += [name for name, limit in (("answer", 32000), ("answerVersion", 80), ("mode", 80))
+              if not filled(reply[name], limit)]
+    if not isinstance(reply["replayed"], bool) or len(reply["references"]) > 50 or len(reply["suggestedActivities"]) > 20:
+        found.append("shape")
+    codes = set()
+    for reference in reply["references"]:
+        kind, code = reference["sourceType"], reference["activityCode"]
+        if not (kind in {"ACTIVITY", "KNOWLEDGE", "RECIPE"}
+                and filled(reference["sourceCode"], 200) and filled(reference["title"], 1000)
+                and (code is None if kind == "RECIPE" else filled(code, 100))
+                and (kind != "ACTIVITY" or reference["sourceCode"] == code)):
+            found.append(f"reference:{reference}")
+        if code is not None:
+            codes.add(code)
+    for suggested in reply["suggestedActivities"]:
+        if not (filled(suggested["activityCode"], 100) and filled(suggested["title"], 1000)
+                and (suggested["reason"] is None or java_length(suggested["reason"]) <= 4000)):
+            found.append(f"suggestion:{suggested}")
+        codes.add(suggested["activityCode"])
+    # 백엔드는 이 코드들을 DB의 공개된 요리 활동에서 찾습니다. 하나라도 없으면 답 전체가 502입니다.
+    return found + sorted(f"unknown-code:{code}" for code in codes - CATALOG)
 
 
 @pytest.fixture
@@ -131,16 +176,71 @@ def test_same_conversation_id_continues_the_conversation(client):
     "text", ["현재 단계를 쉽게 설명해줘", "2단계 계량이 잘 안돼", "몇 분 걸려?", "시작할게", "완료했어", "기록 보여줘"]
 )
 def test_every_kind_of_turn_converts_to_the_backend_shape(client, text):
-    """설명·문제 보고·실행·완료처럼 근거의 형태가 다른 턴도 변환에서 실패하지 않습니다."""
-    ok(chat(client, 7, "요리 활동 추천해줘", "key-1"))
-    ok(chat(client, 7, "두 번째 걸로 할게", "key-2"))
+    """설명·문제 보고·실행·완료처럼 근거의 형태가 다른 턴도 백엔드 검증기가 받는 모양입니다."""
+    recommended = ok(chat(client, 7, "요리 활동 추천해줘", "key-1"))
+    selected = ok(chat(client, 7, "두 번째 걸로 할게", "key-2"))
 
     reply = ok(chat(client, 7, text, "key-3"))
 
-    assert reply["answer"]
-    for reference in reply["references"]:
-        assert reference["sourceType"] in {"ACTIVITY", "RECIPE", "KNOWLEDGE"}
-        assert reference["sourceCode"]
+    for turn in (recommended, selected, reply):
+        assert spring_rejections(7, turn) == []
+
+
+def test_completion_points_to_the_app_instead_of_claiming_a_record(client):
+    """V3의 완료 기록은 이 대화 안에만 남습니다. 앱의 활동 기록과 나무 성장은 앱 화면의 완료(API-29)로만 바뀝니다."""
+    ok(chat(client, 7, "요리 활동 추천해줘", "key-1"))
+    ok(chat(client, 7, "두 번째 걸로 할게", "key-2"))
+
+    done = ok(chat(client, 7, "완료했어", "key-3"))
+    repeated = ok(chat(client, 7, "완료했어", "key-4"))  # 이미 완료로 적힌 활동
+    records = ok(chat(client, 7, "기록 보여줘", "key-5"))
+
+    for reply in (done, repeated):
+        assert reply["mode"] == "action"
+        assert "앱의 활동 기록과 나무 성장" in reply["answer"] and "활동 화면에서 완료" in reply["answer"]
+        assert "기록했어요" not in reply["answer"] and "저장되어" not in reply["answer"]
+    # 대화 안의 완료 표시는 그대로 남아, 기록을 물으면 이 대화의 완료로 답합니다.
+    assert records["answer"].startswith("이 대화에서 완료한 활동은 1개입니다.")
+
+
+def test_spring_rejections_names_what_the_backend_would_refuse():
+    """위 검사가 빈 목록만 돌려주는 검사가 아님을 확인합니다."""
+    reply = {
+        "conversationId": 8, "answer": " ", "answerVersion": "coach-v3.0.0", "mode": "direct", "replayed": False,
+        "references": [{"sourceType": "KNOWLEDGE", "sourceCode": "cook-0-2:tip", "activityCode": None, "title": "팁"}],
+        "suggestedActivities": [{"activityCode": "cook-9-9", "title": "없는 활동", "reason": None}],
+    }
+
+    found = spring_rejections(7, reply)
+
+    assert found[:2] == ["conversationId", "answer"]
+    assert found[2].startswith("reference:") and found[-1] == "unknown-code:cook-9-9"
+
+
+def test_slow_turn_is_answered_before_the_backend_stops_waiting(settings):
+    """Spring은 45초만 기다립니다. 그 전에 한도 안내로 답해 504와 그 뒤의 대화 잠김(COACH409_1)을 막습니다."""
+    app = importlib.import_module("app.main").create_app(replace(settings, backend_turn_seconds=0.3))
+    search = app.state.retrieval.search
+    entered, release = threading.Event(), threading.Event()
+
+    def stuck_search(*args, **kwargs):
+        entered.set()
+        release.wait(timeout=10)  # 제한 시간에 끊기지 않으면 10초 뒤에야 답한다
+        return search(*args, **kwargs)
+
+    app.state.retrieval.search = stuck_search
+    with TestClient(app) as client:
+        started = time.perf_counter()
+        reply = ok(chat(client, 7, "요리 활동 추천해줘", "key-1"))
+        elapsed = time.perf_counter() - started
+        # 공개 경로(/coach/messages)의 제한은 60초 그대로라, 이 경로의 제한(0.3초)보다 오래 걸리는 검색도 기다립니다.
+        threading.Timer(0.6, release.set).start()  # 끊긴 턴의 검색 스레드도 이때 풀린다
+        public = client.post("/coach/messages", json={"message": "요리 활동 추천해줘"}).json()
+
+    assert entered.is_set() and elapsed < 5
+    assert reply["mode"] == "insufficient_evidence"
+    assert spring_rejections(7, reply) == []
+    assert public["mode"] == "direct" and public["activities"]
 
 
 def test_conversations_do_not_share_candidates(client):

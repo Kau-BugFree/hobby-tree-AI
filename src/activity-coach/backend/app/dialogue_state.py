@@ -6,6 +6,7 @@ from uuid import UUID, uuid4, uuid5
 from .dialogue_models import DialogueState, Observation, Requirement, TurnInterpretation
 
 LEGACY_NAMESPACE = UUID('971586e1-264c-4f1f-a045-59ff8a8b59c2')
+CONTEXT_LIMIT = 48000  # 모델에 넘기는 문맥의 JSON 글자 수 한도
 PHASE_STATUS = {'idle': 'idle', 'open': 'active', 'awaiting_observation': 'awaiting_clarification',
                 'answer_provided': 'answered', 'resolved': 'answered', 'abandoned': 'idle'}
 NEW_ISSUE = re.compile(r'((?:새|새로운)\s*문제|다른\s*문제|다른\s*부분)')
@@ -21,6 +22,11 @@ def issue_resolved(text: str) -> bool:
     # Negation of activity completion in another sentence does not negate issue resolution.
     return any(RESOLVED.search(clause) and not re.search(r'않|아직|안\s*해결|아니|[?？]|가정|예시', clause)
                for clause in re.split(r'(?<=[.!?。？])\s*', text))
+
+
+def issue_abandoned(text: str) -> bool:
+    """원문이 문제를 그만한다고 정한 낱말을 담고 부정·물음이 아니면 True."""
+    return bool(ABANDON.search(text)) and not re.search(r'아니|않|하지\s*마|말아|[?？]', text)
 
 
 def new_issue_confirmed(state: DialogueState, text: str, quote: str = '') -> bool:
@@ -67,13 +73,17 @@ def serialize_dialogue(state: DialogueState) -> dict:
 
 
 def apply_transition(state: DialogueState, interpretation: TurnInterpretation, message_id: str,
-                     text: str, activity_id: str | None, execution_id: str | None) -> tuple[DialogueState, list[DialogueState]]:
+                     text: str, activity_id: str | None, execution_id: str | None,
+                     confirmed: bool = False) -> tuple[DialogueState, list[DialogueState]]:
+    """confirmed: 새 문제 확인을 수락한 답(answer_confirmation). '예' 한 낱말 검사와 인용 검사를 대신합니다."""
     current = state.model_copy(deep=True)
     if interpretation.route not in {'dialogue', 'reflection'}:
         return current, []
     archived = []
-    explicit_new = interpretation.transition == 'new_issue' and new_issue_confirmed(state,text,interpretation.transition_quote)
-    consent = explicit_new and (state.pending_question or {}).get('purpose') == 'transition' and bool(re.fullmatch(r'예|네|응|맞아|맞아요|1번?',text.strip()))
+    explicit_new = interpretation.transition == 'new_issue' and (
+        confirmed or new_issue_confirmed(state,text,interpretation.transition_quote))
+    consent = explicit_new and (state.pending_question or {}).get('purpose') == 'transition' and (
+        confirmed or bool(re.fullmatch(r'예|네|응|맞아|맞아요|1번?',text.strip())))
     changed = state.issue_id and (state.activity_id is not None and state.activity_id != activity_id
                                   or state.execution_id is not None and state.execution_id != execution_id)
     if explicit_new or changed:
@@ -108,7 +118,7 @@ def apply_transition(state: DialogueState, interpretation: TurnInterpretation, m
         current.phase, current.pending_question = 'resolved', None
         current.outcome = {'quote': text, 'source_message_id': message_id, 'kind': 'self_report'}
         return current, archived
-    if interpretation.transition == 'abandon' and ABANDON.search(text) and not re.search(r'아니|않|하지\s*마|말아|[?？]',text):
+    if interpretation.transition == 'abandon' and issue_abandoned(text):
         current.phase, current.pending_question = 'abandoned', None
         return current, archived
     pending = state.pending_question if consent else current.pending_question if interpretation.transition != 'correct' else None
@@ -180,7 +190,7 @@ def build_issue_context(state: DialogueState, session: dict) -> dict:
             break
         recent[:0] = [{'role': entry['role'], 'text': entry['text']} for entry in (user, assistant)]
     context['recent_messages'] = recent
-    if len(json.dumps(context, ensure_ascii=False)) > 48000:
+    if len(json.dumps(context, ensure_ascii=False)) > CONTEXT_LIMIT:
         raise ValueError('context_limit')
     return context
 

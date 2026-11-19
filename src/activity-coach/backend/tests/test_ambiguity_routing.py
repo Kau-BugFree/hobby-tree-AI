@@ -71,26 +71,42 @@ def test_ability_statement_is_not_an_observation():
     assert not reported_observation('전자레인지로도 할 수 있어')
 
 
-@pytest.mark.parametrize('text', ['맛이 없어', '너무 짜', '탔어', '반죽이 질어', '물이 넘쳐', '뭔가 이상해',
-                                  '소금을 너무 많이 넣은 것 같아', '불 조절을 못하겠어'])
+@pytest.mark.parametrize('text', ['탔어'])
 def test_keywordless_report_about_selected_activity_opens_issue_without_model(app_factory, text):
     with TestClient(app_factory()) as client:
         sid = create_session(client); select_activity(client, sid)
         reply = message(client, sid, text, 'report')
         session = session_of(client, sid)
-        assert reply['diagnostics']['intent'] == 'coaching' and reply['mode'] == 'clarify'
+        # 설계 6절 4번: 모델 없이는 확인 질문 없이 바로 원문을 안내한다.
+        assert reply['diagnostics']['intent'] == 'coaching' and reply['mode'] == 'reference'
         assert not reply['diagnostics']['search_performed'] and session['candidate_ids'] == []
         assert session['dialogue']['observations'][0]['quote'] == text
 
 
-@pytest.mark.parametrize('text', ['드레싱이 자꾸 분리돼', '계량스푼 눈금이 안 보여'])
-def test_statement_ending_like_a_question_or_request_word_is_still_a_report(app_factory, text):
-    """'분리돼'의 '돼'는 허락을 묻는 말이 아니고, '안 보여'의 '보여'는 보여 달라는 말이 아닙니다."""
+@pytest.mark.parametrize('text', ['맛이 없어', '너무 짜', '반죽이 질어', '물이 넘쳐', '뭔가 이상해',
+                                  '소금을 너무 많이 넣은 것 같아', '불 조절을 못하겠어'])
+def test_keywordless_report_about_selected_activity_is_asked_back_without_model(app_factory, text):
+    # 설계 6절 5번: 모델 없이는 상태 보고 모양(states_condition)으로 문제를 열지 않고 되묻는다.
     with TestClient(app_factory()) as client:
         sid = create_session(client); select_activity(client, sid)
         reply = message(client, sid, text, 'report')
-        assert reply['diagnostics']['intent'] == 'coaching'
-        assert session_of(client, sid)['dialogue']['observations'][0]['quote'] == text
+        session = session_of(client, sid)
+        assert reply['diagnostics']['intent'] == 'ambiguous' and reply['mode'] == 'clarify'
+        assert not reply['diagnostics']['search_performed'] and session['candidate_ids'] == []
+        assert session['dialogue']['observations'] == []
+
+
+@pytest.mark.parametrize('text', ['드레싱이 자꾸 분리돼', '계량스푼 눈금이 안 보여'])
+def test_statement_ending_like_a_question_or_request_word_is_not_an_explanation(app_factory, text):
+    """'분리돼'의 '돼'는 허락을 묻는 말이 아니고, '안 보여'의 '보여'는 보여 달라는 말이 아닙니다.
+
+    설계 6절 5번: 모델 없이는 문제로 받지 않고 되묻는다.
+    """
+    with TestClient(app_factory()) as client:
+        sid = create_session(client); select_activity(client, sid)
+        reply = message(client, sid, text, 'report')
+        assert reply['diagnostics']['intent'] == 'ambiguous'
+        assert session_of(client, sid)['dialogue']['observations'] == []
 
 
 @pytest.mark.parametrize('text', ['이거 넣어도 돼', '이렇게 하면 돼', '원문 보여줘'])
@@ -102,8 +118,7 @@ def test_permission_question_and_show_request_stay_explanations(app_factory, tex
         assert session_of(client, sid)['dialogue']['issue_id'] is None
 
 
-@pytest.mark.parametrize('text', ['3단계에서 설탕이 안 녹고 바닥에 가라앉아 있어',
-                                  '가루 재료를 계량스푼에 수북하게 담았더니 양이 매번 달라', '재료를 다 넣었어'])
+@pytest.mark.parametrize('text', ['재료를 다 넣었어'])
 def test_report_mentioning_a_lookup_word_is_not_a_lookup(app_factory, text):
     """'3단계', '재료'라는 말이 들어 있어도 상태를 말하는 문장은 단계·준비물 조회가 아닙니다."""
     with TestClient(app_factory()) as client:
@@ -114,12 +129,28 @@ def test_report_mentioning_a_lookup_word_is_not_a_lookup(app_factory, text):
         assert session['dialogue']['observations'][0]['quote'] == text
 
 
-def test_step_named_in_a_report_becomes_the_issue_step_not_progress(app_factory):
+@pytest.mark.parametrize('text', ['3단계에서 설탕이 안 녹고 바닥에 가라앉아 있어',
+                                  '가루 재료를 계량스푼에 수북하게 담았더니 양이 매번 달라'])
+def test_report_mentioning_a_lookup_word_is_asked_back_without_model(app_factory, text):
+    """'3단계', '재료'라는 말이 들어 있어도 상태를 말하는 문장은 단계·준비물 조회가 아닙니다.
+
+    설계 6절 5번: 모델 없이는 문제로 받지 않고 되묻는다.
+    """
+    with TestClient(app_factory()) as client:
+        sid = create_session(client); select_activity(client, sid)
+        reply = message(client, sid, text, 'report')
+        session = session_of(client, sid)
+        assert reply['diagnostics']['intent'] == 'ambiguous' and session['current_step'] == 1
+        assert session['dialogue']['observations'] == []
+
+
+def test_step_named_in_a_report_does_not_move_progress(app_factory):
+    # 설계 6절 5번: 모델 없이는 문제를 열지 않으므로 문제 단계도 정하지 않는다.
     with TestClient(app_factory()) as client:
         sid = create_session(client); select_activity(client, sid)
         message(client, sid, '3단계에서 설탕이 안 녹고 바닥에 가라앉아 있어', 'report')
         session = session_of(client, sid)
-        assert session['dialogue']['step_number'] == 3 and session['current_step'] == 1
+        assert session['dialogue']['issue_id'] is None and session['current_step'] == 1
 
 
 @pytest.mark.parametrize('text', ['재료를 알려줘', '3단계 알려줘', '준비물', '다음 단계', '재료가 뭐가 필요해', '재료를 정리해 줘'])
@@ -132,11 +163,12 @@ def test_lookup_request_is_still_answered_directly(app_factory, text):
 
 
 @pytest.mark.parametrize('text', ['김치볶음밥', '오이 무침', '계란말이 김밥'])
-def test_dish_name_with_selected_activity_still_searches_without_model(app_factory, text):
+def test_dish_name_with_selected_activity_is_asked_back_without_model(app_factory, text):
+    # 설계 6절 5번: 모델 없이 규칙에 안 걸린 말은 추천 검색으로 넘기지 않고 되묻는다.
     with TestClient(app_factory()) as client:
         sid = create_session(client); select_activity(client, sid)
         reply = message(client, sid, text, 'dish')
-        assert reply['diagnostics']['intent'] == 'recommend' and reply['diagnostics']['search_performed']
+        assert reply['diagnostics']['intent'] == 'ambiguous' and not reply['diagnostics']['search_performed']
         assert session_of(client, sid)['dialogue']['issue_id'] is None
 
 

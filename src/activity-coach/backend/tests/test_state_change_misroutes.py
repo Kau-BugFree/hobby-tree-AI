@@ -277,12 +277,13 @@ def test_recommendation_request_with_explain_like_word_recommends(client, text):
 
 
 # V05: 키 없음·모델 해석 실패
-def test_keyless_dish_name_with_answered_issue_recommends(client):
+def test_keyless_dish_name_with_answered_issue_is_asked_back(client):
+    # 설계 6절 5번: 모델 없이 규칙에 안 걸린 말은 추천 검색으로 넘기지 않고 되묻는다. 문제 후속으로 받지도 않는다.
     sid = create_session(client); select_activity(client, sid)
     open_answered_issue(client, sid)
     reply = message(client, sid, '김치볶음밥', 'dish')
-    assert reply['diagnostics']['intent'] in RECOMMEND
-    assert reply['diagnostics']['search_performed']
+    assert reply['diagnostics']['intent'] == 'ambiguous'
+    assert not reply['diagnostics']['search_performed']
 
 
 class FailingInterpreter(Planner):
@@ -299,9 +300,10 @@ def test_failed_interpretation_does_not_open_issue(app_factory):
         reply = message(client, sid, '김치볶음밥', 'dish')
         dialogue = state(client, sid)['dialogue']
         assert dialogue['issue_id'] is None and not dialogue['observations']
-        assert reply['mode'] == 'insufficient_evidence'
-        assert reply['diagnostics']['stop_reason'] == 'execution_failure'
-        assert reply['diagnostics']['stop_detail'] == 'provider_error'
+        # 설계 4.4절: 해석 호출이 실패하면 그 턴은 키 없는 경로와 같다. 재순위가 꺼져 있으니 되묻는다.
+        assert reply['mode'] == 'clarify' and reply['diagnostics']['intent'] == 'ambiguous'
+        assert reply['diagnostics'].get('stop_reason') != 'execution_failure'
+        assert reply['diagnostics']['llm_status'] == 'provider_error'
 
 
 def test_oversized_context_in_interpretation_reports_context_limit(app_factory):

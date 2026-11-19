@@ -799,6 +799,68 @@
      }
     }
    }
+  },
+  "/backend/coach/chat": {
+   "post": {
+    "tags": [
+     "07 백엔드 연동"
+    ],
+    "summary": "대화 한 턴 (Spring의 POST /api/v1/coach/chat이 호출)",
+    "description": "conversationId가 같으면 같은 대화로 이어 갑니다. 같은 requestId의 재전송은 저장된 답을 돌려줍니다.",
+    "operationId": "chat_backend_coach_chat_post",
+    "parameters": [
+     {
+      "name": "x-coach-service-token",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Coach-Service-Token"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BackendChatRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Chat Backend Coach Chat Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {
@@ -837,6 +899,47 @@
     ],
     "title": "AskRequest",
     "description": "RAG 검증용 단일 질문입니다. 대화 세션·분기를 거치지 않습니다."
+   },
+   "BackendChatRequest": {
+    "properties": {
+     "conversationId": {
+      "type": "integer",
+      "maximum": 9.223372036854776e+18,
+      "minimum": 1.0,
+      "title": "Conversationid",
+      "description": "백엔드 coach_conversations.conversation_id"
+     },
+     "message": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message"
+     },
+     "requestId": {
+      "type": "string",
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Requestid",
+      "description": "백엔드가 받은 Idempotency-Key"
+     },
+     "hobbyCode": {
+      "type": "string",
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Hobbycode",
+      "description": "백엔드 hobbies.hobby_code. 대화를 시작할 때만 반영",
+      "default": "cooking"
+     }
+    },
+    "additionalProperties": false,
+    "type": "object",
+    "required": [
+     "conversationId",
+     "message",
+     "requestId"
+    ],
+    "title": "BackendChatRequest",
+    "description": "Spring 백엔드가 보내는 한 턴입니다. JSON 이름은 Spring DTO처럼 camelCase(conversationId)입니다."
    },
    "CoachRequest": {
     "properties": {
@@ -1228,6 +1331,10 @@
   {
    "name": "06 RAG 검증",
    "description": "검색 순위·근거·Claude 답변을 한 번에 확인"
+  },
+  {
+   "name": "07 백엔드 연동",
+   "description": "Spring 백엔드 전용. X-Coach-Service-Token 헤더 필요"
   }
  ]
 }

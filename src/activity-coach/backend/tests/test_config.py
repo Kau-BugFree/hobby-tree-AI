@@ -9,7 +9,8 @@ from app.config import ROOT, Settings
 # 환경 변수 이름과 그 값을 받는 Settings 필드
 NUMBERS = {"COACH_RERANK_CANDIDATES": "rerank_candidates", "COACH_DENSE_MIN_SIMILARITY": "dense_min_similarity",
            "COACH_RERANK_MIN_SCORE": "rerank_min_score", "CLAUDE_MAX_TOKENS": "claude_max_tokens",
-           "CLAUDE_TIMEOUT_SECONDS": "claude_timeout_seconds", "CLAUDE_MAX_RETRIES": "claude_max_retries"}
+           "CLAUDE_TIMEOUT_SECONDS": "claude_timeout_seconds", "CLAUDE_MAX_RETRIES": "claude_max_retries",
+           "COACH_BACKEND_TURN_SECONDS": "backend_turn_seconds"}
 PATHS = ("COACH_DATA_DIR", "COACH_INDEX_DIR", "COACH_DATABASE_PATH")
 
 
@@ -26,6 +27,7 @@ def clean_environment(monkeypatch):
     ("COACH_DENSE_MIN_SIMILARITY", "nan"), ("COACH_DENSE_MIN_SIMILARITY", "1.5"),
     ("COACH_RERANK_MIN_SCORE", "inf"), ("COACH_RERANK_MIN_SCORE", "-inf"),
     ("CLAUDE_MAX_TOKENS", "0"), ("CLAUDE_TIMEOUT_SECONDS", "-1"), ("CLAUDE_MAX_RETRIES", "-1"),
+    ("COACH_BACKEND_TURN_SECONDS", "0"), ("COACH_BACKEND_TURN_SECONDS", "120"),
 ])
 def test_invalid_number_stops_startup_and_names_the_variable(monkeypatch, name, value):
     """nan·inf·범위 밖 값으로 시작한 서버는 검색·응답에서 500을 낸다. 시작할 때 막는다."""
@@ -88,3 +90,31 @@ def test_valid_numbers_are_read(monkeypatch):
     monkeypatch.setenv("COACH_RERANK_MIN_SCORE", "-1.5")
     settings = Settings.from_env()
     assert settings.rerank_candidates == 30 and settings.rerank_min_score == -1.5
+
+
+def test_backend_turn_deadline_is_shorter_than_the_spring_wait(monkeypatch):
+    """Spring은 AI 응답을 45초(coach.ai.request-timeout 기본값)만 기다립니다. 그보다 먼저 답해야 504가 나지 않습니다."""
+    assert Settings.from_env().backend_turn_seconds == 40.0 < 45
+    monkeypatch.setenv("COACH_BACKEND_TURN_SECONDS", "90")  # Spring 쪽 대기 시간을 늘린 배포
+    assert Settings.from_env().backend_turn_seconds == 90.0
+
+
+def test_agent_is_off_by_default(monkeypatch):
+    monkeypatch.delenv("COACH_AGENT_ENABLED", raising=False)
+    monkeypatch.delenv("COACH_AGENT_TIMEOUT_SECONDS", raising=False)
+    settings = Settings.from_env()
+    assert settings.agent_enabled is False and settings.agent_timeout_seconds == 10.0
+
+
+def test_agent_settings_are_read(monkeypatch):
+    monkeypatch.setenv("COACH_AGENT_ENABLED", "true")
+    monkeypatch.setenv("COACH_AGENT_TIMEOUT_SECONDS", "5")
+    settings = Settings.from_env()
+    assert settings.agent_enabled is True and settings.agent_timeout_seconds == 5.0
+
+
+def test_agent_effort_is_read_and_empty_means_the_claude_effort(monkeypatch):
+    monkeypatch.setenv("COACH_AGENT_EFFORT", "")   # 빈 값: CLAUDE_EFFORT를 따른다(ClaudeService가 정한다)
+    assert Settings.from_env().agent_effort == "" and Settings().agent_effort == ""
+    monkeypatch.setenv("COACH_AGENT_EFFORT", " low ")
+    assert Settings.from_env().agent_effort == "low"

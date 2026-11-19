@@ -9,7 +9,7 @@ class BudgetExceeded(Exception):
 
 
 class TurnBudget:
-    limits = {'decision': 6, 'retrieval': 3, 'generation': 2, 'verification': 2}
+    limits = {'decision': 6, 'retrieval': 3, 'generation': 2, 'verification': 2, 'agent': 1}
 
     def __init__(self, seconds: float = 60):
         self.deadline = time.monotonic() + seconds

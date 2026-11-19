@@ -19,6 +19,9 @@ ANSWER_VERSION = "coach-v3.0.0"
 # 세션의 origin_request_id에 넣는 열쇠. 공개 경로는 v4 UUID만 이 자리에 쓰므로 겹치지 않는다.
 ORIGIN_PREFIX = "backend-conversation:"
 SOURCE_TYPES = {"activity": "ACTIVITY", "recipe": "RECIPE"}
+# V3의 완료 기록은 이 대화 안에만 남는다. 앱의 활동 기록과 나무 성장은 앱이 백엔드의 완료 API(API-29)를 불러야 바뀐다.
+# 그래서 앱 대화에서는 '기록했어요'라고 답하지 않는다. 공개 경로(/coach/messages)의 답은 그대로다.
+APP_COMPLETION_ANSWER = "이 대화에 완료로 적어 두었어요. 앱의 활동 기록과 나무 성장에는 활동 화면에서 완료해야 반영돼요."
 
 
 def backend_reply(conversation_id: int, reply: dict) -> dict:
@@ -35,7 +38,8 @@ def backend_reply(conversation_id: int, reply: dict) -> dict:
         })
     return {
         "conversationId": conversation_id,
-        "answer": reply["text"],
+        # record는 완료를 기록한 턴(새 기록이든 이미 있던 기록이든)에만 붙는다.
+        "answer": APP_COMPLETION_ANSWER if reply.get("record") else reply["text"],
         "answerVersion": ANSWER_VERSION,
         "mode": reply["mode"],
         "references": references,
@@ -71,7 +75,9 @@ def backend_router(settings: Settings, store: Store, coach: Coach, registry: dic
             store.session_for_origin, f"{ORIGIN_PREFIX}{body.conversation_id}", body.hobby_code
         )
         reply = await coach.respond(
-            CoachRequest(session_id=session["session_id"], message=body.message, request_id=body.request_id)
+            CoachRequest(session_id=session["session_id"], message=body.message, request_id=body.request_id),
+            # Spring이 기다리는 시간 안에 한도 안내라도 답한다. 넘기면 Spring은 504를 내고 이 대화의 새 질문을 409로 막는다.
+            settings.backend_turn_seconds,
         )
         return backend_reply(body.conversation_id, reply)
 
