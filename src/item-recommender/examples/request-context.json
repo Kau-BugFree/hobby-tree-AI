@@ -1,0 +1,17 @@
+{
+  "activityId": 101,
+  "activityContentVersion": 1,
+  "reviewStatus": "PUBLISHED",
+  "preferencesVersion": 2,
+  "contextText": "이 과거 Q14 입력은 호환 목적으로만 수신하며 상품 추천에 사용하지 않습니다.",
+  "materials": [
+    {
+      "materialId": 1001,
+      "name": "계량스푼",
+      "quantity": "1개",
+      "isRequired": true,
+      "acquisitionType": "OWN_OR_BUY"
+    }
+  ],
+  "maxProductsPerMaterial": 3
+}

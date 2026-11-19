@@ -1,0 +1,22 @@
+{
+  "activityId": 101,
+  "activityContentVersion": 1,
+  "reviewStatus": "PUBLISHED",
+  "materials": [
+    {
+      "materialId": 1001,
+      "name": "계량스푼",
+      "quantity": "1개",
+      "isRequired": true,
+      "acquisitionType": "OWN_OR_BUY"
+    }
+  ],
+  "materialSelections": [
+    {
+      "materialId": 1001,
+      "budgetKrw": 10000,
+      "offset": 0
+    }
+  ],
+  "maxProductsPerMaterial": 3
+}
