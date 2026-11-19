@@ -1,0 +1,17 @@
+.venv/
+.runtime/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+*.sqlite3*
+
+
+# Track item recommender examples and API documentation.
+!examples/*.json
+!docs/openapi.json
+
+# Keep local environment settings private.
+.env.*
