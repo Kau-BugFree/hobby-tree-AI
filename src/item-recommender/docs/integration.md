@@ -38,7 +38,7 @@ X-Service-Token: <내부 서비스 토큰>
 | `activityId`, `activityContentVersion` | 1 이상 정수 |
 | `reviewStatus` | `PUBLISHED` |
 | `materials` | 최대 20개, ID 중복 금지, 빈 목록 허용 |
-| `materials[].materialId/name` | 1 이상 정수 / 최대 160자, 공백만인 이름·제어문자 금지 |
+| `materials[].materialId/name` | 1 이상 정수 / 최대 200자, 공백만인 이름·제어문자 금지 |
 | `materials[].quantity/isRequired/acquisitionType` | 최대 160자 또는 null / boolean 기본 true / 최대 30자 또는 null |
 | `maxProductsPerMaterial` | 1~5, 기본 3 |
 | `materialSelections` | 요청에 포함된 준비물 ID별 선택. 최대 20개, ID 중복 금지 |

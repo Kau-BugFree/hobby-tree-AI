@@ -25,7 +25,7 @@ def validate_query(value: str) -> str:
     return value.strip()
 
 
-QueryText = Annotated[str, Field(min_length=1, max_length=160), AfterValidator(validate_query)]
+QueryText = Annotated[str, Field(min_length=1, max_length=200), AfterValidator(validate_query)]
 
 
 class Model(BaseModel):

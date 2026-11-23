@@ -30,7 +30,7 @@ def _document(path: str) -> dict:
 
 
 def _query(value) -> str:
-    if not isinstance(value, str) or not value.strip() or len(value) > 160:
+    if not isinstance(value, str) or not value.strip() or len(value) > 200:
         raise ValueError("invalid preparation name")
     if any(ord(c) < 32 or ord(c) == 127 for c in value):
         raise ValueError("invalid preparation name")

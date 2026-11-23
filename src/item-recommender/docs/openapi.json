@@ -310,7 +310,7 @@
         "properties": {
           "query": {
             "type": "string",
-            "maxLength": 160,
+            "maxLength": 200,
             "minLength": 1,
             "title": "Query"
           },
@@ -341,14 +341,14 @@
         "properties": {
           "primaryQuery": {
             "type": "string",
-            "maxLength": 160,
+            "maxLength": 200,
             "minLength": 1,
             "title": "Primaryquery"
           },
           "fallbackQueries": {
             "items": {
               "type": "string",
-              "maxLength": 160,
+              "maxLength": 200,
               "minLength": 1
             },
             "type": "array",
@@ -387,7 +387,7 @@
           },
           "name": {
             "type": "string",
-            "maxLength": 160,
+            "maxLength": 200,
             "minLength": 1,
             "title": "Name"
           },
@@ -789,7 +789,7 @@
           "queries": {
             "items": {
               "type": "string",
-              "maxLength": 160,
+              "maxLength": 200,
               "minLength": 1
             },
             "type": "array",
