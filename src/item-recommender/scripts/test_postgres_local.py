@@ -57,6 +57,7 @@ def main() -> int:
                     "-m",
                     "pytest",
                     "tests/test_postgres_catalog.py",
+                    "tests/test_material_sync.py",
                     "-q",
                     "--tb=short",
                 ],
