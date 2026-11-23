@@ -20,6 +20,7 @@
 2. 처음 실행하기 전에 `verify_package.bat`으로 전달 파일 SHA-256을 확인합니다. 정상 결과는 `problems: []`입니다. `unlisted`에는 매니페스트에 없는 파일이 나옵니다. 받은 직후인데 `backend/.env`나 `backend/var/coach.sqlite`가 보이면 보낸 쪽의 키·대화 기록이 섞여 온 것이니 지우고 보낸 쪽에 알리세요.
 3. `start_backend.bat`을 실행합니다. 기본 주소는 `http://127.0.0.1:8003`이며 `/health`에서 상태를 확인합니다. `/docs`의 Swagger UI는 브라우저가 외부 CDN에 접근할 수 있어야 표시될 수 있습니다.
 4. Claude 생성이 필요하면 `backend/.env.example`을 `backend/.env`로 복사하고 **본인의 `ANTHROPIC_API_KEY`**를 넣은 뒤 서버를 재시작합니다. 모델 접근 권한에 맞게 `CLAUDE_MODEL`도 설정합니다. 실제 키는 이 패키지에 없습니다.
+5. 음성 질문(음성→글자 변환, `POST /backend/coach/transcribe`)을 쓰려면 구글 서비스 계정 키 파일을 `backend`에 `.env`로 시작하는 이름으로 두고 `backend/.env`의 `GOOGLE_APPLICATION_CREDENTIALS`에 그 경로를 적습니다. 키가 없으면 이 경로만 503이고 나머지는 그대로 동작합니다. 다만 `google-auth`(`backend/requirements.txt`)가 설치되지 않은 환경에서는 서버 전체가 시작하지 않으니, 코드를 갱신할 때 의존성부터 설치합니다. 계약은 `docs/HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`에 있습니다.
 
 키 없이도 모델 검색, 활동 선택, 준비물·단계 조회, 근거 원문 응답, 기록 저장이 동작합니다. Claude 생성·의미 검증은 외부 네트워크·유효한 API 키가 필요하며 비용이 발생합니다. Claude 자체의 모델 가중치는 포함할 수 없습니다.
 

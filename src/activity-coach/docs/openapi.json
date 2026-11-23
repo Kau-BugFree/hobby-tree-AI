@@ -861,6 +861,69 @@
      }
     }
    }
+  },
+  "/backend/coach/transcribe": {
+   "post": {
+    "tags": [
+     "07 백엔드 연동"
+    ],
+    "summary": "음성 → 글자 (Spring의 음성 질문 경로가 호출)",
+    "description": "음성 파일(60초·7MB 이하)의 바이트를 본문으로 받아 글자를 돌려줍니다. 음성은 저장하지 않습니다.",
+    "operationId": "transcribe_backend_coach_transcribe_post",
+    "parameters": [
+     {
+      "name": "x-coach-service-token",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Coach-Service-Token"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Transcribe Backend Coach Transcribe Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "requestBody": {
+     "required": true,
+     "content": {
+      "audio/*": {
+       "schema": {
+        "type": "string",
+        "format": "binary"
+       }
+      }
+     }
+    }
+   }
   }
  },
  "components": {

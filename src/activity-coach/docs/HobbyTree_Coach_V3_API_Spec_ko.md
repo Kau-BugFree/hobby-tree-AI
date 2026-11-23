@@ -1,12 +1,14 @@
 # HobbyTree 활동코치 V3 API 명세
 
-FE · BE · AI 팀 공유용 | 문서 버전 1.2 | 작성일 2026-11-11, 11장 갱신 2026-11-20
+FE · BE · AI 팀 공유용 | 문서 버전 1.3 | 작성일 2026-11-11, 11장 갱신 2026-11-20, 음성 경로 추가 2026-11-23
 
 **명세 기준:** `rag 챗봇연결 v3/2026-11-09/backend/app`의 2026-11-10 23:27 시점 코드(git 저장소가 아니라 커밋이 없습니다). 현재 구현된 V3 서버 계약을 설명합니다. 배포 서버 주소와 Hobby Recommender와의 연결 방식은 아직 확정되지 않았습니다.
 
 **1.1 변경(2026-11-11):** Spring 백엔드 전용 경로 `POST /backend/coach/chat`을 추가하고 11장에 계약을 적었습니다. 1~9장의 기존 경로는 바뀌지 않았습니다.
 
 **1.2 변경(2026-11-20):** 11장을 백엔드 `develop`(커밋 `98425b1`)의 실제 호출 코드(`CoachAiClient`, `CoachAiResponseValidator`, `CoachTurnTransactions`)에 맞췄습니다. 이 경로의 한 턴 제한을 60초에서 40초로 줄였습니다(백엔드 대기 45초). 요청·응답 필드는 바뀌지 않았습니다.
+
+**1.3 변경(2026-11-23):** Spring 백엔드 전용 경로 `POST /backend/coach/transcribe`(음성→글자)를 추가했습니다. 계약은 별도 문서 `HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`에 있습니다. 기존 경로는 바뀌지 않았습니다.
 
 **확인 방법:** 2026-11-11에 서버를 임시 DB로 띄워 요청 50건의 실제 응답을 수집하고, 발화 11건의 분류를 따로 확인했습니다(Claude 키 없음, 임베딩·리랭커 끔). Claude 생성 경로, 하이브리드 검색, 레시피 검색, 500 응답은 실행하지 않고 코드만 읽었으며 본문에 "코드 기준"으로 표시합니다.
 
@@ -58,6 +60,7 @@ CORS 허용 헤더에 Authorization이 없습니다. 브라우저가 토큰 헤�
 | POST | /rag/ask | 검색→근거→답변을 한 번에 확인(검증용) | 200 |
 | GET | /diagnostics/traces | 한 세션의 처리 경로·호출 수 | 200 |
 | POST | /backend/coach/chat | Spring 백엔드 전용 대화(11장) | 200 |
+| POST | /backend/coach/transcribe | Spring 백엔드 전용 음성→글자(별도 문서 `HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`) | 200 |
 | GET | /docs | Swagger UI | 200 |
 | GET | /openapi.json | OpenAPI 명세 | 200 |
 

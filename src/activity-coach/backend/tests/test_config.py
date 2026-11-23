@@ -12,13 +12,14 @@ NUMBERS = {"COACH_RERANK_CANDIDATES": "rerank_candidates", "COACH_DENSE_MIN_SIMI
            "CLAUDE_TIMEOUT_SECONDS": "claude_timeout_seconds", "CLAUDE_MAX_RETRIES": "claude_max_retries",
            "COACH_BACKEND_TURN_SECONDS": "backend_turn_seconds"}
 PATHS = ("COACH_DATA_DIR", "COACH_INDEX_DIR", "COACH_DATABASE_PATH")
+VOICE = ("GOOGLE_APPLICATION_CREDENTIALS", "COACH_STT_MODEL", "COACH_STT_LOCATION", "COACH_STT_TIMEOUT_SECONDS")
 
 
 @pytest.fixture(autouse=True)
 def clean_environment(monkeypatch):
     """개발 PC의 .env와 셸 환경 변수가 결과를 바꾸지 않게 합니다."""
     monkeypatch.setattr("app.config.load_dotenv", lambda *args, **kwargs: None)
-    for name in (*NUMBERS, *PATHS):
+    for name in (*NUMBERS, *PATHS, *VOICE):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -118,3 +119,39 @@ def test_agent_effort_is_read_and_empty_means_the_claude_effort(monkeypatch):
     assert Settings.from_env().agent_effort == "" and Settings().agent_effort == ""
     monkeypatch.setenv("COACH_AGENT_EFFORT", " low ")
     assert Settings.from_env().agent_effort == "low"
+
+
+def test_voice_settings_default_to_off_and_the_global_long_model():
+    """키 파일 경로를 넣지 않으면 음성 변환은 꺼져 있습니다(경로가 503)."""
+    settings = Settings.from_env()
+    assert settings.google_credentials_path is None
+    assert (settings.stt_model, settings.stt_location, settings.stt_timeout_seconds) == ("long", "global", 30.0)
+
+
+def test_blank_voice_settings_use_the_defaults(monkeypatch):
+    for name in VOICE:
+        monkeypatch.setenv(name, "")
+    settings = Settings.from_env()
+    assert settings.google_credentials_path is None
+    assert (settings.stt_model, settings.stt_location, settings.stt_timeout_seconds) == ("long", "global", 30.0)
+
+
+def test_voice_settings_are_read_and_a_relative_key_path_is_under_backend(monkeypatch):
+    monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", ".env.google-credentials.json")
+    monkeypatch.setenv("COACH_STT_MODEL", " chirp_3 ")
+    monkeypatch.setenv("COACH_STT_LOCATION", "us")
+    monkeypatch.setenv("COACH_STT_TIMEOUT_SECONDS", "20")
+    settings = Settings.from_env()
+    assert settings.google_credentials_path == ROOT / ".env.google-credentials.json"
+    assert (settings.stt_model, settings.stt_location, settings.stt_timeout_seconds) == ("chirp_3", "us", 20.0)
+
+
+@pytest.mark.parametrize("name, value", [
+    ("COACH_STT_LOCATION", "us.evil.example/x"), ("COACH_STT_LOCATION", "US"),
+    ("COACH_STT_TIMEOUT_SECONDS", "0"), ("COACH_STT_TIMEOUT_SECONDS", "120"),
+])
+def test_invalid_voice_setting_stops_startup_and_names_the_variable(monkeypatch, name, value):
+    """지역은 구글 호스트 이름에 들어갑니다. 소문자·숫자·하이픈이 아니면 시작할 때 막습니다."""
+    monkeypatch.setenv(name, value)
+    with pytest.raises(ValueError, match=name):
+        Settings.from_env()
