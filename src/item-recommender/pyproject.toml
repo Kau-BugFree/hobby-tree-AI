@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hobbytree-item-recommender"
+version = "0.3.0"
+description = "Database-scheduled product catalog with price ordering and per-product budget comparison"
+requires-python = ">=3.11"
+dependencies = ["fastapi==0.162.0", "pydantic==2.14.2", "httpx==0.28.1", "uvicorn==0.54.0"]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2,<4"]
+
+[tool.setuptools.packages.find]
+include = ["item_recommender*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+

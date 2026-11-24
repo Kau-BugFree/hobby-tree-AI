@@ -1,0 +1,86 @@
+name: hobbytree-items
+
+x-app-environment: &app-environment
+  APP_ENV: production
+  SERVICE_TOKEN: ${SERVICE_TOKEN:?Set SERVICE_TOKEN to at least 32 characters}
+  CATALOG_DATABASE_URL: postgresql://hobbytree_items@db:5432/hobbytree_items
+  PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+  ADPICK_STORAGE_APPROVED: ${ADPICK_STORAGE_APPROVED:-false}
+  CATALOG_RETENTION_SECONDS: ${CATALOG_RETENTION_SECONDS:-86400}
+  ADPICK_ALLOWED_PURCHASE_HOSTS: ${ADPICK_ALLOWED_PURCHASE_HOSTS:-link.adpick.co.kr,deg.kr,adpick.co.kr}
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    environment:
+      POSTGRES_USER: hobbytree_items
+      POSTGRES_DB: hobbytree_items
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_cron
+      - -c
+      - cron.database_name=hobbytree_items
+      - -c
+      - cron.use_background_workers=on
+      - -c
+      - cron.max_running_jobs=2
+    volumes:
+      - catalog-db:/var/lib/postgresql/data
+      - ./sql/001_catalog.sql:/docker-entrypoint-initdb.d/001_catalog.sql:ro
+      - ./sql/002_pg_cron.sql:/docker-entrypoint-initdb.d/002_pg_cron.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hobbytree_items -d hobbytree_items"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hobbytree-item-recommender:local
+    environment:
+      <<: *app-environment
+    ports:
+      - 127.0.0.1:8001:8001
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2).close()"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hobbytree-item-recommender:local
+    command: ["python", "-m", "item_recommender.cli", "worker"]
+    environment:
+      <<: *app-environment
+      ADPICK_API_KEY: ${ADPICK_API_KEY:-}
+      ADPICK_FILTERING_APPROVED: ${ADPICK_FILTERING_APPROVED:-false}
+      ADPICK_RATE_LIMIT_PER_MINUTE: ${ADPICK_RATE_LIMIT_PER_MINUTE:-6}
+      ADPICK_SEARCH_LIMIT: ${ADPICK_SEARCH_LIMIT:-20}
+      ADPICK_TIMEOUT_SECONDS: ${ADPICK_TIMEOUT_SECONDS:-5}
+      WORKER_POLL_SECONDS: ${WORKER_POLL_SECONDS:-10}
+      WORKER_LEASE_SECONDS: ${WORKER_LEASE_SECONDS:-30}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  catalog-db:
