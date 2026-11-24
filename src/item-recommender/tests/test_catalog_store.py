@@ -315,3 +315,43 @@ def test_failed_never_collected_query_cannot_starve_unattempted_query(store):
     store.register_queries(["미시도 품목"], NOW)
     store.enqueue_due(NOW)
     assert store.claim_job(NOW).query_key == "미시도 품목"
+
+
+@pytest.mark.parametrize("initial", ["MANUAL", "BE_MATERIAL"])
+@pytest.mark.parametrize("incoming", ["MANUAL", "BE_MATERIAL"])
+def test_registration_origin_precedence_and_reactivation(store, initial, incoming):
+    assert store.register_queries(["계량 스푼"], NOW, origin=initial) == 1
+    with store._transaction() as connection:
+        row = connection.execute("SELECT origin FROM catalog_queries").fetchone()
+        assert row["origin"] == initial
+        connection.execute("UPDATE catalog_queries SET active = 0")
+    later = NOW + timedelta(seconds=1)
+    for _ in range(2):
+        assert store.register_queries(["계량 스푼"], later, origin=incoming) == 0
+    expected = "MANUAL" if "MANUAL" in (initial, incoming) else "BE_MATERIAL"
+    with store._transaction(write=False) as connection:
+        row = connection.execute(
+            "SELECT active, origin, updated_at FROM catalog_queries"
+        ).fetchone()
+        assert tuple(row) == (1, expected, later.timestamp())
+
+
+@pytest.mark.parametrize("origin", ["OTHER", "", None])
+def test_invalid_origin_does_not_register_any_queries(store, origin):
+    with pytest.raises(ValueError, match="invalid query origin"):
+        store.register_queries(["계량스푼"], NOW, origin=origin)
+    with store._transaction(write=False) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM catalog_queries").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("operation", ["fallback", "curated"])
+def test_operator_edits_promote_automatic_queries_to_manual(store, operation):
+    store.register_queries(["계량스푼", "계량 스푼"], NOW, origin="BE_MATERIAL")
+    if operation == "fallback":
+        store.set_fallbacks("계량스푼", ["계량 스푼"], NOW)
+    else:
+        store.put_curated("계량스푼", [offer()], NOW, NOW + timedelta(hours=1))
+    with store._transaction(write=False) as connection:
+        rows = dict(connection.execute("SELECT query_key, origin FROM catalog_queries"))
+        assert rows["계량스푼"] == "MANUAL"
+        assert rows["계량 스푼"] == ("MANUAL" if operation == "fallback" else "BE_MATERIAL")

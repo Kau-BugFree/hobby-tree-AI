@@ -3,12 +3,13 @@
 import unicodedata
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Protocol, Sequence
+from typing import Literal, Protocol, Sequence
 from zoneinfo import ZoneInfo
 
 from .domain import Offer
 
 SEOUL = ZoneInfo("Asia/Seoul")
+QueryOrigin = Literal["MANUAL", "BE_MATERIAL"]
 
 
 def query_key(value: str) -> str:
@@ -47,7 +48,9 @@ class StoredSnapshot:
 
 class CatalogStore(Protocol):
     def initialize(self) -> None: ...
-    def register_queries(self, queries: Sequence[str], now: datetime) -> int: ...
+    def register_queries(
+        self, queries: Sequence[str], now: datetime, *, origin: QueryOrigin = "MANUAL"
+    ) -> int: ...
     def set_fallbacks(self, primary: str, fallbacks: Sequence[str], now: datetime) -> None: ...
     def fallback_keys(self, primary: str) -> tuple[str, ...]: ...
     def read_snapshot(self, key: str, source: str = "BATCH") -> StoredSnapshot: ...

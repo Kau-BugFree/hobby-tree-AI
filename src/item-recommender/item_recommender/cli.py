@@ -75,6 +75,12 @@ def _parser() -> argparse.ArgumentParser:
     commands.add_parser("init-db", help="수집 메타데이터와 상품 저장소 초기화")
     register = commands.add_parser("register", help="BE 내보내기 JSON의 준비물 검색어 등록")
     register.add_argument("--file", required=True)
+    register.add_argument(
+        "--origin",
+        choices=("MANUAL", "BE_MATERIAL"),
+        default="MANUAL",
+        help="MANUAL: 운영자 등록(기본값), BE_MATERIAL: 지원 취미의 공개 활동 export 등록",
+    )
     fallback = commands.add_parser("fallbacks", help="운영자가 확인한 대체 검색어 등록")
     fallback.add_argument("--file", required=True)
     worker = commands.add_parser("worker", help="DB가 예약한 작업 처리")
@@ -115,8 +121,8 @@ def main(argv: list[str] | None = None) -> int:
             store.initialize()
             _emit({"status": "INITIALIZED"})
         elif args.command == "register":
-            count = store.register_queries(queries, now)
-            _emit({"status": "REGISTERED", "registeredCount": count})
+            count = store.register_queries(queries, now, origin=args.origin)
+            _emit({"status": "REGISTERED", "registeredCount": count, "origin": args.origin})
         elif args.command == "fallbacks":
             store.set_fallbacks(primary, fallbacks, now)
             _emit({"status": "FALLBACKS_UPDATED", "fallbackCount": len(fallbacks)})

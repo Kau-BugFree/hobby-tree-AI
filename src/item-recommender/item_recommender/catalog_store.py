@@ -13,7 +13,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
 
-from .catalog_domain import SEOUL, RefreshJob, StoredSnapshot, in_batch_window, query_key
+from .catalog_domain import (
+    SEOUL,
+    QueryOrigin,
+    RefreshJob,
+    StoredSnapshot,
+    in_batch_window,
+    query_key,
+)
 from .domain import Offer
 
 MAX_OFFERS = 20
@@ -138,7 +145,16 @@ class _CatalogStore:
     def _table(self, name: str) -> str:
         return f"item_recommender.{name}" if self._postgres else name
 
-    def _register(self, connection, queries: Sequence[str], timestamp: float) -> int:
+    def _register(
+        self,
+        connection,
+        queries: Sequence[str],
+        timestamp: float,
+        *,
+        origin: QueryOrigin = "MANUAL",
+    ) -> int:
+        if origin not in ("MANUAL", "BE_MATERIAL"):
+            raise ValueError("invalid query origin")
         if isinstance(queries, (str, bytes)):
             raise ValueError("queries must be a sequence of material names")
         keys = dict.fromkeys(_key(query) for query in queries)
@@ -148,25 +164,34 @@ class _CatalogStore:
                 connection,
                 f"""
                 INSERT INTO {self._table("catalog_queries")}
-                    (query_key, query_text, created_at, updated_at)
-                VALUES (?, ?, ?, ?) ON CONFLICT(query_key) DO NOTHING
+                    (query_key, query_text, origin, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?) ON CONFLICT(query_key) DO NOTHING
                 """,
-                (key, key, timestamp, timestamp),
+                (key, key, origin, timestamp, timestamp),
             )
             count += cursor.rowcount
             self._execute(
                 connection,
                 f"""
-                UPDATE {self._table("catalog_queries")} SET active = 1, origin = 'MANUAL', updated_at = ?
+                UPDATE {self._table("catalog_queries")} SET active = 1,
+                    origin = CASE WHEN ? = 'MANUAL' THEN 'MANUAL' ELSE origin END,
+                    updated_at = ?
                 WHERE query_key = ?
                 """,
-                (timestamp, key),
+                (origin, timestamp, key),
             )
         return count
 
-    def register_queries(self, queries: Sequence[str], now: datetime) -> int:
+    def register_queries(
+        self, queries: Sequence[str], now: datetime, *, origin: QueryOrigin = "MANUAL"
+    ) -> int:
+        """Register names; explicit manual ownership survives later automatic imports.
+
+        BE_MATERIAL only upserts eligible names supplied by a trusted synchronizer.
+        It does not check publication status or deactivate names absent from a partial list.
+        """
         with self._transaction() as connection:
-            return self._register(connection, queries, _timestamp(now))
+            return self._register(connection, queries, _timestamp(now), origin=origin)
 
     def set_fallbacks(self, primary: str, fallbacks: Sequence[str], now: datetime) -> None:
         primary = _key(primary)

@@ -120,7 +120,7 @@ wrapper는 `isSuccess/code/message/result`이며 정상 처리 code는 `ITEM_REC
 
 | 경로 | 본문·역할 |
 | --- | --- |
-| `POST /internal/v1/catalog/queries` | `{"queries":["계량스푼"]}` — 수집 검색어 등록 |
+| `POST /internal/v1/catalog/queries` | `{"queries":["계량스푼"]}` — 운영자 수동 등록(MANUAL, 자동 동기화용 아님) |
 | `PUT /internal/v1/catalog/fallbacks` | `{"primaryQuery":"계량스푼","fallbackQueries":["계량 스푼"]}` — 확인된 동의어 등록 |
 | `PUT /internal/v1/catalog/curated` | `query/products/expiresAt` — 운영자가 확인한 대체 상품 등록 |
 
@@ -135,3 +135,5 @@ BE는 활동 공개·권한 검증과 내부 토큰, 자료형·버전 매핑을
 `GET /health`는 `servingMode=CATALOG_ONLY`, `catalogBackend`, `storageApproved`, `upstreamCallsOnRequest=false`, `batchWindow` 등의 실행 설정을 반환합니다. `providerConnectivityChecked=false`이며 실제 공급자 연결 성공을 뜻하지 않습니다. 공급자 키는 조회 API의 필수 설정이 아닙니다.
 
 수집 준비와 권한·보관 설정은 [batch.md](batch.md)를 참고하세요. 기존 Q14 상품 필터 파서는 제거했습니다. 호환 입력 필드만 유지합니다.
+
+자동 export 등록은 `register --origin BE_MATERIAL`을 사용합니다. 입력은 지원 취미의 공개 활동으로 제한해야 하며, 일부 export의 누락 항목은 자동 비활성화하지 않습니다. 출처 전환과 수동 유지 규칙은 [배치 문서](batch.md#검색어-출처와-수동-유지-정책)를 참고하세요.

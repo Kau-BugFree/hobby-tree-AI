@@ -144,3 +144,29 @@ def test_sync_reactivates_query_when_hobby_support_returns(sync_database):
         assert connection.execute(
             f"SELECT active, origin FROM {schema}.catalog_queries"
         ).fetchall() == [(expected, "BE_MATERIAL")]
+
+
+@pytest.mark.parametrize("origin", ["MANUAL", "BE_MATERIAL"])
+def test_python_import_origin_survives_sql_sync_and_controls_deactivation(sync_database, origin):
+    from item_recommender.catalog_store import PostgresCatalogStore
+
+    connection, schema, sync = sync_database
+
+    class IsolatedStore(PostgresCatalogStore):
+        def _table(self, name):
+            return f"{schema}.{name}"
+
+    # Use the fixture transaction; no external connection or real BE tables.
+    store = IsolatedStore("")
+    store._register(connection, ["계량스푼"], 1.0, origin=origin)
+    add_material(connection, schema, 1)
+    connection.execute(sync)
+    assert connection.execute(
+        f"SELECT active, origin FROM {schema}.catalog_queries"
+    ).fetchall() == [(1, origin)]
+    connection.execute(f"UPDATE {schema}.hobbies SET is_supported = false")
+    connection.execute(sync)
+    expected = 1 if origin == "MANUAL" else 0
+    assert connection.execute(
+        f"SELECT active, origin FROM {schema}.catalog_queries"
+    ).fetchall() == [(expected, origin)]

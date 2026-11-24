@@ -76,7 +76,8 @@ class Store:
     def initialize(self):
         self.initialized += 1
 
-    def register_queries(self, queries, now):
+    def register_queries(self, queries, now, *, origin="MANUAL"):
+        self.registered_origin = origin
         self.registered.extend(queries)
         return len(set(queries))
 
@@ -569,3 +570,24 @@ def test_worker_loop_honors_backoff_and_closes_provider(cli_setup, monkeypatch, 
         asyncio.run(cli._worker(settings, store, False))
     assert delays == [47]
     assert provider.closed
+
+
+@pytest.mark.parametrize("origin", [None, "MANUAL", "BE_MATERIAL"])
+def test_cli_passes_registration_origin(cli_setup, tmp_path, capsys, origin):
+    cli, store = cli_setup
+    path = tmp_path / "materials.json"
+    path.write_text(json.dumps({"materials": [{"name": "계량스푼"}]}))
+    args = ["register", "--file", str(path)]
+    if origin is not None:
+        args += ["--origin", origin]
+    assert cli.main(args) == 0
+    assert store.registered_origin == (origin or "MANUAL")
+    assert json.loads(capsys.readouterr().out)["origin"] == (origin or "MANUAL")
+
+
+def test_cli_rejects_unknown_origin_before_registration(cli_setup, tmp_path):
+    cli, store = cli_setup
+    with pytest.raises(SystemExit) as error:
+        cli.main(["register", "--file", str(tmp_path / "unused.json"), "--origin", "OTHER"])
+    assert error.value.code == 2
+    assert not store.registered

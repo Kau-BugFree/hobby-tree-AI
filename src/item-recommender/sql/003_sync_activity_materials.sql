@@ -38,6 +38,7 @@ UPDATE item_recommender.catalog_queries q
    );
 COMMIT;
 
--- For non-Korean Unicode case folding (e.g. ß), prefer application register_queries(),
--- whose Python NFKC+casefold normalization is authoritative. PostgreSQL lower() is not casefold().
+-- Application imports must explicitly use register_queries(..., origin='BE_MATERIAL').
+-- PostgreSQL lower() is not Python casefold(); their key parity remains a separate task.
+-- Do not mix normalization strategies for a catalog until that contract is aligned.
 -- This is a one-shot synchronization; schedule it explicitly if the backend owner approves.

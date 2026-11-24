@@ -34,7 +34,7 @@ BE가 export한 `{materials:[{name:...},...]}` 또는 활동 상세 응답의 `{
 
 ```sh
 python -m item_recommender.cli init-db
-python -m item_recommender.cli register --file examples/request-basic.json
+python -m item_recommender.cli register --origin BE_MATERIAL --file examples/request-basic.json
 python -m item_recommender.cli status
 ```
 
@@ -81,7 +81,7 @@ PostgreSQL 서버에 pg_cron이 설치되어 있어야 하며, `shared_preload_l
 psql "$CATALOG_DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/003_sync_activity_materials.sql
 ```
 
-이 SQL은 BE의 공개 활동·준비물을 읽어 AI 수집 목록에 등록하기 위한 선택 경로입니다. 별도의 AI DB에는 BE 테이블이 없으므로 사용할 수 없습니다. 그 경우 export·register 방식을 사용하세요. BE 테이블에는 SELECT 권한만 부여하고, AI 쓰기 권한은 전용 스키마로 제한하는 운영 역할 구성이 필요합니다. 이 동기화는 한 번 실행하는 명령이며 기본 cron에 포함되지 않습니다. BE에서 준비물이 바뀌면 다시 등록·동기화해야 하고, 주기적 원본 동기화는 담당자와 별도로 연결해야 합니다.
+이 SQL은 BE의 공개 활동·준비물을 읽어 AI 수집 목록에 등록하기 위한 선택 경로입니다. 별도의 AI DB에는 BE 테이블이 없으므로 사용할 수 없습니다. 그 경우 지원 취미·공개 활동만 담긴 export에 `register --origin BE_MATERIAL`을 사용하세요. 이 경로는 등록만 수행하며 누락 항목의 비활성화는 별도 동기화 계약이 필요합니다. BE 테이블에는 SELECT 권한만 부여하고, AI 쓰기 권한은 전용 스키마로 제한하는 운영 역할 구성이 필요합니다. 이 동기화는 한 번 실행하는 명령이며 기본 cron에 포함되지 않습니다. BE에서 준비물이 바뀌면 다시 등록·동기화해야 하고, 주기적 원본 동기화는 담당자와 별도로 연결해야 합니다.
 
 ## 작업자와 상태 확인
 
@@ -125,7 +125,7 @@ Compose에서는 `cron.use_background_workers=on`으로 예약 SQL을 실행합�
 
 ```sh
 docker compose cp examples/request-basic.json api:/tmp/materials.json
-docker compose exec api python -m item_recommender.cli register --file /tmp/materials.json
+docker compose exec api python -m item_recommender.cli register --origin BE_MATERIAL --file /tmp/materials.json
 docker compose exec api python -m item_recommender.cli status
 ```
 
@@ -145,3 +145,27 @@ Compose 예시는 로컬 검증을 위한 단일 DB 계정 구성입니다. 실�
 페이지 이동과 화면 필터는 저장된 후보 안에서 동작합니다. 화면 새로고침은 같은 DB를 다시 조회할 뿐 수집하지 않습니다. 앞으로 사용자 갱신 요청을 추가하더라도 큐에 등록하고, 일일 처리량·중복 요청·허용 시간 규칙을 별도로 정해야 합니다.
 
 관측할 항목은 고유 검색어 수, 대기·실행·실패 작업 수, 당일 호출 수, 수집 지연, 가격 없는 상품 비율, 후보 제외 사유입니다. 상품 수·오류 코드 같은 진단과 API 키·사용자 입력·원본 요청 URL을 구분해 기록하세요.
+
+
+## 검색어 출처와 수동 유지 정책
+
+`origin`은 검색어를 자동 비활성화할 수 있는지 구분합니다. 전체 출처 이력은 아닙니다.
+
+| 등록 경로 | 지정 출처 | 기존 검색어 처리 |
+| --- | --- | --- |
+| SQL 003 / 공개 준비물 export (`--origin BE_MATERIAL`) | BE_MATERIAL | 기존 MANUAL 유지 |
+| 운영자 등록 API / CLI 기본값 또는 `--origin MANUAL` | MANUAL | 기존 BE_MATERIAL도 MANUAL로 전환 |
+| 운영자 fallback / curated 등록 | MANUAL | 관련 검색어를 수동 유지 대상으로 전환 |
+
+Python 자동 등록 호출은 `register_queries(names, now, origin="BE_MATERIAL")`을 사용합니다.
+기본값 MANUAL은 기존 운영자 호출과 호환하기 위한 값이며 자동 동기화에 사용하지 않습니다.
+HTTP 등록 API는 운영자용으로 유지하고 요청 본문에 origin 필드를 추가하지 않습니다.
+
+BE_MATERIAL 등록은 입력의 공개 여부를 검증하지 않습니다. 호출자는 지원 취미의 공개 활동에서
+얻은 준비물만 전달해야 합니다. 활동별 또는 일부 export에서 빠진 검색어를 비활성화하지 않습니다.
+SQL 003은 전체 BE 테이블의 공개 조건을 조회하여 자동 등록 검색어만 비활성화합니다.
+MANUAL 검색어는 운영자가 명시적으로 유지한 것이므로 원본 활동이 내려가도 유지합니다.
+
+이 변경은 이미 MANUAL로 저장된 행을 일괄 BE_MATERIAL로 바꾸지 않습니다.
+기존 데이터의 출처 판별·정리는 담당자 확인 후 별도로 수행합니다.
+SQL lower와 Python casefold 정규화 일치 및 export 삭제 동기화도 별도 작업입니다.

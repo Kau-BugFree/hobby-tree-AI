@@ -365,3 +365,25 @@ def test_catalog_clock_failure_is_redacted(tmp_path, store, monkeypatch):
             assert response.status_code == 503
             assert response.json()["code"] == "CATALOG_UNAVAILABLE"
             assert "private-database" not in response.text
+
+
+def test_operator_registration_explicitly_keeps_manual_ownership(tmp_path, store):
+    store.register_queries(["계량스푼"], NOW, origin="BE_MATERIAL")
+    config = settings(tmp_path, service_token="internal-token")
+    with TestClient(create_app(config, store, clock=lambda: NOW)) as client:
+        client.headers["X-Service-Token"] = "internal-token"
+        assert (
+            client.post("/internal/v1/catalog/queries", json={"queries": ["계량스푼"]}).status_code
+            == 200
+        )
+        with store._transaction(write=False) as connection:
+            assert (
+                connection.execute("SELECT origin FROM catalog_queries").fetchone()[0] == "MANUAL"
+            )
+        assert (
+            client.post(
+                "/internal/v1/catalog/queries",
+                json={"queries": ["다른 준비물"], "origin": "BE_MATERIAL"},
+            ).status_code
+            == 422
+        )

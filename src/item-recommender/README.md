@@ -52,7 +52,7 @@ curl -sS http://127.0.0.1:8001/internal/v1/item-recommendations \
 ## 준비물 등록과 예시
 
 ```sh
-python -m item_recommender.cli register --file examples/request-basic.json
+python -m item_recommender.cli register --origin BE_MATERIAL --file examples/request-basic.json
 python -m item_recommender.cli status
 ```
 

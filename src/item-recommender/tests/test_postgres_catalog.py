@@ -172,3 +172,50 @@ def test_postgres_quota_is_atomic_between_connections(pg_store):
             (namespace,),
         )
     assert store.reserve_provider_slot(namespace, NOW) is None
+
+
+@pytest.mark.parametrize("initial", ["MANUAL", "BE_MATERIAL"])
+@pytest.mark.parametrize("incoming", ["MANUAL", "BE_MATERIAL"])
+def test_postgres_registration_origin_precedence(pg_store, initial, incoming):
+    store, prefix, _ = pg_store
+    key = prefix + "스푼"
+    assert store.register_queries([key], NOW, origin=initial) == 1
+    with store._transaction() as connection:
+        assert (
+            connection.execute(
+                "SELECT origin FROM item_recommender.catalog_queries WHERE query_key = %s", (key,)
+            ).fetchone()["origin"]
+            == initial
+        )
+        connection.execute(
+            "UPDATE item_recommender.catalog_queries SET active = 0 WHERE query_key = %s", (key,)
+        )
+    for _ in range(2):
+        assert store.register_queries([key], NOW, origin=incoming) == 0
+    expected = "MANUAL" if "MANUAL" in (initial, incoming) else "BE_MATERIAL"
+    with store._transaction() as connection:
+        assert connection.execute(
+            "SELECT active, origin FROM item_recommender.catalog_queries WHERE query_key = %s",
+            (key,),
+        ).fetchone() == {"active": 1, "origin": expected}
+
+
+def test_postgres_concurrent_manual_and_automatic_registration(pg_store):
+    store, prefix, _ = pg_store
+    key = prefix + "스푼"
+    start = Barrier(2, timeout=10)
+
+    def register(origin):
+        start.wait()
+        return store.register_queries([key], NOW, origin=origin)
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        counts = list(workers.map(register, ["MANUAL", "BE_MATERIAL"]))
+    assert sum(counts) == 1
+    with store._transaction() as connection:
+        assert (
+            connection.execute(
+                "SELECT origin FROM item_recommender.catalog_queries WHERE query_key = %s", (key,)
+            ).fetchone()["origin"]
+            == "MANUAL"
+        )
