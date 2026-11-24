@@ -26,30 +26,34 @@ def sync_database():
     with psycopg.connect(dsn, connect_timeout=5) as connection:
         with connection.transaction(force_rollback=True):
             connection.execute(migration)
-            connection.execute(
-                f"""
-                CREATE TABLE {schema}.hobbies (
-                    hobby_id bigint PRIMARY KEY,
-                    is_supported boolean NOT NULL
-                );
-                CREATE TABLE {schema}.hobby_stages (
-                    hobby_stage_id bigint PRIMARY KEY,
-                    hobby_id bigint REFERENCES {schema}.hobbies(hobby_id)
-                );
-                CREATE TABLE {schema}.activities (
-                    activity_id bigint PRIMARY KEY,
-                    hobby_stage_id bigint
-                        REFERENCES {schema}.hobby_stages(hobby_stage_id),
-                    review_status text NOT NULL
-                );
-                CREATE TABLE {schema}.activity_materials (
-                    activity_id bigint
-                        REFERENCES {schema}.activities(activity_id),
-                    material_name text NOT NULL
-                );
-                """
-            )
+            create_backend_tables(connection, schema)
             yield connection, schema, sync
+
+
+def create_backend_tables(connection, schema):
+    connection.execute(
+        f"""
+        CREATE TABLE {schema}.hobbies (
+            hobby_id bigint PRIMARY KEY,
+            is_supported boolean NOT NULL
+        );
+        CREATE TABLE {schema}.hobby_stages (
+            hobby_stage_id bigint PRIMARY KEY,
+            hobby_id bigint REFERENCES {schema}.hobbies(hobby_id)
+        );
+        CREATE TABLE {schema}.activities (
+            activity_id bigint PRIMARY KEY,
+            hobby_stage_id bigint
+                REFERENCES {schema}.hobby_stages(hobby_stage_id),
+            review_status text NOT NULL
+        );
+        CREATE TABLE {schema}.activity_materials (
+            activity_id bigint
+                REFERENCES {schema}.activities(activity_id),
+            material_name text NOT NULL
+        );
+        """
+    )
 
 
 def add_material(connection, schema, activity_id, supported=True, review_status="PUBLISHED"):
@@ -170,3 +174,169 @@ def test_python_import_origin_survives_sql_sync_and_controls_deactivation(sync_d
     assert connection.execute(
         f"SELECT active, origin FROM {schema}.catalog_queries"
     ).fetchall() == [(expected, origin)]
+
+
+def sync_statements(schema):
+    """Keep file transaction boundaries and send each statement separately.
+
+    Sending the entire script in one execute() can create an implicit transaction
+    even without BEGIN, hiding a missing transaction boundary. This narrow loader
+    supports this file's four statements only, not arbitrary SQL or PL/pgSQL.
+    """
+    script = (ROOT / "sql/003_sync_activity_materials.sql").read_text(encoding="utf-8")
+    script = script.replace("item_recommender.", f"{schema}.").replace("public.", f"{schema}.")
+    statements, pending = [], []
+    for line in script.splitlines():
+        if not line.strip() or line.lstrip().startswith("--"):
+            continue
+        pending.append(line)
+        if line.rstrip().endswith(";"):
+            statements.append("\n".join(pending).strip())
+            pending = []
+    assert not pending, "Unterminated sync SQL statement"
+    assert len(statements) == 4, "Update the test loader if sync SQL structure changes"
+    assert statements[0] == "BEGIN;"
+    assert statements[1].startswith("WITH material_queries AS (")
+    assert statements[2].startswith(f"UPDATE {schema}.catalog_queries q")
+    assert statements[3] == "COMMIT;"
+    return statements
+
+
+def execute_committed_sync(dsn, schema, *, omit_boundaries=False):
+    import psycopg
+
+    statements = sync_statements(schema)
+    if omit_boundaries:
+        statements = statements[1:-1]  # Negative control only; never changes the SQL file.
+    with psycopg.connect(dsn, connect_timeout=5, autocommit=True) as connection:
+        for statement in statements:
+            connection.execute(statement)
+
+
+def committed_catalog_rows(dsn, schema):
+    import psycopg
+
+    # A separate connection proves what was persisted, not just transaction-local state.
+    with psycopg.connect(dsn, connect_timeout=5, autocommit=True) as connection:
+        return connection.execute(
+            f"SELECT query_key, query_text, active, origin, created_at, updated_at "
+            f"FROM {schema}.catalog_queries ORDER BY query_key"
+        ).fetchall()
+
+
+@pytest.fixture
+def committed_sync_database():
+    dsn = os.getenv("CATALOG_TEST_DATABASE_URL")
+    if not dsn:
+        pytest.skip("dedicated PostgreSQL test DSN not configured")
+    psycopg = pytest.importorskip("psycopg")
+    schema = "sync_atomic_test_" + uuid.uuid4().hex
+    migration = (ROOT / "sql/001_catalog.sql").read_text(encoding="utf-8")
+    migration = migration.replace("item_recommender", schema)
+    try:
+        # Commit the baseline before the tested sync. No fixture-wide rollback wrapper.
+        with psycopg.connect(dsn, connect_timeout=5) as connection:
+            connection.execute(migration)
+            create_backend_tables(connection, schema)
+            add_material(connection, schema, 1)
+            add_material(connection, schema, 2)
+            connection.execute(
+                f"UPDATE {schema}.activity_materials SET material_name = %s WHERE activity_id = 2",
+                ("거품기",),
+            )
+            for name, active, origin in [
+                ("거품기", 0, "BE_MATERIAL"),
+                ("프라이팬", 1, "BE_MATERIAL"),
+                ("오븐장갑", 1, "MANUAL"),
+            ]:
+                connection.execute(
+                    f"INSERT INTO {schema}.catalog_queries "
+                    "(query_key, query_text, active, origin, created_at, updated_at) "
+                    "VALUES (%s, %s, %s, %s, 100, 200)",
+                    (name, name, active, origin),
+                )
+            connection.execute(
+                f"""
+                CREATE FUNCTION {schema}.fail_deactivation() RETURNS trigger
+                LANGUAGE plpgsql AS $$
+                BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM {schema}.catalog_queries
+                        WHERE query_key = '계량스푼' AND active = 1
+                    ) OR NOT EXISTS (
+                        SELECT 1 FROM {schema}.catalog_queries
+                        WHERE query_key = '거품기' AND active = 1
+                    ) THEN
+                        RAISE EXCEPTION 'registration_did_not_run';
+                    END IF;
+                    RAISE EXCEPTION 'injected_deactivation_failure';
+                END;
+                $$;
+                CREATE TRIGGER fail_deactivation BEFORE UPDATE
+                ON {schema}.catalog_queries FOR EACH ROW
+                WHEN (NEW.active = 0)
+                EXECUTE FUNCTION {schema}.fail_deactivation();
+                """
+            )
+        yield dsn, schema
+    finally:
+        # Drop only this fixture's generated schema, including its failure trigger.
+        with psycopg.connect(dsn, connect_timeout=5, autocommit=True) as connection:
+            connection.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+
+
+def expect_deactivation_failure(dsn, schema, *, omit_boundaries=False):
+    from psycopg.errors import RaiseException
+
+    with pytest.raises(RaiseException, match="injected_deactivation_failure"):
+        execute_committed_sync(dsn, schema, omit_boundaries=omit_boundaries)
+
+
+def test_sync_failure_rolls_back_insert_reactivation_and_timestamps(committed_sync_database):
+    dsn, schema = committed_sync_database
+    before = committed_catalog_rows(dsn, schema)
+    expect_deactivation_failure(dsn, schema)
+    assert committed_catalog_rows(dsn, schema) == before
+
+
+def test_sync_can_retry_and_commit_after_failure(committed_sync_database):
+    import psycopg
+
+    dsn, schema = committed_sync_database
+    before = {row[0]: row for row in committed_catalog_rows(dsn, schema)}
+    expect_deactivation_failure(dsn, schema)
+    assert {row[0]: row for row in committed_catalog_rows(dsn, schema)} == before
+    with psycopg.connect(dsn, connect_timeout=5, autocommit=True) as connection:
+        connection.execute(f"DROP TRIGGER fail_deactivation ON {schema}.catalog_queries")
+    execute_committed_sync(dsn, schema)
+    after = {row[0]: row for row in committed_catalog_rows(dsn, schema)}
+    expected = {
+        "계량스푼": (1, "BE_MATERIAL"),
+        "거품기": (1, "BE_MATERIAL"),
+        "프라이팬": (0, "BE_MATERIAL"),
+        "오븐장갑": (1, "MANUAL"),
+    }
+    assert {key: row[2:4] for key, row in after.items()} == expected
+    assert after["오븐장갑"] == before["오븐장갑"]
+    for key in ("거품기", "프라이팬"):
+        assert after[key][4] == before[key][4]
+        assert after[key][5] > before[key][5]
+    execute_committed_sync(dsn, schema)
+    repeated = committed_catalog_rows(dsn, schema)
+    assert {row[0]: row[2:4] for row in repeated} == expected
+    assert next(row for row in repeated if row[0] == "오븐장갑") == before["오븐장갑"]
+
+
+def test_sync_negative_control_detects_missing_transaction_boundaries(committed_sync_database):
+    dsn, schema = committed_sync_database
+    before = {row[0]: row for row in committed_catalog_rows(dsn, schema)}
+    expect_deactivation_failure(dsn, schema, omit_boundaries=True)
+    after = {row[0]: row for row in committed_catalog_rows(dsn, schema)}
+    # Without BEGIN/COMMIT, the prior registration committed despite the later failure.
+    assert after != before
+    assert "계량스푼" not in before
+    assert after["계량스푼"][2:4] == (1, "BE_MATERIAL")
+    assert before["거품기"][2] == 0 and after["거품기"][2] == 1
+    assert after["거품기"][5] > before["거품기"][5]
+    assert after["프라이팬"] == before["프라이팬"]
+    assert after["오븐장갑"] == before["오븐장갑"]
