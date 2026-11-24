@@ -21,7 +21,7 @@ SELECT name, name, 1, 'BE_MATERIAL', extract(epoch FROM clock_timestamp()),
 ON CONFLICT (query_key) DO UPDATE
     SET active = 1, updated_at = excluded.updated_at;
 
--- Disable only automatically imported names that no published activity still references.
+-- Disable only automatically imported names no supported, published activity references.
 -- Explicitly registered/curated queries keep their MANUAL origin and remain active.
 UPDATE item_recommender.catalog_queries q
    SET active = 0, updated_at = extract(epoch FROM clock_timestamp())
@@ -29,7 +29,10 @@ UPDATE item_recommender.catalog_queries q
    AND NOT EXISTS (
        SELECT 1 FROM public.activity_materials m
        JOIN public.activities a ON a.activity_id = m.activity_id
+       JOIN public.hobby_stages hs ON hs.hobby_stage_id = a.hobby_stage_id
+       JOIN public.hobbies h ON h.hobby_id = hs.hobby_id
         WHERE a.review_status = 'PUBLISHED'
+          AND h.is_supported = true
           AND m.material_name IS NOT NULL
           AND lower(regexp_replace(btrim(normalize(m.material_name, NFKC)), '\s+', ' ', 'g')) = q.query_key
    );
