@@ -193,3 +193,26 @@ SQL lower와 Python casefold 정규화 일치 및 export 삭제 동기화도 별
 검증합니다. 테스트 종료 시 해당 스키마와 오류 트리거를 정리합니다.
 SQL 오류가 없는 불완전한 export나 잘못된 원본 데이터는 트랜잭션만으로 탐지할 수 없으며,
 전체·부분 목록 및 삭제 동기화 계약은 별도 합의가 필요합니다.
+
+## BE 준비물 전체 export v1 파일 검증
+
+로컬 macOS·Linux에서 아래 명령으로 합성 파일을 검증합니다.
+
+```sh
+python -m item_recommender.cli validate-material-export \
+  --file tests/fixtures/item-material-export-v1.json \
+  --source-id synthetic-hobbytree \
+  --source-epoch 11111111-1111-4111-8111-111111111111
+```
+
+허용된 원본과 epoch는 전달받은 파일과 독립적으로 지정합니다. 예시 값은 테스트 전용입니다.
+정규 UTF-8 JSON과 마지막 LF를 포함한 최종 일반 파일을 사용합니다. 임시 파일과 심볼릭 링크는 거절합니다.
+파일 크기(1,048,576바이트), 행 수(10,000), 계약 버전·범위·완결성, 메타데이터, ID·버전, 이름과 건수,
+준비물 ID의 숫자 순서 및 원문 payload의 SHA-256을 검증합니다. 단일 합성 예시의 기대 건수는 활동 4개, 준비물 4개입니다.
+
+종료 코드 0은 파일 검사를 마쳤다는 뜻입니다. VALIDATED는 정상 파일, HOLD_EMPTY는 유효하지만 적용을 보류할 빈 전체 목록입니다.
+검증 실패는 종료 코드 2와 REJECT_ 사유를 반환합니다. 카탈로그 반영·재전송 판정·검색어 정규화는 후속 동기화 단계에 속합니다.
+검증 명령은 DB·서비스 설정이나 외부 API 키를 요구하지 않습니다.
+
+[BE export v1 계약](https://github.com/Kau-BugFree/hobby-tree-Backend/blob/1ee535fc2cc9ced38ce5bd1a7bc64905bf92bd2c/docs/item-material-export.md) ·
+[합성 예시 원본](https://github.com/Kau-BugFree/hobby-tree-Backend/blob/1ee535fc2cc9ced38ce5bd1a7bc64905bf92bd2c/docs/examples/item-material-export-v1.json)
