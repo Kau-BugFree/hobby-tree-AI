@@ -5,9 +5,12 @@ import json
 import os
 import re
 import stat
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from uuid import UUID
+
+from .catalog_domain import validated_query_key
 
 MAX_BYTES = 1_048_576
 MAX_ROWS = 10_000
@@ -128,7 +131,7 @@ def _check_rows(doc):
         raise ExportError("REJECT_COUNT")
 
 
-def validate_export(path: Path, source_id: str, source_epoch: str) -> dict:
+def _read_validated_document(path: Path, source_id: str, source_epoch: str) -> dict:
     """Read one final regular file. The trusted identity comes from the caller."""
     if path.name.startswith(".material-export-"):
         raise ExportError("REJECT_TEMP_FILE")
@@ -156,10 +159,64 @@ def validate_export(path: Path, source_id: str, source_epoch: str) -> dict:
         raise
     except (ValueError, RecursionError):
         raise ExportError("REJECT_JSON") from None
+    return doc
+
+
+def validate_export(path: Path, source_id: str, source_epoch: str) -> dict:
+    doc = _read_validated_document(path, source_id, source_epoch)
     return {
         "status": "VALIDATED" if doc["materialCount"] else "HOLD_EMPTY",
         "materialCount": doc["materialCount"],
         "activityCount": doc["activityCount"],
         "sourceSequence": doc["sourceSequence"],
-        "payloadSha256": digest,
+        "payloadSha256": doc["payloadSha256"],
     }
+
+
+@dataclass(frozen=True)
+class MaterialReference:
+    material_id: int
+    activity_id: int
+    hobby_id: int
+    activity_content_version: int
+    raw_name: str
+    query_key: str
+
+
+@dataclass(frozen=True)
+class MaterialReferenceSnapshot:
+    source_id: str
+    source_epoch: str
+    source_sequence: int
+    payload_sha256: str
+    references: tuple[MaterialReference, ...]
+
+
+def read_reference_snapshot(
+    path: Path, source_id: str, source_epoch: str
+) -> MaterialReferenceSnapshot:
+    """Construct references from the very document whose raw payload was verified."""
+    doc = _read_validated_document(path, source_id, source_epoch)
+    references = []
+    for row in doc["payload"]["materials"]:
+        try:
+            key = validated_query_key(row["name"])
+        except ValueError:
+            raise ExportError("REJECT_QUERY_KEY") from None
+        references.append(
+            MaterialReference(
+                material_id=int(row["materialId"]),
+                activity_id=int(row["activityId"]),
+                hobby_id=int(row["hobbyId"]),
+                activity_content_version=int(row["activityContentVersion"]),
+                raw_name=row["name"],
+                query_key=key,
+            )
+        )
+    return MaterialReferenceSnapshot(
+        source_id=source_id,
+        source_epoch=source_epoch,
+        source_sequence=int(doc["sourceSequence"]),
+        payload_sha256=doc["payloadSha256"],
+        references=tuple(references),
+    )

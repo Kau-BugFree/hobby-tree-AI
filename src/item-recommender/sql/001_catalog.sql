@@ -10,6 +10,19 @@ CREATE TABLE IF NOT EXISTS item_recommender.catalog_queries (
     created_at double precision NOT NULL,
     updated_at double precision NOT NULL
 );
+CREATE TABLE IF NOT EXISTS item_recommender.material_source_refs (
+    source_id TEXT NOT NULL,
+    source_epoch TEXT NOT NULL,
+    material_id BIGINT NOT NULL CHECK (material_id > 0),
+    activity_id BIGINT NOT NULL CHECK (activity_id > 0),
+    hobby_id BIGINT NOT NULL CHECK (hobby_id > 0),
+    activity_content_version BIGINT NOT NULL CHECK (activity_content_version > 0),
+    raw_name TEXT NOT NULL CHECK (length(raw_name) BETWEEN 1 AND 160),
+    query_key TEXT NOT NULL REFERENCES item_recommender.catalog_queries(query_key),
+    PRIMARY KEY (source_id, source_epoch, material_id)
+);
+CREATE INDEX IF NOT EXISTS material_source_refs_by_key
+    ON item_recommender.material_source_refs(query_key, source_id, source_epoch);
 CREATE TABLE IF NOT EXISTS item_recommender.query_fallbacks (
     primary_key text NOT NULL REFERENCES item_recommender.catalog_queries(query_key),
     fallback_key text NOT NULL REFERENCES item_recommender.catalog_queries(query_key),
