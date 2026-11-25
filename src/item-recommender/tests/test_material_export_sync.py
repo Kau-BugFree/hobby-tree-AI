@@ -1,18 +1,15 @@
 """Verify full-export decisions and persisted state on both catalog implementations."""
 
 import json
-import os
-import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import datetime, timezone
-from pathlib import Path
 from threading import Barrier
 
 import pytest
 
 from item_recommender import cli
-from item_recommender.catalog_store import PostgresCatalogStore, SQLiteCatalogStore
+from item_recommender.catalog_store import SQLiteCatalogStore
 from item_recommender.config import Settings
 from test_material_reference_store import (
     EPOCH,
@@ -26,34 +23,12 @@ from test_material_reference_store import (
 NOW = datetime(2026, 11, 25, tzinfo=timezone.utc)
 
 
-@pytest.fixture(params=["sqlite", "postgres"])
-def store(request, tmp_path):
-    if request.param == "sqlite":
-        db = SQLiteCatalogStore(tmp_path / "catalog.sqlite3")
-        try:
-            db.initialize()
-            yield db
-        finally:
-            db.close()
-        return
-    dsn = os.getenv("CATALOG_TEST_DATABASE_URL")
-    if not dsn:
-        pytest.skip("dedicated PostgreSQL test DSN not configured")
-    schema = "export_test_" + uuid.uuid4().hex
-
-    class ScopedStore(PostgresCatalogStore):
-        def _table(self, name):
-            return f"{schema}.{name}"
-
-    db = ScopedStore(dsn)
-    sql = (Path(__file__).resolve().parents[1] / "sql/001_catalog.sql").read_text()
-    with db._transaction() as conn:
-        conn.execute(sql.replace("item_recommender", schema))
+@pytest.fixture
+def store(material_catalog_factory):
+    db = material_catalog_factory()
     try:
         yield db
     finally:
-        with db._transaction() as conn:
-            conn.execute(f"DROP SCHEMA {schema} CASCADE")
         db.close()
 
 

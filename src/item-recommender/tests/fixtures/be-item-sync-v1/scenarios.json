@@ -1,0 +1,408 @@
+{
+  "syntheticOnly": true,
+  "initialSource": {
+    "hobbies": [
+      [
+        1,
+        true
+      ],
+      [
+        2,
+        true
+      ],
+      [
+        3,
+        true
+      ],
+      [
+        9,
+        false
+      ]
+    ],
+    "activities": [
+      [
+        11,
+        1,
+        "PUBLISHED"
+      ],
+      [
+        12,
+        1,
+        "PUBLISHED"
+      ],
+      [
+        21,
+        2,
+        "PUBLISHED"
+      ],
+      [
+        31,
+        3,
+        "PUBLISHED"
+      ],
+      [
+        41,
+        1,
+        "DRAFT"
+      ],
+      [
+        91,
+        9,
+        "PUBLISHED"
+      ]
+    ],
+    "materials": [
+      [
+        101,
+        11,
+        " 계량스푼 "
+      ],
+      [
+        102,
+        12,
+        "계량스푼"
+      ],
+      [
+        201,
+        21,
+        "피크"
+      ],
+      [
+        301,
+        31,
+        "책갈피"
+      ],
+      [
+        401,
+        41,
+        "비공개 준비물"
+      ],
+      [
+        901,
+        91,
+        "미지원 준비물"
+      ]
+    ]
+  },
+  "initialManualQueries": [
+    "독서등",
+    "수동 유지"
+  ],
+  "sourceCases": [
+    {
+      "id": "01-initial",
+      "file": "01-initial.json",
+      "sourceChange": null,
+      "expectedMaterialIds": [
+        "101",
+        "102",
+        "201",
+        "301"
+      ],
+      "expectedAi": {
+        "decision": "APPLY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "독서등",
+          "수동 유지",
+          "책갈피",
+          "피크"
+        ]
+      }
+    },
+    {
+      "id": "02-add",
+      "file": "02-add.json",
+      "sourceChange": {
+        "operation": "addMaterial",
+        "id": 302,
+        "activityId": 31,
+        "name": "독서등"
+      },
+      "expectedMaterialIds": [
+        "101",
+        "102",
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "APPLY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "독서등",
+          "수동 유지",
+          "책갈피",
+          "피크"
+        ]
+      }
+    },
+    {
+      "id": "03-rename",
+      "file": "03-rename.json",
+      "sourceChange": {
+        "operation": "renameMaterial",
+        "id": 201,
+        "name": "기타 피크"
+      },
+      "expectedMaterialIds": [
+        "101",
+        "102",
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "REVIEW_DEACTIVATION",
+        "deactivationCandidates": [
+          "피크"
+        ],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "04-hide-shared",
+      "file": "04-hide-shared.json",
+      "sourceChange": {
+        "operation": "setReviewStatus",
+        "id": 11,
+        "status": "DRAFT"
+      },
+      "expectedMaterialIds": [
+        "102",
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "APPLY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [
+          "계량스푼"
+        ],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "05-hide-last-reference",
+      "file": "05-hide-last-reference.json",
+      "sourceChange": {
+        "operation": "setReviewStatus",
+        "id": 12,
+        "status": "DRAFT"
+      },
+      "expectedMaterialIds": [
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "REVIEW_DEACTIVATION",
+        "deactivationCandidates": [
+          "계량스푼"
+        ],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "06-republish",
+      "file": "06-republish.json",
+      "sourceChange": {
+        "operation": "setReviewStatus",
+        "id": 11,
+        "status": "PUBLISHED"
+      },
+      "expectedMaterialIds": [
+        "101",
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "APPLY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "07-unsupported",
+      "file": "07-unsupported.json",
+      "sourceChange": {
+        "operation": "setSupported",
+        "id": 2,
+        "supported": false
+      },
+      "expectedMaterialIds": [
+        "101",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "REVIEW_DEACTIVATION",
+        "deactivationCandidates": [
+          "기타 피크"
+        ],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "08-supported-again",
+      "file": "08-supported-again.json",
+      "sourceChange": {
+        "operation": "setSupported",
+        "id": 2,
+        "supported": true
+      },
+      "expectedMaterialIds": [
+        "101",
+        "201",
+        "301",
+        "302"
+      ],
+      "expectedAi": {
+        "decision": "APPLY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysAfterApprovedApply": [
+          "계량스푼",
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    },
+    {
+      "id": "09-empty",
+      "file": "09-empty.json",
+      "sourceChange": {
+        "operation": "disableAllHobbies"
+      },
+      "expectedMaterialIds": [],
+      "expectedAi": {
+        "decision": "HOLD_EMPTY",
+        "deactivationCandidates": [],
+        "manualOriginsPreserved": [
+          "독서등",
+          "수동 유지"
+        ],
+        "sharedQueriesPreserved": [],
+        "activeKeysUnchanged": [
+          "계량스푼",
+          "기타 피크",
+          "독서등",
+          "수동 유지",
+          "책갈피"
+        ]
+      }
+    }
+  ],
+  "deliveryBaseline": "08-supported-again.json",
+  "deliveryCases": [
+    {
+      "file": "08-supported-again.json",
+      "expectedDecision": "NOOP_REPLAY",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    },
+    {
+      "file": "03-rename.json",
+      "expectedDecision": "REJECT_STALE",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    },
+    {
+      "file": "same-sequence-conflict.json",
+      "expectedDecision": "REJECT_SEQUENCE_CONFLICT",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    },
+    {
+      "file": "incomplete.json",
+      "expectedDecision": "REJECT_INCOMPLETE",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    },
+    {
+      "file": "hash-mismatch.json",
+      "expectedDecision": "REJECT_HASH",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    },
+    {
+      "file": "unknown-epoch.json",
+      "expectedDecision": "REJECT_EPOCH",
+      "catalogUnchanged": true,
+      "acceptedSequenceUnchanged": "8"
+    }
+  ],
+  "note": "AI expected decisions are assertions to implement, not evidence of a working importer. Review cases assume explicit synthetic approval before the next source case. Empty and rejected deliveries never advance accepted sequence."
+}

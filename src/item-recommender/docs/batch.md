@@ -291,3 +291,31 @@ python -m item_recommender.cli validate-material-export \
 검색어와 MANUAL 소유권을 보존합니다. 사라진 원본 참조는 비현재 상태로 보관합니다.
 기존 AI 카탈로그의 업그레이드는 같은 초기화 SQL 또는 SQLite `init-db`를 사용합니다.
 운영 전달 채널·승인 담당자·기존 SQL 동기화에서의 전환 시점은 BE와 합의할 사항입니다.
+
+## BE 합성 시나리오로 전체 동기화 검증
+
+AI의 `tests/fixtures/be-item-sync-v1/`에 BE 커밋 `8e467fa2a577dd4a92c82cebfb0382842efac2c2`의
+합성 JSON 14개를 보관합니다. 기대값은 `scenarios.json`에 있고 나머지 13개 파일을 입력으로 씁니다.
+재전송과 과거 순번 검사는 앞서 사용한 파일을 다시 전달하므로 검증 사례는 총 15건입니다.
+원본이 바뀌면 새 BE 커밋을 정하고 기대값과 입력을 함께 갱신합니다. 무결성 거절을 확인하는
+`hash-mismatch.json`은 받은 바이트 그대로 사용합니다.
+
+| 검증 | 성공 기준 |
+| --- | --- |
+| 순차 변경 9건 | 변경마다 CLI 판정, 현재 준비물 ID, 활성 검색어, MANUAL 소유권, 수신 순번이 기대값과 일치합니다. 두 활동이 공유하는 검색어는 하나가 비공개가 되어도 유지됩니다. |
+| 비활성화 검토 | 03·05·07번에서 승인 전 DB가 유지되고 목록에 명시된 후보를 승인한 뒤에만 반영됩니다. |
+| 빈 전체 목록 | 09번은 HOLD_EMPTY이며 마지막 정상 순번 8과 카탈로그가 유지됩니다. |
+| 전달 6건 | 08 재전송은 NOOP_REPLAY, 과거 순번·동일 순번 충돌·미완료·잘못된 해시·다른 epoch는 각각 지정한 사유로 거절됩니다. 모든 경우에 세 테이블과 순번 8이 유지됩니다. |
+
+모듈 루트에서 다음 명령으로 두 DB 구현을 검증합니다.
+
+```sh
+.venv/bin/python -m pytest -q 'tests/test_be_material_sync_contract.py::test_be_scenarios[sqlite]'
+.venv/bin/python scripts/test_postgres_local.py
+```
+
+15건은 앞선 반영 상태를 이어받으므로 DB마다 하나의 연속 테스트로 실행합니다.
+실패하면 pytest가 표시한 JSON 파일명, 기대 판정, 실제 출력 또는 DB 행의 차이를 확인합니다.
+BE가 생성한 예시를 AI CLI에 입력하는 검증 범위이며, BE 서비스에서 실제로 내보내고 상품을 조회하는 공동 테스트는 후속 단계입니다.
+
+[BE 합성 시나리오와 원본 파일](https://github.com/Kau-BugFree/hobby-tree-Backend/tree/8e467fa2a577dd4a92c82cebfb0382842efac2c2/docs/examples/item-sync-v1)
