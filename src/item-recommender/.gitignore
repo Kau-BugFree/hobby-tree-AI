@@ -15,3 +15,6 @@ __pycache__/
 
 # Keep local environment settings private.
 .env.*
+
+# Pinned synthetic BE contract inputs and expected decisions.
+!tests/fixtures/be-item-sync-v1/*.json

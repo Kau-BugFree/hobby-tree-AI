@@ -60,6 +60,7 @@ def main() -> int:
                     "tests/test_material_sync.py",
                     "tests/test_material_reference_store.py::test_postgres_reference_preview",
                     "tests/test_material_export_sync.py",
+                    "tests/test_be_material_sync_contract.py::test_be_scenarios[postgres]",
                     "-q",
                     "--tb=short",
                 ],
