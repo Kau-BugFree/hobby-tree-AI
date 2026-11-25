@@ -9,3 +9,4 @@ torch==2.11.0+cu128
 sentence-transformers==6.2.0
 transformers==5.20.2
 anthropic==2.4.0
+google-auth==2.63.1

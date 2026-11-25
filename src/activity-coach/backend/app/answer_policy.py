@@ -10,6 +10,23 @@ from .turn_budget import BudgetExceeded
 # 공급자 쪽 실패 상태. 모델이 답을 판단한 결과가 아니므로 다시 호출하지 않고 원문 안내를 유지한다.
 PROVIDER_FAILURES = frozenset({'timeout', 'network_error', 'rate_limited', 'authentication_error',
                                'provider_error', 'blocked', 'truncated', 'context_too_long'})
+# 공급자 실패로 원문만 안내할 때 앞에 붙인다. 실패를 성공으로 보이지 않게 한다.
+UNAVAILABLE_PREFIX = '설명을 생성하지 못해 자료 원문을 그대로 안내합니다.\n\n'
+# Claude 없이 원문으로 안내할 때 재순위로 추려 보여 줄 원문 항목 수(설계 4.5절).
+REFERENCE_TOP_K = 3
+FULL_TEXT_TAIL = '전체 원문이 필요하면 “원문 보여줘”라고 요청해 주세요.'
+
+
+def mark_unavailable(response: dict) -> None:
+    """원문으로 답한 응답 앞에 UNAVAILABLE_PREFIX를 한 번만 붙입니다. 실패를 답변처럼 보이지 않게 합니다."""
+    if response['mode'] == 'reference' and not response['text'].startswith(UNAVAILABLE_PREFIX):
+        response['text'] = UNAVAILABLE_PREFIX + response['text']
+
+
+def original_requested(question: str) -> bool:
+    """원문을 그대로 보여 달라는 말이면 True. '원문 말고 요약해줘'처럼 원문을 거절하는 말은 아닙니다."""
+    return bool(re.search(r'원문(?:을|만|도)?\s*(?:(?:그대로\s*)?(?:보여|출력|읽어|줘)|그대로\s*[.!?]?$)', question)
+                and not re.search(r'원문[^.!?]*(?:말고|말아|말라|않|요약|지\s*마)', question))
 
 
 def knowledge_evidence(row: dict, activity_id: str) -> dict:
@@ -88,7 +105,7 @@ class AnswerPolicy:
                     if o.get('status') == 'reported' and o.get('provenance') != 'legacy']
         from .turn_router import coaching_requirements
         from .dialogue import is_trouble
-        from .coach import SELF_ASSESSMENT
+        from .intent_rules import SELF_ASSESSMENT
         kinds = ({r.kind if hasattr(r,'kind') else r['kind'] for r in requirements}
                  or {p['kind'] for p in coaching_requirements(question)})
         if is_trouble(question) or re.search(r'해결|대처|고치|고쳐|고칠|바로잡', question):
@@ -96,9 +113,7 @@ class AnswerPolicy:
         if SELF_ASSESSMENT.search(question) or re.search(r'실력|숙련|진단', question):
             kinds.add('assessment')
         source_summary = bool(kinds) and kinds <= {'lookup', 'procedure'}
-        original_requested = bool(re.search(
-            r'원문(?:을|만|도)?\s*(?:(?:그대로\s*)?(?:보여|출력|읽어|줘)|그대로\s*[.!?]?$)', question)
-            and not re.search(r'원문[^.!?]*(?:말고|말아|말라|않|요약|지\s*마)', question))
+        original = original_requested(question)
         conditions_unknown = any(e['applies_when'] and e['applies_when'] not in reported
                                  for e in rows if e['review_status']=='reviewed' or source_summary)
         if too_long:
@@ -108,11 +123,11 @@ class AnswerPolicy:
         elif any(c['reason']=='conflicting' for c in unresolved):
             reason='conflicting_evidence'
         return {'question':question, 'evidence':rows, 'covered':covered, 'unresolved':unresolved,
-                'asks_assessment': 'assessment' in kinds, 'original_requested': original_requested,
+                'asks_assessment': 'assessment' in kinds, 'original_requested': original,
                 'asks_cause_or_remedy':bool(kinds & {'cause','remedy','assessment'}),
                 # An explicit request for the original, or an assessment disclaimer, is never narrowed.
-                'focus': {} if original_requested or 'assessment' in kinds else self._focus_lines(rows, focus),
-                'stop_reason':reason, 'allow_generation':bool(rows) and not reason and not original_requested
+                'focus': {} if original or 'assessment' in kinds else self._focus_lines(rows, focus),
+                'stop_reason':reason, 'allow_generation':bool(rows) and not reason and not original
                     and (all(e['review_status']=='reviewed' for e in rows)
                          or source_summary)}
 
@@ -120,11 +135,16 @@ class AnswerPolicy:
         rows=prepared['evidence']
         # With planner-cited lines, show those lines only; the text stays verbatim source, never model wording.
         focus=prepared.get('focus') or {}
-        shown=[e for e in rows if e['evidence_id'] in focus] if focus else rows
+        # Without a model, the reranker's most relevant rows stand in for the planner's lines (design 4.5).
+        ranked_ids=prepared.get('ranked_ids') or []
+        by_id={e['evidence_id']:e for e in rows}
+        shown=([e for e in rows if e['evidence_id'] in focus] if focus
+               else [by_id[k] for k in ranked_ids] if ranked_ids else rows)
         if any(e['review_status']!='reviewed' for e in rows):
             # The cause disclaimer belongs to cause/remedy requests, not to plain lookups or comparisons.
             text=(('원인을 확정할 검토 자료는 없어요. ' if prepared.get('asks_cause_or_remedy') else '')
-                  +('지금 상황과 관련된 원문 내용만 추려 안내합니다.' if focus else '다음은 기존 활동 원문의 참고 안내입니다.'))
+                  +('지금 상황과 관련된 원문 내용만 추려 안내합니다.' if focus or ranked_ids
+                    else '다음은 기존 활동 원문의 참고 안내입니다.'))
         else:
             text='다음은 자료 원문의 참고 안내입니다. 개인 상태의 원인이나 실력은 확정하지 않아요.'
         if not rows:
@@ -137,9 +157,11 @@ class AnswerPolicy:
                             +('\n'.join('- '+line for line in focus[e['evidence_id']]) if focus else e['excerpt'])
                             +('\n적용 조건: '+e['applies_when'] if e['applies_when'] else '') for e in shown)
             if focus:
-                text += '\n\n전체 원문이 필요하면 “원문 보여줘”라고 요청해 주세요.'
+                text += '\n\n' + FULL_TEXT_TAIL
         if prepared['unresolved']:
             text += '\n\n아직 확인하지 못한 요청: ' + '; '.join(r['text'] for r in prepared['unresolved'])
+        if ranked_ids:
+            text += '\n\n' + FULL_TEXT_TAIL
         return {'text':text, 'mode':'reference' if rows else 'insufficient_evidence', 'status':'reference' if rows else 'no_evidence',
                 'sources':shown, 'cited_evidence_ids':[e['evidence_id'] for e in shown],
                 'cited_activity_ids':list(dict.fromkeys(e['activity_id'] for e in shown)),
@@ -149,25 +171,38 @@ class AnswerPolicy:
                     'source_review':{e['evidence_id']:e['review_status'] for e in rows},
                     'stop_reason':prepared['stop_reason'],'next_action':'원문 확인 또는 미확인 항목 설명'}}
 
+    @staticmethod
+    def _narrowed(prepared: dict, ranked: list[dict] | None) -> dict:
+        """Keep the first REFERENCE_TOP_K ranked rows in rank order. Explicit originals,
+        assessment disclaimers and planner focus are never narrowed."""
+        if not ranked or prepared['original_requested'] or prepared['asks_assessment'] or prepared['focus']:
+            return prepared
+        allowed={e['evidence_id'] for e in prepared['evidence']}
+        ids=[r['evidence_id'] for r in ranked if r['evidence_id'] in allowed][:REFERENCE_TOP_K]
+        return {**prepared, 'ranked_ids': ids} if ids else prepared
+
     async def answer(self, question: str, evidence: list, context: dict, requirements: list, llm: object, budget,
-                     focus=()) -> dict:
+                     focus=(), ranked: list[dict] | None = None, unavailable: str | None = None) -> dict:
+        """unavailable: 이 턴에 Claude가 답하지 못한 상태. 있으면 생성하지 않고 원문 안내를 돌려줍니다."""
         prepared=self.prepare(question,evidence,context,requirements,focus)
-        result=self.render_reference(prepared)
+        # The source-text answer; ranked rows only narrow it, never a generated answer.
+        reference=self.render_reference(self._narrowed(prepared, ranked))
         if not prepared['allow_generation']:
-            return result
-        if not hasattr(llm, 'explain_claims') or not getattr(llm, 'configured', True):
-            return result
+            return reference
+        if unavailable or not hasattr(llm, 'explain_claims') or not getattr(llm, 'configured', True):
+            return reference
+        result=self.render_reference(prepared)
         rows=prepared['evidence']; calls_before=budget.llm_calls; usage_before=dict(budget.usage)
         answer_context = {**context, 'question': question}
         errors=[]; validation=result['validation']; previous_claims=[]; previous_verdicts=[]
-        unavailable=None  # 공급자 오류나 예산 소진으로 생성기가 답을 내지 못한 사유
+        failure=None  # 공급자 오류나 예산 소진으로 생성기가 답을 내지 못한 사유
         try:
             async with asyncio.timeout(budget.remaining_seconds()):
                 for attempt in range(2):
                     generated=await budget.model_call('generation',llm.explain_claims,question,rows,
                         {**answer_context,'validation_errors':errors,'previous_claims':previous_claims,'previous_verdicts':previous_verdicts})
                     if generated.get('status') in PROVIDER_FAILURES:
-                        unavailable=generated['status']; break
+                        failure=generated['status']; break
                     if not generated.get('claims') or len(generated['claims'])>8:
                         errors=['invalid_claims']; validation['format']='failed'; continue
                     try:
@@ -182,7 +217,7 @@ class AnswerPolicy:
                     validation['semantic_support']='failed'
                     checked=await budget.model_call('verification',llm.verify_claims,[c.model_dump() for c in claims],rows,answer_context)
                     if checked.get('status') in PROVIDER_FAILURES:
-                        validation['semantic_support']='not_run'; unavailable=checked['status']; break
+                        validation['semantic_support']='not_run'; failure=checked['status']; break
                     previous_verdicts=checked.get('verdicts') or []
                     if not self._supported(checked.get('verdicts'),claims):
                         validation['semantic_support']='failed'; errors=['semantic_support_failed']; continue
@@ -194,19 +229,20 @@ class AnswerPolicy:
                         by_id[key]['activity_id'] for key in result['cited_evidence_ids']))
                     break
         except (BudgetExceeded, TimeoutError):
-            result['metacognition']['stop_reason']='budget_exhausted'; unavailable='budget_exhausted'
+            result['metacognition']['stop_reason']='budget_exhausted'; failure='budget_exhausted'
         except (AttributeError, TypeError, ValueError):
             result['metacognition']['stop_reason']='execution_failure'
         result.update(llm_calls=budget.llm_calls-calls_before,
                       model=getattr(llm, 'model', None),
                       usage={k:v-usage_before.get(k,0) for k,v in budget.usage.items()},
-                      validation_errors=[unavailable] if unavailable else errors)
+                      validation_errors=[failure] if failure else errors)
         if result['mode']!='generated' and not result['metacognition']['stop_reason']:
             result['metacognition']['stop_reason']='execution_failure'
-        if result['mode'] != 'generated' and unavailable:
+        if result['mode'] != 'generated' and failure:
             # 원문 안내는 키 없는 배포에서도 나가는 내용이다. 일시적인 공급자 오류 때문에 그보다 적게 주지 않는다.
+            result.update({k: reference[k] for k in ('text', 'sources', 'cited_evidence_ids', 'cited_activity_ids')})
             result['status'] = 'generation_unavailable'
-            result['text'] = '설명을 생성하지 못해 자료 원문을 그대로 안내합니다.\n\n' + result['text']
+            result['text'] = UNAVAILABLE_PREFIX + result['text']
         elif result['mode'] != 'generated':
             # 검증에서 떨어진 답은 내보내지 않는다. 보류한 응답이 답변·인용으로 집계되지 않게 상태와 인용을 비운다.
             result.update(status='withheld', cited_evidence_ids=[], cited_activity_ids=[],

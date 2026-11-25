@@ -6,6 +6,7 @@ import httpx2
 import pytest
 from app.claude import ClaudeService
 from test_claude import settings, message, execute
+from test_actions import wire
 
 
 def run(handler, config=None, context=None):
@@ -92,3 +93,58 @@ def test_new_structured_methods_preserve_all_context_and_disable_retries():
             assert (await service.verify_claims(generated['claims'],[],context))['verdicts']
             assert all(len(item['context']['dialogue']['observations'])==8 for item in seen)
     asyncio.run(call())
+
+
+def choose(raw, seen=None):
+    def handler(request):
+        payload=json.loads(request.content)
+        if seen is not None:
+            seen.append(json.loads(payload['messages'][0]['content']))
+        return httpx2.Response(200,json=message(text=json.dumps(raw)))
+    async def call():
+        async with anthropic.AsyncAnthropic(api_key='test',max_retries=0,
+            http_client=anthropic.DefaultAsyncHttpxClient(transport=httpx2.MockTransport(handler))) as client:
+            return await ClaudeService(settings(),client=client).choose_action('2번',{'candidates':[1,2]})
+    return asyncio.run(call())
+
+
+def test_choose_action_returns_the_action_dict():
+    seen=[]
+    result=choose({'decision':wire(action='select_candidate',number=2)},seen)
+    assert result['status']=='planned' and result['llm_calls']==1
+    assert result['decision']=={'action':'select_candidate','number':2}
+    assert seen==[{'text':'2번','context':{'candidates':[1,2]}}]
+
+
+def test_choose_action_marks_an_unknown_action_invalid():
+    result=choose({'decision':{'action':'delete_everything'}})
+    assert result['status']=='invalid_decision' and result['decision'] is None
+
+
+def efforts(config):
+    """choose_action과 interpret_turn을 한 번씩 불러 각 요청의 effort를 돌려준다."""
+    seen={}
+    def handler(request):
+        payload=json.loads(request.content)
+        inputs=json.loads(payload['messages'][0]['content'])
+        name='choose_action' if 'candidates' in inputs['context'] else 'interpret_turn'
+        seen[name]=payload['output_config']['effort']
+        raw={'decision':wire(action='show_records')} if name=='choose_action' else {'route':'unclear','transition':'none'}
+        return httpx2.Response(200,json=message(text=json.dumps(raw)))
+    async def call():
+        async with anthropic.AsyncAnthropic(api_key='test',max_retries=0,
+            http_client=anthropic.DefaultAsyncHttpxClient(transport=httpx2.MockTransport(handler))) as client:
+            service=ClaudeService(config,client=client)
+            assert (await service.choose_action('기록',{'candidates':[]}))['status']=='planned'
+            assert (await service.interpret_turn('기록',{}))['status']=='planned'
+    asyncio.run(call())
+    return seen
+
+
+def test_agent_effort_defaults_to_the_claude_effort():
+    assert efforts(settings(agent_effort=''))=={'choose_action':'medium','interpret_turn':'medium'}
+    assert efforts(settings())=={'choose_action':'medium','interpret_turn':'medium'}
+
+
+def test_agent_effort_applies_only_to_choose_action():
+    assert efforts(settings(agent_effort='low'))=={'choose_action':'low','interpret_turn':'medium'}

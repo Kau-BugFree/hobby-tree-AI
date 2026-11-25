@@ -1,10 +1,14 @@
 # HobbyTree 활동코치 V3 API 명세
 
-FE · BE · AI 팀 공유용 | 문서 버전 1.1 | 작성일 2026-11-11
+FE · BE · AI 팀 공유용 | 문서 버전 1.3 | 작성일 2026-11-11, 11장 갱신 2026-11-20, 음성 경로 추가 2026-11-23
 
 **명세 기준:** `rag 챗봇연결 v3/2026-11-09/backend/app`의 2026-11-10 23:27 시점 코드(git 저장소가 아니라 커밋이 없습니다). 현재 구현된 V3 서버 계약을 설명합니다. 배포 서버 주소와 Hobby Recommender와의 연결 방식은 아직 확정되지 않았습니다.
 
 **1.1 변경(2026-11-11):** Spring 백엔드 전용 경로 `POST /backend/coach/chat`을 추가하고 11장에 계약을 적었습니다. 1~9장의 기존 경로는 바뀌지 않았습니다.
+
+**1.2 변경(2026-11-20):** 11장을 백엔드 `develop`(커밋 `98425b1`)의 실제 호출 코드(`CoachAiClient`, `CoachAiResponseValidator`, `CoachTurnTransactions`)에 맞췄습니다. 이 경로의 한 턴 제한을 60초에서 40초로 줄였습니다(백엔드 대기 45초). 요청·응답 필드는 바뀌지 않았습니다.
+
+**1.3 변경(2026-11-23):** Spring 백엔드 전용 경로 `POST /backend/coach/transcribe`(음성→글자)를 추가했습니다. 계약은 별도 문서 `HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`에 있습니다. 기존 경로는 바뀌지 않았습니다.
 
 **확인 방법:** 2026-11-11에 서버를 임시 DB로 띄워 요청 50건의 실제 응답을 수집하고, 발화 11건의 분류를 따로 확인했습니다(Claude 키 없음, 임베딩·리랭커 끔). Claude 생성 경로, 하이브리드 검색, 레시피 검색, 500 응답은 실행하지 않고 코드만 읽었으며 본문에 "코드 기준"으로 표시합니다.
 
@@ -56,6 +60,7 @@ CORS 허용 헤더에 Authorization이 없습니다. 브라우저가 토큰 헤�
 | POST | /rag/ask | 검색→근거→답변을 한 번에 확인(검증용) | 200 |
 | GET | /diagnostics/traces | 한 세션의 처리 경로·호출 수 | 200 |
 | POST | /backend/coach/chat | Spring 백엔드 전용 대화(11장) | 200 |
+| POST | /backend/coach/transcribe | Spring 백엔드 전용 음성→글자(별도 문서 `HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`) | 200 |
 | GET | /docs | Swagger UI | 200 |
 | GET | /openapi.json | OpenAPI 명세 | 200 |
 
@@ -675,7 +680,7 @@ V3는 git 저장소가 아니라 고정 링크가 없습니다. 아래 경로는
 
 **POST /backend/coach/chat**
 
-`hobby-tree-Backend`의 `POST /api/v1/coach/chat`(API-34)이 서버 대 서버로 호출하는 경로입니다. 2026-11-11에 추가했습니다. 백엔드 `develop`(커밋 `603c525`)의 `CoachService`·DTO를 읽고 맞췄으며, 임시 DB로 서버를 띄워 요청 9건의 실제 응답을 확인했습니다. Spring 쪽 호출 코드는 아직 없습니다.
+`hobby-tree-Backend`의 `POST /api/v1/coach/chat`(API-34)이 서버 대 서버로 호출하는 경로입니다. 2026-11-11에 추가했습니다. 백엔드 `develop`(커밋 `603c525`)의 `CoachService`·DTO를 읽고 맞췄으며, 임시 DB로 서버를 띄워 요청 9건의 실제 응답을 확인했습니다. Spring 쪽 호출 코드는 백엔드 #157에서 `domain/coach/client/CoachAiClient`로 들어왔고, 2026-11-20에 `develop`(커밋 `98425b1`)의 그 코드와 다시 대조했습니다. 백엔드 쪽 설명은 백엔드 저장소의 `docs/coach-fastapi-integration.md`에 있습니다.
 
 백엔드가 대화와 메시지를 저장하고, V3는 답변만 만듭니다. 백엔드는 V3의 세션 ID를 보관하지 않습니다.
 
@@ -690,7 +695,7 @@ V3는 git 저장소가 아니라 고정 링크가 없습니다. 아래 경로는
 | --- | --- | --- | --- |
 | conversationId | integer | 필수 | 백엔드 `coach_conversations.conversation_id`. 1 이상 |
 | message | string | 필수 | 사용자 발화. 공백 제거 후 1~2,000자 |
-| requestId | string | 필수 | 백엔드가 받은 `Idempotency-Key`를 그대로. 1~120자 |
+| requestId | string | 필수 | 재전송을 알아보는 값. 1~120자. 백엔드는 `Idempotency-Key` 원문 대신 예약한 멱등 행 번호로 만든 `coach-turn-<번호>`를 보냄 |
 | hobbyCode | string | 선택 | 백엔드 `hobbies.hobby_code`. 생략하면 `cooking`. 등록되지 않은 값은 422 |
 
 - 이름은 camelCase만 받습니다. `conversation_id`처럼 보내면 422입니다.
@@ -733,25 +738,33 @@ V3는 백엔드의 숫자 ID를 모릅니다. 활동은 `activityCode`로 알리
 | `answer`, `coach_messages.content` | `answer` |
 | `coach_messages.answer_version` | `answerVersion` |
 | `references[].sourceType`, `title` | 그대로 |
-| `references[].sourceId` | `activityCode`로 조회한 `activity_id`. `activityCode`가 null이거나 조회되지 않으면 null |
-| `suggestedActivities[].activityId` | `activityCode`로 조회한 `activity_id`. 조회되지 않는 항목은 제외 |
-| `suggestedActivities[].title`, `reason` | 그대로 |
+| `references[].sourceId` | `ACTIVITY`만 `activityCode`로 조회한 `activity_id`. `KNOWLEDGE`·`RECIPE`는 null이고 `sourceCode`를 함께 내려보냄 |
+| `suggestedActivities[].activityId`, `title` | `activityCode`로 조회한 `activity_id`와 DB의 활동 이름 |
+| `suggestedActivities[].reason` | 그대로 |
 | `messageId`, `createdAt`, `usedContext` | 백엔드가 생성 |
 
-`mode`와 `replayed`는 현재 Spring DTO에 없는 값입니다. 쓰지 않는다면 역직렬화에서 무시하도록 설정합니다.
+**백엔드가 응답에 거는 검사(하나라도 어긋나면 답 전체가 502 `COACH502_1`):**
 
-**전제:** 백엔드 DB의 `activity_code`가 V3의 `activity_id`와 같아야 합니다. 활동 자료는 `hobby-tree-AI` 저장소 `#1-feat-rag-backend` 브랜치의 `backend/data/activities.jsonl`(162건)입니다. 백엔드 저장소에는 활동 초기 데이터가 없어 실제 DB의 코드는 확인하지 못했습니다.
+- `conversationId`가 요청과 같음. `answer`는 공백이 아닌 1~32,000자, `answerVersion`·`mode`는 1~80자.
+- `references`는 50건 이하, `suggestedActivities`는 20건 이하.
+- `references[]`: `sourceType`은 세 값 중 하나, `sourceCode` 1~200자, `title` 1~1,000자. `RECIPE`는 `activityCode`가 null이어야 하고, 나머지는 1~100자여야 합니다. `ACTIVITY`는 `sourceCode`와 `activityCode`가 같아야 합니다.
+- `suggestedActivities[]`: `activityCode` 1~100자, `title` 1~1,000자, `reason`은 null이거나 4,000자 이하.
+- null이 아닌 모든 `activityCode`가 백엔드 DB의 공개(PUBLISHED)된 요리 활동에 있어야 합니다. 없는 코드는 빼고 저장하지 않습니다.
+- 응답 본문은 256KiB 이하.
+
+**전제:** 백엔드 DB의 `activity_code`가 V3의 `activity_id`와 같아야 합니다. 2026-11-20 확인: 백엔드가 적재하는 카탈로그의 건수(취미 3·단계 18·활동 386·단계 설명 1,313·준비물 1,850)는 프런트 저장소 `src/data/catalog`의 요리 162·악기 140·독서 84건 합계와 같고, 그 요리 162건의 ID·제목은 V3 `backend/data/activities.jsonl`과 같습니다. 카탈로그 SQL 자체는 백엔드 저장소에 없어 운영 DB의 공개 상태까지는 확인하지 못했습니다.
 
 ### 11.4 동작 규칙
 
 - **대화 연결:** `conversationId`가 같으면 같은 대화로 이어 갑니다. 추천 후보, 선택한 활동, 현재 단계는 V3가 기억합니다.
 - **소유권:** V3는 사용자를 모릅니다. 그 `conversationId`가 로그인한 사용자의 것인지는 백엔드가 호출 전에 확인해야 합니다(현재 `CoachService`의 `findOwnedByIdWithHobby`).
 - **재전송:** 같은 `conversationId`·`requestId`·`message`를 다시 보내면 저장된 답을 돌려주고 모델을 다시 호출하지 않습니다. 같은 `requestId`로 다른 `message`를 보내면 409입니다.
-- **새 대화의 재시도:** 재전송 보호는 `conversationId`가 같을 때만 성립합니다. 첫 호출이 실패해 백엔드 트랜잭션이 취소되면 다음 시도는 새 번호를 받으므로 V3는 새 대화로 처리합니다.
-- **시간:** 한 턴은 최대 60초입니다. 백엔드의 응답 대기 시간은 그보다 길게(75초 이상) 잡습니다. `CoachService.chat`이 `@Transactional`이므로, 그 안에서 호출하면 DB 트랜잭션이 호출 시간만큼 열려 있습니다.
+- **새 대화의 재시도:** 재전송 보호는 `conversationId`가 같을 때만 성립합니다. 백엔드는 호출 전에 대화 번호와 `requestId`를 먼저 저장해 두고, 실패한 질문을 같은 키로 다시 받으면 같은 번호·같은 `requestId`로 다시 보냅니다. V3는 저장된 답을 돌려줍니다.
+- **시간:** 이 경로의 한 턴은 최대 40초입니다(`COACH_BACKEND_TURN_SECONDS`). 백엔드는 AI 응답을 45초(`coach.ai.request-timeout`, 최대 120초)만 기다리고 넘으면 504 `COACH504_1`을 냅니다. 그 뒤 같은 대화의 새 질문은 실패한 질문을 같은 키로 다시 보내 성공시킬 때까지 409 `COACH409_1`로 막히므로, V3가 먼저 한도 안내로 답합니다. 백엔드의 대기 시간을 바꾸면 이 값도 그보다 짧게 맞춥니다. 공개 경로(`/coach/messages`)는 60초 그대로입니다.
+- **상태 코드:** 백엔드는 V3의 429·503을 503 `COACH503_1`로, 그 밖의 200이 아닌 응답을 502 `COACH502_1`로 바꿉니다. 502로 끝난 질문도 대화를 막으므로, 백엔드가 유효하다고 본 요청에 V3가 4xx·5xx를 내면 안 됩니다.
 - **중단된 턴:** 한도를 넘겨 중단한 턴도 HTTP 200이고 `mode`가 `insufficient_evidence`입니다. 같은 `requestId`로 다시 보내면 같은 답이 반복되므로, 다시 묻는 것은 새 키로 보냅니다.
 - **DB 짝:** V3의 `var/coach.sqlite`는 백엔드 DB 하나와 짝을 이룹니다. 백엔드 DB를 초기화하거나 다른 환경의 백엔드가 같은 V3를 쓰면, 같은 번호의 옛 대화 맥락이 이어 붙습니다. 그때는 V3 DB도 함께 비우거나 분리합니다.
-- **실행·완료 기록:** 이 경로에서 "시작할게", "완료했어"라고 말하면 V3 안에 실행과 완료 기록이 생깁니다. 백엔드의 활동 기록과 성장에는 반영되지 않습니다.
+- **실행·완료 기록:** 이 경로에서 "시작할게", "완료했어"라고 말하면 V3 안에 실행과 완료 기록이 생깁니다. 백엔드의 활동 기록과 성장에는 반영되지 않습니다. 그래서 완료를 기록한 턴의 `answer`는 공개 경로의 "활동 완료를 기록했어요." 대신 "이 대화에 완료로 적어 두었어요. 앱의 활동 기록과 나무 성장에는 활동 화면에서 완료해야 반영돼요."입니다(2026-11-20). 앱의 기록과 성장은 앱이 백엔드의 API-29를 불러야 바뀝니다. "시작할게"의 답("활동을 시작했어요. 총 N단계입니다.")은 그대로이며 백엔드의 활동 시작(API-26)을 부르지 않습니다.
 
 ### 11.5 오류
 
@@ -773,6 +786,7 @@ V3는 백엔드의 숫자 ID를 모릅니다. 활동은 `activityCode`로 알리
 | --- | --- |
 | COACH_BACKEND_TOKEN | 백엔드와 공유하는 토큰. 비우면 이 경로는 503. 32자보다 짧으면 서버가 시작하지 않음 |
 | COACH_ALLOWED_HOSTS | 백엔드가 V3를 부를 때 쓰는 호스트 이름을 추가(쉼표 구분, 포트 제외) |
+| COACH_BACKEND_TURN_SECONDS | 이 경로의 한 턴 제한(초). 기본 40, 1~115. 백엔드의 `coach.ai.request-timeout`보다 짧게 둠 |
 
 이 경로에는 요청 수 제한이 없습니다. 사용자별 호출 제한은 백엔드에서 겁니다. 토큰은 헤더에 평문으로 실리므로 백엔드와 V3 사이는 내부망이나 TLS로 둡니다.
 

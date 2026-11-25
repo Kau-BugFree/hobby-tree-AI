@@ -605,6 +605,24 @@ class Retrieval:
             return None, "reranker_inference_failed"
         return {aid: float(score) for aid, score in zip(candidates, scores)}, None
 
+    def rank_evidence(self, query: str, rows: list[dict]) -> tuple[list[dict] | None, str | None]:
+        """(재순위 점수 순으로 하한 이상만 남긴 근거, 점수를 못 낸 사유). 점수를 낼 수 없으면 근거는 None.
+
+        사유는 설정으로 껐거나 성공했으면 None이다. 인스턴스에 남기지 않는다(다른 세션의 호출이 덮어쓴다).
+        """
+        if not rows:
+            return [], None
+        if self._reranker is None:  # 설정으로 꺼졌거나(사유 없음) 모델을 올리지 못했다
+            return None, self._reranker_error
+        try:
+            scores = [float(s) for s in self._reranker.score(query, [row["excerpt"] for row in rows])]
+        except Exception:  # GPU 메모리 부족 등 추론 오류는 사유만 돌려주고 정렬 없이 둔다.
+            logger.warning("evidence reranking failed", exc_info=True)
+            return None, "reranker_inference_failed"
+        floor = self.rerank_min_score
+        scored = [(s, row) for s, row in zip(scores, rows) if floor is None or s >= floor]
+        return [row for _, row in sorted(scored, key=lambda pair: -pair[0])], None
+
     def search(self, query: str, hobby_key: str = "cooking", constraints: dict[str, Any] | None = None, limit: int = 3, scope: str = "activities") -> dict[str, Any]:
         """조건 필터 → BM25/벡터 → RRF → cross-encoder(없으면 규칙) 재정렬 후 근거와 진단을 반환한다."""
         started = time.perf_counter()
@@ -752,6 +770,11 @@ class Retrieval:
         diagnostics.update(candidate_ids=chosen, reranker_error=reranker_error,
                            latency_ms=round((time.perf_counter() - started) * 1000, 2))
         return {"items": [docs[aid] for aid in chosen], "diagnostics": diagnostics}
+
+    @property
+    def model_errors(self) -> dict[str, str | None]:
+        """불러오지 못한 모델의 사유. 설정으로 끈 모델은 None이다."""
+        return {"embedding": self._encoder_error, "reranker": self._reranker_error}
 
     def status(self) -> dict[str, Any]:
         """구성·실제 색인 상태를 알려 준다. 설정 켜짐만으로 하이브리드가 준비됐다고 표시하지 않는다."""

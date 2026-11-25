@@ -27,6 +27,8 @@ from .claude import ClaudeService
 from .coach import Coach
 from .ask import RagAsk
 from .backend_bridge import backend_router
+from .transcribe import GoogleTranscriber
+from .vocabulary import VOCABULARY
 
 
 def public_session(session):
@@ -39,13 +41,14 @@ def without_session_id(payload):
     return {key: value for key, value in payload.items() if key != "session_id"}
 
 
-def create_app(settings=None, retrieval=None, llm=None):
+def create_app(settings=None, retrieval=None, llm=None, transcriber=None):
     """테스트에서는 별도 DB와 가짜 외부 HTTP 클라이언트를 주입할 수 있습니다."""
     settings = settings or Settings.from_env()
     store = Store(settings.database_path)
     retrieval = retrieval or Retrieval(settings)
     llm = llm or ClaudeService(settings)
-    coach = Coach(store, retrieval, llm)
+    transcriber = transcriber or GoogleTranscriber(settings)
+    coach = Coach(store, retrieval, llm, settings.agent_enabled, settings.agent_timeout_seconds)
     asker = RagAsk(retrieval, llm)
     registry_path = settings.data_dir / "hobbies.json"
     registry = (
@@ -53,6 +56,10 @@ def create_app(settings=None, retrieval=None, llm=None):
         if registry_path.exists()
         else {"cooking": {"label": "요리"}}
     )
+    # 낱말 묶음이 없는 취미는 첫 요청에서 KeyError(500)가 난다. 시작할 때 멈춘다.
+    missing = [hobby for hobby in registry if hobby not in VOCABULARY]
+    if missing:
+        raise RuntimeError(f"app/vocabulary.py에 낱말 묶음이 없는 취미: {', '.join(missing)}")
     api = FastAPI(
         title="HobbyTree 활동코치",
         version="3.0.0",
@@ -324,5 +331,5 @@ def create_app(settings=None, retrieval=None, llm=None):
             raise StoreError(422, "등록되지 않은 취미입니다.")
         return await asker.answer(body.question, body.hobby_key, body.constraints.model_dump(), body.top_k)
 
-    api.include_router(backend_router(settings, store, coach, registry))
+    api.include_router(backend_router(settings, store, coach, registry, transcriber))
     return api

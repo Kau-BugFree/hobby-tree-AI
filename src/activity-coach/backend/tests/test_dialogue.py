@@ -332,7 +332,8 @@ def test_no_key_selected_asks_once_then_shows_source(app_factory):
     with TestClient(app_factory()) as client:
         sid=create_session(client); select_activity(client,sid)
         first=message(client,sid,'잘 모르겠어','q1')
-        assert first['mode']=='clarify'
+        # 설계 6절 4번: 모델 없이는 확인 질문 없이 바로 원문을 안내한다.
+        assert first['mode']=='reference' and first['sources'] and 'clarification' not in first
         second=message(client,sid,'모르겠어요','q2')
         assert second['mode']=='reference' and second['sources']
         assert second['diagnostics']['llm_calls']==0

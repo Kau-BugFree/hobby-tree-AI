@@ -2,10 +2,11 @@
 
 > **저장소 사본 안내 (hobby-tree-AI)**
 >
-> 이 폴더는 전달 패키지에서 실행 코드(`backend/app`), 테스트(`backend/tests`), 도구(`backend/scripts`), 활동·코칭·평가 자료(`backend/data`의 작은 파일), API 명세(`docs/`)만 옮긴 것입니다.
+> 이 폴더는 전달 패키지에서 실행 코드(`backend/app`), 테스트(`backend/tests`), 도구(`backend/scripts`), 활동·코칭·평가 자료(`backend/data`의 작은 파일), 구조 설명과 API 명세(`docs/`)만 옮긴 것입니다.
 >
-> 동봉 Python(`runtime/`), 검색 모델(`models/`), 레시피 원자료와 색인(`backend/data/recipes`, `backend/var`), 구조·검증 문서(`verification/` 등), `package_manifest.json`은 들어 있지 않습니다. 그래서 아래 본문의 배치 파일과 일부 문서 링크는 전달 패키지에서만 동작합니다.
+> 동봉 Python(`runtime/`), 검색 모델(`models/`), 레시피 원자료와 색인(`backend/data/recipes`, `backend/var`), 검증 기록(`verification/`)과 그 밖의 문서, `package_manifest.json`은 들어 있지 않습니다. 그래서 아래 본문의 배치 파일과 일부 문서 링크는 전달 패키지에서만 동작합니다.
 >
+> - 구조(2026-11-20 반영): [현재 구조](docs/ARCHITECTURE.md). 요청 분류는 규칙 표(`backend/app/intent_rules.py`)가 맡고, 설정을 켜면 Claude가 턴마다 행동 하나를 고르는 에이전트 진입점(`backend/app/agent.py`, 기본 꺼짐)이 앞에 섭니다. 두 경로는 같은 실행 함수(`backend/app/action_executors.py`)를 씁니다.
 > - 설치: `backend/requirements.txt` 첫머리의 안내를 따릅니다(Python 3.12).
 > - 테스트: `backend`에서 `python -m pytest tests -q`. 모델과 색인 없이 실행되며, 레시피 색인이 필요한 대조 1건은 건너뜁니다.
 > - 서버: `backend`에서 `python -m uvicorn app.main:create_app --factory --port 8003`. 모델이 없으면 `backend/.env`에 `COACH_EMBEDDING_ENABLED=false`, `COACH_RERANKER_ENABLED=false`를 넣습니다.
@@ -19,6 +20,7 @@
 2. 처음 실행하기 전에 `verify_package.bat`으로 전달 파일 SHA-256을 확인합니다. 정상 결과는 `problems: []`입니다. `unlisted`에는 매니페스트에 없는 파일이 나옵니다. 받은 직후인데 `backend/.env`나 `backend/var/coach.sqlite`가 보이면 보낸 쪽의 키·대화 기록이 섞여 온 것이니 지우고 보낸 쪽에 알리세요.
 3. `start_backend.bat`을 실행합니다. 기본 주소는 `http://127.0.0.1:8003`이며 `/health`에서 상태를 확인합니다. `/docs`의 Swagger UI는 브라우저가 외부 CDN에 접근할 수 있어야 표시될 수 있습니다.
 4. Claude 생성이 필요하면 `backend/.env.example`을 `backend/.env`로 복사하고 **본인의 `ANTHROPIC_API_KEY`**를 넣은 뒤 서버를 재시작합니다. 모델 접근 권한에 맞게 `CLAUDE_MODEL`도 설정합니다. 실제 키는 이 패키지에 없습니다.
+5. 음성 질문(음성→글자 변환, `POST /backend/coach/transcribe`)을 쓰려면 구글 서비스 계정 키 파일을 `backend`에 `.env`로 시작하는 이름으로 두고 `backend/.env`의 `GOOGLE_APPLICATION_CREDENTIALS`에 그 경로를 적습니다. 키가 없으면 이 경로만 503이고 나머지는 그대로 동작합니다. 다만 `google-auth`(`backend/requirements.txt`)가 설치되지 않은 환경에서는 서버 전체가 시작하지 않으니, 코드를 갱신할 때 의존성부터 설치합니다. 계약은 `docs/HobbyTree_Coach_Voice_Transcribe_Spec_ko.md`에 있습니다.
 
 키 없이도 모델 검색, 활동 선택, 준비물·단계 조회, 근거 원문 응답, 기록 저장이 동작합니다. Claude 생성·의미 검증은 외부 네트워크·유효한 API 키가 필요하며 비용이 발생합니다. Claude 자체의 모델 가중치는 포함할 수 없습니다.
 

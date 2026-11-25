@@ -1,6 +1,7 @@
 """Read-only intent interpretation; execution authority stays in Coach."""
 import re
 
+from .answer_policy import PROVIDER_FAILURES
 from .dialogue_models import DialogueState, TurnInterpretation
 from .dialogue_state import ABANDON, NEW_ISSUE, UNKNOWN, build_issue_context, new_issue_confirmed, issue_resolved
 from .turn_budget import TurnBudget
@@ -22,7 +23,7 @@ REPORT_ENDING = re.compile(rf'(?:[{SS_FINAL}](?:어(?:요)?|다)|남아\s*있(?:
 
 
 def information_request(text: str) -> bool:
-    from .coach import INFO_REQUEST
+    from .intent_rules import INFO_REQUEST
     return bool(INFO_REQUEST.search(text) or re.search(r'말해\s*줘|(?:구분|요약)해', text)
                 or withdrawn_requirements(text))
 
@@ -84,12 +85,15 @@ class InterpretationFailed(Exception):
 
 
 class TurnRouter:
-    def __init__(self, llm):
+    def __init__(self, llm: object) -> None:
         self.llm = llm
+        self.last_status: str | None = None  # interpret_turn의 공급자 실패 상태. 호출하지 않았거나 성공하면 None.
 
-    async def interpret(self, text: str, session: dict, state: DialogueState, budget: TurnBudget) -> TurnInterpretation:
-        from .coach import (ACTIVITY_LOOKUP, CAPABILITY, NEGATED_ACTION,
-                            RECOMMEND_REASON, SELF_ASSESSMENT, INFO_REQUEST, asks_for_dishes)
+    async def interpret(self, text: str, session: dict, state: DialogueState, budget: TurnBudget,
+                        unavailable: str | None = None) -> TurnInterpretation:
+        """unavailable: 이 턴에 Claude가 답하지 못한 상태. 있으면 interpret_turn을 부르지 않고 그 실패처럼 처리합니다."""
+        from .intent_rules import (ACTIVITY_LOOKUP, CAPABILITY, CERTAINTY, NEGATED_ACTION,
+                                   RECOMMEND_REASON, SELF_ASSESSMENT, INFO_REQUEST, asks_for_dishes)
         from .dialogue import is_trouble
         quotes = observation_quotes(text)
         if issue_resolved(text):
@@ -103,7 +107,7 @@ class TurnRouter:
             return TurnInterpretation(route='action')
         if SELF_ASSESSMENT.search(text):
             return TurnInterpretation(route='reflection', transition='continue')
-        if RECOMMEND_REASON.search(text) or CAPABILITY.search(text) or re.search(r'확실해|검토.*됐|무슨\s*근거', text):
+        if RECOMMEND_REASON.search(text) or CAPABILITY.search(text) or CERTAINTY.search(text):
             return TurnInterpretation(route='meta')
         if asks_for_dishes(text) and (INFO_REQUEST.search(text) or '추천' in text):
             return TurnInterpretation(route='recommend')
@@ -127,23 +131,33 @@ class TurnRouter:
         clear = bool(pending or is_trouble(text) or quotes or COACHING_REQUEST.search(text) or transition != 'continue'
                      or state.issue_id and information_request(text)
                      or state.issue_id and re.search(r'왜|어떻게|그럼|그러면|그래도|이건|그건', text))
-        if clear and transition != 'correct':
+
+        def by_rules() -> TurnInterpretation:
             proposals = coaching_requirements(text)
-            if pending and not quotes and not information_request(text):
-                quotes = [text]
+            reported = [text] if pending and not quotes and not information_request(text) else quotes
             return TurnInterpretation(route='dialogue', transition=transition, transition_quote=text,
-                observation_updates=[{'quote': quote, 'status': 'unknown' if UNKNOWN.search(quote) else 'reported'} for quote in quotes],
+                observation_updates=[{'quote': quote, 'status': 'unknown' if UNKNOWN.search(quote) else 'reported'} for quote in reported],
                 requirement_proposals=proposals)
+
+        if clear and transition != 'correct':
+            return by_rules()
         if not hasattr(self.llm, 'interpret_turn'):
             return TurnInterpretation(route='dialogue' if clear else 'lookup', transition=transition if clear else 'none')
-        result = await budget.model_call('decision', self.llm.interpret_turn, text, build_issue_context(state, session))
+        result = ({'decision': None, 'status': unavailable} if unavailable
+                  else await budget.model_call('decision', self.llm.interpret_turn, text, build_issue_context(state, session)))
         try:
             decision = TurnInterpretation.model_validate(result.get('decision'))
         except ValueError:
-            # Without a key the rules above are all there is. A provider error or an invalid answer is a
-            # failed turn: guessing 'dialogue' would open an issue for a dish name.
-            if result.get('status') != 'not_configured':
-                raise InterpretationFailed(result.get('status') or 'invalid_decision')
+            status = result.get('status')
+            # The provider gave no answer: use what the rules alone give (design 4.4). context_too_long is
+            # in PROVIDER_FAILURES but retrying cannot help, so it still fails the turn like an invalid answer:
+            # guessing 'dialogue' would open an issue for a dish name. A sentence the rules leave open takes
+            # the no-key path: handed off as unclear, looked up through the reranker gates, else asked back.
+            if status in PROVIDER_FAILURES and status != 'context_too_long':
+                self.last_status = status
+                return by_rules() if clear else TurnInterpretation(route='unclear', transition='none')
+            if status != 'not_configured':
+                raise InterpretationFailed(status or 'invalid_decision')
             return TurnInterpretation(route='dialogue', transition='correct' if transition == 'correct' else 'none')
         if decision.route == 'action':
             return TurnInterpretation(route='lookup')

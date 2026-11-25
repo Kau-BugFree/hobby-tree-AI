@@ -222,3 +222,23 @@ def test_confirmed_proposal_retains_original_quote_requirement_and_consent():
     assert updated.observations[0].quote==pending['proposed_goal'] and updated.observations[0].source_message_id=='m1'
     consent=updated.observations[-1]
     assert consent.question_snapshot['question_id']=='q' and consent.selected_option_index==0 and consent.source_message_id=='m2'
+
+
+def test_confirmed_argument_accepts_the_proposal_without_the_yes_word():
+    state,model=modules()
+    pending={'question_id':'q','text':'새 문제로 시작할까요?','options':['예','아니요'],'purpose':'transition',
+        'proposed_transition':'new_issue','proposed_goal':'이번엔 설탕이 안 녹아요','source_message_id':'m1'}
+    current=model.DialogueState(issue_id='i',phase='awaiting_observation',pending_question=pending)
+    interpretation=model.TurnInterpretation(route='dialogue',transition='new_issue')
+    updated,archives=state.apply_transition(current,interpretation,'m2','응 새로운 거야',None,None,confirmed=True)
+    assert updated.issue_id!='i' and archives and updated.goal==pending['proposed_goal']
+    assert updated.observations[0].quote==pending['proposed_goal'] and updated.observations[0].source_message_id=='m1'
+    kept,_=state.apply_transition(current,interpretation,'m2','응 새로운 거야',None,None)
+    assert kept.issue_id=='i'
+
+
+@pytest.mark.parametrize('text,expected',[('문제 그만할래',True),('이 문제는 중단할게',True),('이건 그만할래',False),
+                                          ('문제 그만하지 마',False),('문제 그만할까?',False)])
+def test_issue_abandoned(text,expected):
+    state,_=modules()
+    assert state.issue_abandoned(text) is expected

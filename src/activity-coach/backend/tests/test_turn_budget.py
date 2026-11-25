@@ -2,7 +2,7 @@ import importlib
 import pytest
 
 
-@pytest.mark.parametrize('kind,limit', [('decision',6),('retrieval',3),('generation',2),('verification',2)])
+@pytest.mark.parametrize('kind,limit', [('decision',6),('retrieval',3),('generation',2),('verification',2),('agent',1)])
 def test_budget_last_allowed_and_first_rejected(kind, limit):
     module = importlib.import_module('app.turn_budget')
     budget = module.TurnBudget()

@@ -32,9 +32,9 @@ def app_factory(tmp_path, monkeypatch):
     monkeypatch.setattr(Settings, "from_env", classmethod(lambda cls: settings))
     create_app = importlib.import_module("app.main").create_app
 
-    def build(*, llm=None, api_key=""):
+    def build(*, llm=None, api_key="", **overrides):
         """외부 생성기만 교체하고 검색·저장·라우팅은 실제 구현을 사용합니다."""
-        return create_app(replace(settings, anthropic_api_key=api_key), llm=llm)
+        return create_app(replace(settings, anthropic_api_key=api_key, **overrides), llm=llm)
 
     return build
 
