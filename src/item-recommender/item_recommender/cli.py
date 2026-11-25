@@ -75,12 +75,16 @@ def _parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     for name, help_text in (
         ("validate-material-export", "BE 준비물 전체 export v1 파일 검증"),
+        ("sync-material-export", "준비물 전체 export의 수신 판정 및 승인 반영"),
         ("preview-material-references", "준비물 원본 참조와 카탈로그 검색어 비교"),
     ):
         command = commands.add_parser(name, help=help_text)
         command.add_argument("--file", type=Path, required=True)
         command.add_argument("--source-id", required=True, help="허용된 원본 식별자")
         command.add_argument("--source-epoch", required=True, help="허용된 원본 계보 UUID")
+        if name == "sync-material-export":
+            command.add_argument("--apply", action="store_true", help="검토한 전체 export 반영")
+            command.add_argument("--approve-plan", help="비활성화 후보 검토 결과의 planSha256")
     commands.add_parser("init-db", help="수집 메타데이터와 상품 저장소 초기화")
     register = commands.add_parser("register", help="BE 내보내기 JSON의 준비물 검색어 등록")
     register.add_argument("--file", required=True)
@@ -118,6 +122,20 @@ def main(argv: list[str] | None = None) -> int:
 
     store = None
     try:
+        if args.command == "sync-material-export":
+            if args.approve_plan is not None and not args.apply:
+                raise ExportError("REJECT_APPROVAL")
+            snapshot = read_reference_snapshot(args.file, args.source_id, args.source_epoch)
+            store = open_store(settings, read_only=not args.apply)
+            report = store.sync_material_export(
+                snapshot, utcnow(), apply=args.apply, approve_plan=args.approve_plan
+            )
+            _emit(report)
+            if report["status"].startswith("REJECT_"):
+                return 2
+            if args.apply and report["status"] in {"HOLD_EMPTY", "REVIEW_DEACTIVATION"}:
+                return 3
+            return 0
         if args.command == "preview-material-references":
             snapshot = read_reference_snapshot(args.file, args.source_id, args.source_epoch)
             store = open_store(settings, read_only=True)

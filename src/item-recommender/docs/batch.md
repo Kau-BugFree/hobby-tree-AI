@@ -246,7 +246,48 @@ python -m item_recommender.cli validate-material-export \
 명령을 반복해도 카탈로그는 그대로입니다. 마지막 참조가 사라진 자동 검색어만 비활성화
 검토 후보가 됩니다. MANUAL 항목, 다른 원본에서도 참조하는 검색어, 이전 참조를 확인할
 수 없는 기존 검색어는 자동 비활성화 대상에서 제외합니다. 빈 전체 목록은 HOLD_EMPTY로 보류합니다.
-출력에는 검토용 검색어가 포함됩니다. 실제 반영·순번 관리·승인은 후속 동기화 단계에서 처리합니다.
+출력에는 검토용 검색어가 포함됩니다. 실제 반영·순번 관리·승인은 아래의 `sync-material-export` 명령에서 처리합니다.
 
 기존 DB에서는 `init-db`가 참조 테이블과 인덱스를 추가하며 기존 검색어를 자동 분류하지
 않습니다. 미리보기를 실행할 DB에는 이 스키마가 먼저 적용되어 있어야 합니다.
+
+## 전체 export 수신과 승인 반영
+
+파일 밖에서 승인한 원본 ID와 epoch를 지정하고 초기화된 AI 카탈로그를 사용합니다.
+같은 원본에서 첫 반영 후 epoch를 바꾸려면 별도 전환 절차가 필요합니다.
+아래 예시는 합성 파일과 임시 SQLite DB에서 한 번 반영한 뒤 같은 파일을 재전송합니다.
+
+```sh
+(
+  set -e
+  unset CATALOG_DATABASE_URL ADPICK_API_KEY SERVICE_TOKEN
+  export APP_ENV=local ADPICK_FILTERING_APPROVED=false ADPICK_STORAGE_APPROVED=false
+  export CATALOG_DB_PATH="$(mktemp -d)/catalog.sqlite3"
+  .venv/bin/python -m item_recommender.cli init-db
+  sync_sample() {
+    .venv/bin/python -m item_recommender.cli sync-material-export \
+      --source-id synthetic-hobbytree --source-epoch 11111111-1111-4111-8111-111111111111 \
+      --file tests/fixtures/item-material-export-v1.json "$@"
+  }
+  sync_sample
+  sync_sample --apply
+  sync_sample --apply
+)
+```
+
+| 판정 | 의미와 조치 |
+| --- | --- |
+| `APPLY` | 읽기 전용 비교가 끝났으며 비활성화 후보가 없습니다. |
+| `APPLIED` | 검색어, 원본 참조, 승인한 비활성화, 수신 이력을 한 트랜잭션으로 반영했습니다. |
+| `NOOP_REPLAY` | 마지막 수신 순번과 payload hash가 일치합니다. 이미 반영한 상태입니다. |
+| `REVIEW_DEACTIVATION` | 출력된 후보 전체를 검토한 뒤 같은 파일에 `--apply --approve-plan <planSha256>`을 지정합니다. |
+| `REJECT_APPROVAL` | 다시 미리보기하여 현재 후보와 파일을 확인합니다. |
+| `HOLD_EMPTY` | 빈 전체 목록입니다. BE에 원본을 확인하는 동안 마지막 정상 순번과 카탈로그를 보존합니다. |
+| `REJECT_STALE` / `REJECT_SEQUENCE_CONFLICT` / `REJECT_EPOCH` | 각각 과거 순번, 같은 순번의 다른 payload, 허용되지 않은 계보입니다. 전달 이력을 확인합니다. |
+
+종료 코드 0은 판정 완료 또는 정상 반영·재전송, 2는 거절, 3은 반영 요청 보류, 1은 실행 오류입니다.
+승인 해시는 이전 순번·새 파일·변경 후보에 묶이며 실제 반영 시 다시 계산합니다.
+운영자의 CLI와 DB 접근 권한은 별도로 관리합니다. 다른 공개 활동이나 원본에서 사용하는
+검색어와 MANUAL 소유권을 보존합니다. 사라진 원본 참조는 비현재 상태로 보관합니다.
+기존 AI 카탈로그의 업그레이드는 같은 초기화 SQL 또는 SQLite `init-db`를 사용합니다.
+운영 전달 채널·승인 담당자·기존 SQL 동기화에서의 전환 시점은 BE와 합의할 사항입니다.

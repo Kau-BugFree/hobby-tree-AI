@@ -21,6 +21,15 @@ CREATE TABLE IF NOT EXISTS item_recommender.material_source_refs (
     query_key TEXT NOT NULL REFERENCES item_recommender.catalog_queries(query_key),
     PRIMARY KEY (source_id, source_epoch, material_id)
 );
+ALTER TABLE item_recommender.material_source_refs
+    ADD COLUMN IF NOT EXISTS is_current INTEGER NOT NULL DEFAULT 1 CHECK (is_current IN (0, 1));
+CREATE TABLE IF NOT EXISTS item_recommender.material_export_receipts (
+    source_id TEXT NOT NULL, source_epoch TEXT NOT NULL,
+    source_sequence BIGINT NOT NULL CHECK (source_sequence > 0),
+    payload_sha256 TEXT NOT NULL, accepted_at DOUBLE PRECISION NOT NULL,
+    approval_digest TEXT,
+    PRIMARY KEY (source_id, source_sequence)
+);
 CREATE INDEX IF NOT EXISTS material_source_refs_by_key
     ON item_recommender.material_source_refs(query_key, source_id, source_epoch);
 CREATE TABLE IF NOT EXISTS item_recommender.query_fallbacks (
