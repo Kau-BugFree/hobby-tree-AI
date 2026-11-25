@@ -19,7 +19,7 @@ from .catalog_domain import (
     RefreshJob,
     StoredSnapshot,
     in_batch_window,
-    query_key,
+    validated_query_key as _key,
 )
 from .domain import Offer
 
@@ -32,6 +32,19 @@ CREATE TABLE IF NOT EXISTS catalog_queries (
     active INTEGER NOT NULL DEFAULT 1, origin TEXT NOT NULL DEFAULT 'MANUAL',
     created_at REAL NOT NULL, updated_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS material_source_refs (
+    source_id TEXT NOT NULL,
+    source_epoch TEXT NOT NULL,
+    material_id INTEGER NOT NULL CHECK (material_id > 0),
+    activity_id INTEGER NOT NULL CHECK (activity_id > 0),
+    hobby_id INTEGER NOT NULL CHECK (hobby_id > 0),
+    activity_content_version INTEGER NOT NULL CHECK (activity_content_version > 0),
+    raw_name TEXT NOT NULL CHECK (length(raw_name) BETWEEN 1 AND 160),
+    query_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
+    PRIMARY KEY (source_id, source_epoch, material_id)
+);
+CREATE INDEX IF NOT EXISTS material_source_refs_by_key
+    ON material_source_refs(query_key, source_id, source_epoch);
 CREATE TABLE IF NOT EXISTS query_fallbacks (
     primary_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
     fallback_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
@@ -77,15 +90,6 @@ def _timestamp(value: datetime) -> float:
 
 def _datetime(value) -> datetime | None:
     return None if value is None else datetime.fromtimestamp(float(value), timezone.utc)
-
-
-def _key(value: str) -> str:
-    if not isinstance(value, str):
-        raise ValueError("catalog query must be text")
-    result = query_key(value)
-    if not result or len(result) > 200 or any(ord(c) < 32 or ord(c) == 127 for c in result):
-        raise ValueError("invalid catalog query")
-    return result
 
 
 def _source(value: str) -> str:
@@ -192,6 +196,67 @@ class _CatalogStore:
         """
         with self._transaction() as connection:
             return self._register(connection, queries, _timestamp(now), origin=origin)
+
+    def preview_material_references(self, snapshot) -> dict:
+        """Compare validated references with existing ownership in one DB snapshot."""
+        incoming = {ref.query_key for ref in snapshot.references}
+        result = {
+            "status": "PREVIEW" if incoming else "HOLD_EMPTY",
+            "referenceCount": len(snapshot.references),
+            "uniqueQueryCount": len(incoming),
+            "insertKeys": [],
+            "reactivateKeys": [],
+            "keepKeys": [],
+            "deactivationCandidates": [],
+        }
+        if not incoming:
+            return result
+
+        refs = self._table("material_source_refs")
+        catalog = self._table("catalog_queries")
+        # Bind the entire key set once so the 10,000-row contract does not depend
+        # on SQLite's host parameter limit. Only this origin's previous keys and
+        # incoming keys can affect this preview.
+        key_rows = (
+            "SELECT jsonb_array_elements_text(CAST(? AS jsonb))"
+            if self._postgres
+            else "SELECT value FROM json_each(?)"
+        )
+        scope = (snapshot.source_id, snapshot.source_epoch)
+        with self._transaction(write=False) as connection:
+            rows = self._execute(
+                connection,
+                f"""
+                WITH incoming(query_key) AS ({key_rows}),
+                affected(query_key) AS (
+                    SELECT query_key FROM incoming
+                    UNION
+                    SELECT query_key FROM {refs} WHERE source_id = ? AND source_epoch = ?
+                )
+                SELECT a.query_key, q.active, q.origin,
+                    EXISTS (
+                        SELECT 1 FROM {refs} r WHERE r.query_key = a.query_key
+                        AND (r.source_id <> ? OR r.source_epoch <> ?)
+                    ) AS referenced_elsewhere
+                FROM affected a LEFT JOIN {catalog} q ON q.query_key = a.query_key
+                """,
+                (json.dumps(sorted(incoming), ensure_ascii=False), *scope, *scope),
+            ).fetchall()
+        for row in sorted(rows, key=lambda row: row["query_key"]):
+            key = row["query_key"]
+            if key in incoming:
+                if row["active"] is None:
+                    result["insertKeys"].append(key)
+                elif not row["active"]:
+                    result["reactivateKeys"].append(key)
+                else:
+                    result["keepKeys"].append(key)
+            elif row["active"]:
+                if row["origin"] == "BE_MATERIAL" and not row["referenced_elsewhere"]:
+                    result["deactivationCandidates"].append(key)
+                else:
+                    result["keepKeys"].append(key)
+        return result
 
     def set_fallbacks(self, primary: str, fallbacks: Sequence[str], now: datetime) -> None:
         primary = _key(primary)
@@ -586,12 +651,17 @@ class _CatalogStore:
 
 
 class SQLiteCatalogStore(_CatalogStore):
-    def __init__(self, path):
+    def __init__(self, path, *, read_only=False):
         self._lock = threading.RLock()
-        if str(path) != ":memory:":
-            Path(path).parent.mkdir(parents=True, exist_ok=True)
+        use_uri = read_only and str(path) != ":memory:"
+        if use_uri:
+            database = Path(path).resolve().as_uri() + "?mode=ro"
+        else:
+            database = str(path)
+            if database != ":memory:":
+                Path(path).parent.mkdir(parents=True, exist_ok=True)
         self._connection = sqlite3.connect(
-            str(path), timeout=5, isolation_level=None, check_same_thread=False
+            database, timeout=5, isolation_level=None, check_same_thread=False, uri=use_uri
         )
         self._connection.row_factory = sqlite3.Row
         self._connection.execute("PRAGMA foreign_keys = ON")
@@ -619,8 +689,9 @@ class SQLiteCatalogStore(_CatalogStore):
 class PostgresCatalogStore(_CatalogStore):
     _postgres = True
 
-    def __init__(self, dsn: str):
+    def __init__(self, dsn: str, *, read_only=False):
         self._dsn = dsn
+        self._read_only = read_only
         self._closed = False
 
     @contextmanager
@@ -634,6 +705,8 @@ class PostgresCatalogStore(_CatalogStore):
             raise RuntimeError("PostgreSQL catalog requires psycopg") from None
         with psycopg.connect(self._dsn, connect_timeout=5, row_factory=dict_row) as connection:
             with connection.transaction():
+                if self._read_only:
+                    connection.execute("SET TRANSACTION READ ONLY")
                 yield connection
 
     def initialize(self) -> None:
@@ -658,7 +731,7 @@ class PostgresCatalogStore(_CatalogStore):
         self._closed = True
 
 
-def open_store(settings):
+def open_store(settings, *, read_only=False):
     if settings.catalog_database_url:
-        return PostgresCatalogStore(settings.catalog_database_url)
-    return SQLiteCatalogStore(settings.catalog_db_path)
+        return PostgresCatalogStore(settings.catalog_database_url, read_only=read_only)
+    return SQLiteCatalogStore(settings.catalog_db_path, read_only=read_only)

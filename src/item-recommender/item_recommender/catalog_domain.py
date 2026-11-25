@@ -16,6 +16,15 @@ def query_key(value: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", value).casefold().split())
 
 
+def validated_query_key(value: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError("catalog query must be text")
+    result = query_key(value)
+    if not result or len(result) > 200 or any(ord(c) < 32 or ord(c) == 127 for c in result):
+        raise ValueError("invalid catalog query")
+    return result
+
+
 def in_batch_window(now: datetime) -> bool:
     if now.tzinfo is None:
         raise ValueError("batch clock must be timezone-aware")

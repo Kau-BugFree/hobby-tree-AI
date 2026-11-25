@@ -216,3 +216,37 @@ python -m item_recommender.cli validate-material-export \
 
 [BE export v1 계약](https://github.com/Kau-BugFree/hobby-tree-Backend/blob/1ee535fc2cc9ced38ce5bd1a7bc64905bf92bd2c/docs/item-material-export.md) ·
 [합성 예시 원본](https://github.com/Kau-BugFree/hobby-tree-Backend/blob/1ee535fc2cc9ced38ce5bd1a7bc64905bf92bd2c/docs/examples/item-material-export-v1.json)
+
+## 전체 export의 원본 참조와 검색어 비교
+
+`preview-material-references`는 검증에 통과한 동일한 파일 내용으로 준비물 참조를 구성하고,
+초기화된 AI 카탈로그를 읽어 변경 후보를 출력합니다. 참조는 원본 ID, epoch, 준비물 ID로
+식별하며 활동 ID, 취미 ID, 활동 버전, 원문 이름과 정규화 검색어를 보존합니다.
+정규화는 추천 조회와 같은 Python NFKC·casefold·공백 정리를 사용합니다. 원문이 160자
+이하여도 정규화한 키가 비거나 200자를 넘으면 전체 입력을 거절합니다.
+
+로컬에서는 임시 디렉터리에 검증용 DB를 만들고 다음 명령을 실행합니다.
+
+```sh
+(
+  set -e
+  unset CATALOG_DATABASE_URL ADPICK_API_KEY SERVICE_TOKEN
+  export APP_ENV=local ADPICK_FILTERING_APPROVED=false ADPICK_STORAGE_APPROVED=false
+  export CATALOG_DB_PATH="$(mktemp -d)/catalog.sqlite3"
+  .venv/bin/python -m item_recommender.cli init-db
+  .venv/bin/python -m item_recommender.cli preview-material-references \
+    --file tests/fixtures/item-material-export-v1.json \
+    --source-id synthetic-hobbytree \
+    --source-epoch 11111111-1111-4111-8111-111111111111
+)
+```
+
+빈 DB에서 BE 단일 합성 예시는 참조 4개, 검색어 3개를 반환합니다.
+`insertKeys`, `reactivateKeys`, `keepKeys`, `deactivationCandidates`는 비교 결과이며
+명령을 반복해도 카탈로그는 그대로입니다. 마지막 참조가 사라진 자동 검색어만 비활성화
+검토 후보가 됩니다. MANUAL 항목, 다른 원본에서도 참조하는 검색어, 이전 참조를 확인할
+수 없는 기존 검색어는 자동 비활성화 대상에서 제외합니다. 빈 전체 목록은 HOLD_EMPTY로 보류합니다.
+출력에는 검토용 검색어가 포함됩니다. 실제 반영·순번 관리·승인은 후속 동기화 단계에서 처리합니다.
+
+기존 DB에서는 `init-db`가 참조 테이블과 인덱스를 추가하며 기존 검색어를 자동 분류하지
+않습니다. 미리보기를 실행할 DB에는 이 스키마가 먼저 적용되어 있어야 합니다.

@@ -10,7 +10,7 @@ from .batch import BatchWorker, utcnow
 from .catalog_domain import in_batch_window
 from .catalog_store import open_store
 from .config import Settings
-from .material_export import ExportError, validate_export
+from .material_export import ExportError, read_reference_snapshot, validate_export
 from .provider import AdpickClient
 
 
@@ -73,12 +73,14 @@ async def _worker(settings: Settings, store, once: bool) -> None:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="하비트리 준비물 상품 수집 작업 관리")
     commands = parser.add_subparsers(dest="command", required=True)
-    validate = commands.add_parser(
-        "validate-material-export", help="BE 준비물 전체 export v1 파일 검증"
-    )
-    validate.add_argument("--file", type=Path, required=True)
-    validate.add_argument("--source-id", required=True, help="허용된 원본 식별자")
-    validate.add_argument("--source-epoch", required=True, help="허용된 원본 계보 UUID")
+    for name, help_text in (
+        ("validate-material-export", "BE 준비물 전체 export v1 파일 검증"),
+        ("preview-material-references", "준비물 원본 참조와 카탈로그 검색어 비교"),
+    ):
+        command = commands.add_parser(name, help=help_text)
+        command.add_argument("--file", type=Path, required=True)
+        command.add_argument("--source-id", required=True, help="허용된 원본 식별자")
+        command.add_argument("--source-epoch", required=True, help="허용된 원본 계보 UUID")
     commands.add_parser("init-db", help="수집 메타데이터와 상품 저장소 초기화")
     register = commands.add_parser("register", help="BE 내보내기 JSON의 준비물 검색어 등록")
     register.add_argument("--file", required=True)
@@ -116,6 +118,11 @@ def main(argv: list[str] | None = None) -> int:
 
     store = None
     try:
+        if args.command == "preview-material-references":
+            snapshot = read_reference_snapshot(args.file, args.source_id, args.source_epoch)
+            store = open_store(settings, read_only=True)
+            _emit(store.preview_material_references(snapshot))
+            return 0
         if args.command == "schedule" and (
             settings.app_env != "local" or settings.catalog_database_url
         ):
@@ -162,6 +169,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "worker":
             asyncio.run(_worker(settings, store, args.once))
         return 0
+    except ExportError as error:
+        _emit({"status": str(error)})
+        return 2
     except (ValueError, TypeError, KeyError, json.JSONDecodeError):
         _emit({"status": "INVALID_INPUT"})
         return 2
