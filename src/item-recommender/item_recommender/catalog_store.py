@@ -22,6 +22,7 @@ from .catalog_domain import (
     validated_query_key as _key,
 )
 from .domain import Offer
+from .material_export import MaterialReferenceSnapshot
 
 MAX_OFFERS = 20
 MAX_PAYLOAD_BYTES = 256 * 1024
@@ -41,10 +42,18 @@ CREATE TABLE IF NOT EXISTS material_source_refs (
     activity_content_version INTEGER NOT NULL CHECK (activity_content_version > 0),
     raw_name TEXT NOT NULL CHECK (length(raw_name) BETWEEN 1 AND 160),
     query_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
+    is_current INTEGER NOT NULL DEFAULT 1 CHECK (is_current IN (0, 1)),
     PRIMARY KEY (source_id, source_epoch, material_id)
 );
 CREATE INDEX IF NOT EXISTS material_source_refs_by_key
     ON material_source_refs(query_key, source_id, source_epoch);
+CREATE TABLE IF NOT EXISTS material_export_receipts (
+    source_id TEXT NOT NULL, source_epoch TEXT NOT NULL,
+    source_sequence BIGINT NOT NULL CHECK (source_sequence > 0),
+    payload_sha256 TEXT NOT NULL, accepted_at DOUBLE PRECISION NOT NULL,
+    approval_digest TEXT,
+    PRIMARY KEY (source_id, source_sequence)
+);
 CREATE TABLE IF NOT EXISTS query_fallbacks (
     primary_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
     fallback_key TEXT NOT NULL REFERENCES catalog_queries(query_key),
@@ -199,6 +208,10 @@ class _CatalogStore:
 
     def preview_material_references(self, snapshot) -> dict:
         """Compare validated references with existing ownership in one DB snapshot."""
+        with self._transaction(write=False) as connection:
+            return self._reference_plan(connection, snapshot)
+
+    def _reference_plan(self, connection, snapshot):
         incoming = {ref.query_key for ref in snapshot.references}
         result = {
             "status": "PREVIEW" if incoming else "HOLD_EMPTY",
@@ -223,25 +236,24 @@ class _CatalogStore:
             else "SELECT value FROM json_each(?)"
         )
         scope = (snapshot.source_id, snapshot.source_epoch)
-        with self._transaction(write=False) as connection:
-            rows = self._execute(
-                connection,
-                f"""
-                WITH incoming(query_key) AS ({key_rows}),
-                affected(query_key) AS (
-                    SELECT query_key FROM incoming
-                    UNION
-                    SELECT query_key FROM {refs} WHERE source_id = ? AND source_epoch = ?
-                )
-                SELECT a.query_key, q.active, q.origin,
-                    EXISTS (
-                        SELECT 1 FROM {refs} r WHERE r.query_key = a.query_key
-                        AND (r.source_id <> ? OR r.source_epoch <> ?)
-                    ) AS referenced_elsewhere
-                FROM affected a LEFT JOIN {catalog} q ON q.query_key = a.query_key
-                """,
-                (json.dumps(sorted(incoming), ensure_ascii=False), *scope, *scope),
-            ).fetchall()
+        rows = self._execute(
+            connection,
+            f"""
+            WITH incoming(query_key) AS ({key_rows}),
+            affected(query_key) AS (
+                SELECT query_key FROM incoming
+                UNION
+                SELECT query_key FROM {refs} WHERE source_id = ? AND source_epoch = ? AND is_current = 1
+            )
+            SELECT a.query_key, q.active, q.origin,
+                EXISTS (
+                    SELECT 1 FROM {refs} r WHERE r.query_key = a.query_key AND r.is_current = 1
+                    AND (r.source_id <> ? OR r.source_epoch <> ?)
+                ) AS referenced_elsewhere
+            FROM affected a LEFT JOIN {catalog} q ON q.query_key = a.query_key
+            """,
+            (json.dumps(sorted(incoming), ensure_ascii=False), *scope, *scope),
+        ).fetchall()
         for row in sorted(rows, key=lambda row: row["query_key"]):
             key = row["query_key"]
             if key in incoming:
@@ -257,6 +269,141 @@ class _CatalogStore:
                 else:
                     result["keepKeys"].append(key)
         return result
+
+    def sync_material_export(
+        self, snapshot: MaterialReferenceSnapshot, now: datetime, *, apply=False, approve_plan=None
+    ) -> dict:
+        """Check delivery order and recompute the review plan inside the same transaction."""
+        scope = (snapshot.source_id, snapshot.source_epoch)
+        sequence = snapshot.source_sequence
+        receipts = self._table("material_export_receipts")
+        catalog = self._table("catalog_queries")
+        refs = self._table("material_source_refs")
+        with self._transaction(write=apply) as connection:
+            if self._postgres:
+                if apply:
+                    # Protect both first delivery and shared ownership across different sources.
+                    connection.execute(
+                        f"LOCK TABLE {catalog}, {refs}, {receipts} IN SHARE ROW EXCLUSIVE MODE"
+                    )
+                else:
+                    connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+            last = self._execute(
+                connection,
+                f"""SELECT source_epoch, source_sequence, payload_sha256 FROM {receipts}
+                    WHERE source_id = ? ORDER BY source_sequence DESC LIMIT 1""",
+                (snapshot.source_id,),
+            ).fetchone()
+            previous = last["source_sequence"] if last else None
+            report = {
+                "sourceId": snapshot.source_id,
+                "sourceEpoch": snapshot.source_epoch,
+                "sourceSequence": str(sequence),
+                "payloadSha256": snapshot.payload_sha256,
+                "previousAcceptedSequence": str(previous) if previous is not None else None,
+            }
+            if last:
+                if last["source_epoch"] != snapshot.source_epoch:
+                    return dict(report, status="REJECT_EPOCH")
+                if sequence < previous:
+                    return dict(report, status="REJECT_STALE")
+                if sequence == previous:
+                    same_payload = last["payload_sha256"] == snapshot.payload_sha256
+                    return dict(
+                        report, status="NOOP_REPLAY" if same_payload else "REJECT_SEQUENCE_CONFLICT"
+                    )
+
+            plan = self._reference_plan(connection, snapshot)
+            report.update(plan)
+            if not snapshot.references:
+                return report
+            candidates = plan["deactivationCandidates"]
+            review_digest = None
+            if candidates:
+                review_digest = hashlib.sha256(
+                    json.dumps(
+                        report, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                    ).encode()
+                ).hexdigest()
+                report["planSha256"] = review_digest
+            if approve_plan is not None and (not apply or approve_plan != review_digest):
+                return dict(report, status="REJECT_APPROVAL")
+            if candidates and approve_plan is None:
+                return dict(report, status="REVIEW_DEACTIVATION")
+            if not apply:
+                return dict(report, status="APPLY")
+
+            timestamp = _timestamp(now)
+            self._write_material_references(connection, snapshot, plan, timestamp)
+            self._execute(
+                connection,
+                f"""
+                INSERT INTO {receipts}
+                (source_id, source_epoch, source_sequence, payload_sha256, accepted_at, approval_digest)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (*scope, sequence, snapshot.payload_sha256, timestamp, review_digest),
+            )
+            return dict(report, status="APPLIED")
+
+    def _write_material_references(self, connection, snapshot, plan, timestamp):
+        scope = (snapshot.source_id, snapshot.source_epoch)
+        catalog = self._table("catalog_queries")
+        refs = self._table("material_source_refs")
+        cursor = connection.cursor()
+
+        def batch(sql, records):
+            cursor.executemany(sql.replace("?", "%s") if self._postgres else sql, records)
+
+        try:
+            batch(
+                f"""
+                INSERT INTO {catalog} (query_key, query_text, origin, created_at, updated_at)
+                VALUES (?, ?, 'BE_MATERIAL', ?, ?)
+                ON CONFLICT (query_key) DO UPDATE SET active = 1, updated_at = excluded.updated_at
+                """,
+                [
+                    (key, key, timestamp, timestamp)
+                    for key in plan["insertKeys"] + plan["reactivateKeys"]
+                ],
+            )
+            self._execute(
+                connection,
+                f"""
+                UPDATE {refs} SET is_current = 0
+                WHERE source_id = ? AND source_epoch = ? AND is_current = 1""",
+                scope,
+            )
+            batch(
+                f"""
+                INSERT INTO {refs} (source_id, source_epoch, material_id, activity_id, hobby_id,
+                                    activity_content_version, raw_name, query_key, is_current)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                ON CONFLICT (source_id, source_epoch, material_id) DO UPDATE SET
+                    activity_id = excluded.activity_id, hobby_id = excluded.hobby_id,
+                    activity_content_version = excluded.activity_content_version,
+                    raw_name = excluded.raw_name, query_key = excluded.query_key, is_current = 1
+                """,
+                [
+                    (
+                        *scope,
+                        r.material_id,
+                        r.activity_id,
+                        r.hobby_id,
+                        r.activity_content_version,
+                        r.raw_name,
+                        r.query_key,
+                    )
+                    for r in snapshot.references
+                ],
+            )
+            batch(
+                f"""UPDATE {catalog} SET active = 0, updated_at = ?
+                      WHERE query_key = ? AND origin = 'BE_MATERIAL'""",
+                [(timestamp, key) for key in plan["deactivationCandidates"]],
+            )
+        finally:
+            cursor.close()
 
     def set_fallbacks(self, primary: str, fallbacks: Sequence[str], now: datetime) -> None:
         primary = _key(primary)
@@ -669,6 +816,13 @@ class SQLiteCatalogStore(_CatalogStore):
     def initialize(self) -> None:
         with self._lock:
             self._connection.executescript(_SQLITE_SCHEMA)
+            with self._transaction() as connection:
+                columns = connection.execute("PRAGMA table_info(material_source_refs)")
+                if "is_current" not in {row["name"] for row in columns}:
+                    connection.execute(
+                        "ALTER TABLE material_source_refs ADD COLUMN is_current INTEGER "
+                        "NOT NULL DEFAULT 1 CHECK (is_current IN (0, 1))"
+                    )
 
     @contextmanager
     def _transaction(self, write=True):
