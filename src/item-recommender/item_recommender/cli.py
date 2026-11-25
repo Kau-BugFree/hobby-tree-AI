@@ -10,6 +10,7 @@ from .batch import BatchWorker, utcnow
 from .catalog_domain import in_batch_window
 from .catalog_store import open_store
 from .config import Settings
+from .material_export import ExportError, validate_export
 from .provider import AdpickClient
 
 
@@ -72,6 +73,12 @@ async def _worker(settings: Settings, store, once: bool) -> None:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="하비트리 준비물 상품 수집 작업 관리")
     commands = parser.add_subparsers(dest="command", required=True)
+    validate = commands.add_parser(
+        "validate-material-export", help="BE 준비물 전체 export v1 파일 검증"
+    )
+    validate.add_argument("--file", type=Path, required=True)
+    validate.add_argument("--source-id", required=True, help="허용된 원본 식별자")
+    validate.add_argument("--source-epoch", required=True, help="허용된 원본 계보 UUID")
     commands.add_parser("init-db", help="수집 메타데이터와 상품 저장소 초기화")
     register = commands.add_parser("register", help="BE 내보내기 JSON의 준비물 검색어 등록")
     register.add_argument("--file", required=True)
@@ -93,6 +100,14 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "validate-material-export":
+        try:
+            report = validate_export(args.file, args.source_id, args.source_epoch)
+        except ExportError as error:
+            _emit({"status": str(error)})
+            return 2
+        _emit(report)
+        return 0
     try:
         settings = Settings.from_env()
     except Exception:
