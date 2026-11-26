@@ -1,0 +1,3 @@
+-r requirements-dev.txt
+pgserver==0.1.4
+psycopg[binary]==3.3.9

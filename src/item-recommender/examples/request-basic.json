@@ -1,0 +1,22 @@
+{
+  "activityId": 101,
+  "activityContentVersion": 1,
+  "reviewStatus": "PUBLISHED",
+  "materials": [
+    {
+      "materialId": 1001,
+      "name": "계량스푼",
+      "quantity": "1개",
+      "isRequired": true,
+      "acquisitionType": "OWN_OR_BUY"
+    },
+    {
+      "materialId": 1002,
+      "name": "앞치마",
+      "quantity": null,
+      "isRequired": false,
+      "acquisitionType": null
+    }
+  ],
+  "maxProductsPerMaterial": 3
+}

@@ -1,0 +1,14 @@
+{
+  "hobbyId": 10,
+  "treeStatus": "ACTIVE",
+  "currentStageNumber": 2,
+  "completedActivityIds": [1003],
+  "availableMinutes": 30,
+  "signals": ["PREFER_ONE_PAN"],
+  "preferredDifficulty": "APPROPRIATE",
+  "candidates": [
+    {"activityId": 1003, "hobbyId": 10, "stageId": 101, "stageNumber": 1, "title": "완료한 예시 활동", "durationMinutes": 10, "published": true, "startable": true},
+    {"activityId": 1004, "hobbyId": 10, "stageId": 102, "stageNumber": 2, "title": "예시 샐러드", "durationMinutes": 10, "onePan": false, "published": true, "startable": true},
+    {"activityId": 1005, "hobbyId": 10, "stageId": 102, "stageNumber": 2, "title": "예시 원팬 파스타", "durationMinutes": 20, "onePan": true, "published": true, "startable": true}
+  ]
+}
