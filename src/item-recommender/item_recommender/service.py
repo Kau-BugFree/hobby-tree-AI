@@ -19,7 +19,7 @@ from .models import (
     RecommendationResponse,
     RecommendationResult,
 )
-from .provider import _https_url
+from .provider import purchase_url
 
 
 def compare_budget(price: int | None, budget: int | None) -> BudgetComparison:
@@ -96,7 +96,11 @@ class RecommendationService:
             return []
         valid, seen = [], set()
         for offer in snapshot.offers:
-            if not _https_url(offer.purchase_url, self.settings.allowed_purchase_hosts):
+            if not purchase_url(
+                offer.purchase_url,
+                self.settings.allowed_purchase_hosts,
+                self.settings.adpick_api_key,
+            ):
                 continue
             # Curated associations have been explicitly registered by an operator.
             if snapshot.source != "CURATED" and not material_matches(

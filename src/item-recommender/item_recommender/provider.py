@@ -5,6 +5,7 @@ import hashlib
 import ipaddress
 import json
 import math
+import posixpath
 import re
 import time
 from collections import Counter
@@ -70,6 +71,24 @@ def _https_url(value, allowed_hosts: tuple[str, ...] | None = None) -> str | Non
     return value
 
 
+def purchase_url(value, allowed_hosts: tuple[str, ...], api_key: str | None = None) -> str | None:
+    """Keep the original tracking URL; filter credential-bearing links at ingest and read."""
+    if not _https_url(value, allowed_hosts):
+        return None
+    decoded = unquote(value)
+    if api_key and (api_key in value or api_key in decoded):
+        return None
+    parts = urlsplit(value)
+    path = posixpath.normpath(unquote(parts.path))
+    if parts.hostname == "biz.adpick.co.kr" and re.match(
+        r"^/+api/[^/]+/(?:search|best|malls|conversion|link|directlink)(?:/|$)", path, re.I
+    ):
+        return None
+    if re.search(r"[?&](?:adpick[-_])?api[-_]?key=", decoded, re.I):
+        return None
+    return value
+
+
 def _price(value) -> tuple[str, int | None]:
     if type(value) is int and 0 <= value <= 1_000_000_000_000:
         return f"{value:,}원", value
@@ -89,7 +108,7 @@ def _price(value) -> tuple[str, int | None]:
     return display, numeric if numeric <= 1_000_000_000_000 else None
 
 
-def _purchase_url_discard_reason(value) -> str:
+def _purchase_url_discard_reason(value, allowed_hosts) -> str:
     """Return fixed diagnostic codes only; never include provider data or arbitrary hosts."""
     if value is None or (isinstance(value, str) and not value.strip()):
         return "MISSING_PURCHASE_URL"
@@ -102,6 +121,8 @@ def _purchase_url_discard_reason(value) -> str:
                     if parts.hostname == "www.adpick.co.kr"
                     else "HTTP_PURCHASE_URL"
                 )
+            if _https_url(value, allowed_hosts):
+                return "UNSAFE_PURCHASE_URL"
             if _https_url(value) is not None:
                 return (
                     "PURCHASE_HOST_WWW_ADPICK_NOT_ALLOWED"
@@ -269,28 +290,29 @@ class AdpickClient:
             if title is None:
                 reasons["INVALID_TITLE"] += 1
                 continue
-            purchase_url = _https_url(
-                row.get("commissionlink"), self.settings.allowed_purchase_hosts
+            raw_link = row.get("commissionlink")
+            link = purchase_url(
+                raw_link, self.settings.allowed_purchase_hosts, self.settings.adpick_api_key
             )
-            if purchase_url is None:
-                reasons[_purchase_url_discard_reason(row.get("commissionlink"))] += 1
+            if link is None:
+                reasons[
+                    _purchase_url_discard_reason(raw_link, self.settings.allowed_purchase_hosts)
+                ] += 1
                 continue
-            if purchase_url in seen:
+            if link in seen:
                 reasons["DUPLICATE"] += 1
                 continue
-            seen.add(purchase_url)
+            seen.add(link)
             display_price, price = _price(row.get("price"))
             offers.append(
                 Offer(
                     offer_ref="adpick_"
-                    + hashlib.sha256((self._namespace + "\0" + purchase_url).encode()).hexdigest()[
-                        :24
-                    ],
+                    + hashlib.sha256((self._namespace + "\0" + link).encode()).hexdigest()[:24],
                     title=title,
                     display_price=display_price,
                     price_krw=price,
                     image_url=_https_url(row.get("photo")),
-                    purchase_url=purchase_url,
+                    purchase_url=link,
                     merchant_code=_text(row.get("cp_code"), 100) or "",
                     merchant_name=_text(row.get("cp_name"), 200) or "",
                     fetched_at=datetime.fromtimestamp(self.clock(), timezone.utc),

@@ -5,6 +5,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 
+DEFAULT_PURCHASE_HOSTS = ("link.adpick.co.kr", "deg.kr", "adpick.co.kr", "biz.adpick.co.kr")
+
+
 def _boolean(name: str, default: bool = False) -> bool:
     value = os.getenv(name)
     if value is None:
@@ -31,7 +34,7 @@ class Settings:
     rate_limit_per_minute: int = 6
     circuit_failure_threshold: int = 3
     circuit_reset_seconds: int = 30
-    allowed_purchase_hosts: tuple[str, ...] = ("link.adpick.co.kr", "deg.kr", "adpick.co.kr")
+    allowed_purchase_hosts: tuple[str, ...] = DEFAULT_PURCHASE_HOSTS
     search_limit: int = 20
 
     def __post_init__(self):
@@ -78,7 +81,7 @@ class Settings:
 
     @classmethod
     def from_env(cls):
-        hosts = os.getenv("ADPICK_ALLOWED_PURCHASE_HOSTS", "link.adpick.co.kr,deg.kr,adpick.co.kr")
+        hosts = os.getenv("ADPICK_ALLOWED_PURCHASE_HOSTS", ",".join(DEFAULT_PURCHASE_HOSTS))
         return cls(
             app_env=os.getenv("APP_ENV", "local"),
             service_token=os.getenv("SERVICE_TOKEN") or None,

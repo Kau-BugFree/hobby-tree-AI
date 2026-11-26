@@ -1,5 +1,6 @@
 """Catalog-only HTTP API with synthetic data, never a live commerce key."""
 
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -294,8 +295,12 @@ def test_operator_registration_and_curated_validation(tmp_path, store):
         assert client.put("/internal/v1/catalog/curated", json=payload).status_code == 200
         item = client.post(PATH, json=BODY).json()["result"]["materialResults"][0]
         assert item["selectionSource"] == "CURATED" and item["necessityReason"] is None
-        bad = {**payload, "products": [{**product, "purchaseUrl": "javascript:alert(1)"}]}
-        assert client.put("/internal/v1/catalog/curated", json=bad).status_code == 422
+        for invalid in (
+            "javascript:alert(1)",
+            "https://biz.adpick.co.kr/api/old-fixture-key/directlink",
+        ):
+            bad = {**payload, "products": [{**product, "purchaseUrl": invalid}]}
+            assert client.put("/internal/v1/catalog/curated", json=bad).status_code == 422
         assert (
             client.put(
                 "/internal/v1/catalog/curated",
@@ -387,3 +392,24 @@ def test_operator_registration_explicitly_keeps_manual_ownership(tmp_path, store
             ).status_code
             == 422
         )
+
+
+def test_biz_purchase_host_revalidates_stored_offers(tmp_path, store):
+    good = "https://biz.adpick.co.kr/sample?ref=spoon"
+    urls = [
+        good,
+        "http://biz.adpick.co.kr/spoon",
+        "https://other.example.org/spoon",
+        "https://biz.adpick.co.kr/api/old-fixture-key/directlink",
+    ]
+    seed(store, [replace(offer(ref=str(i)), purchase_url=url) for i, url in enumerate(urls)])
+    with TestClient(create_app(settings(tmp_path), store, clock=lambda: NOW)) as client:
+        response = client.post(PATH, json=BODY)
+        assert response.status_code == 200
+        item = response.json()["result"]["materialResults"][0]
+        assert item["status"] == "AVAILABLE"
+        assert [(p["priceKrw"], p["purchaseUrl"]) for p in item["products"]] == [(10000, good)]
+        assert "old-fixture-key" not in response.text
+    restricted = settings(tmp_path, allowed_purchase_hosts=("deg.kr",))
+    with TestClient(create_app(restricted, store, clock=lambda: NOW)) as client:
+        assert client.post(PATH, json=BODY).json()["result"]["materialResults"][0]["products"] == []

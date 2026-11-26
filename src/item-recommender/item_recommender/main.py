@@ -22,7 +22,7 @@ from .models import (
     RecommendationRequest,
     RecommendationResponse,
 )
-from .provider import _https_url, _text
+from .provider import _https_url, _text, purchase_url
 from .service import RecommendationService
 
 MAX_BODY_BYTES = 64 * 1024
@@ -226,23 +226,25 @@ def create_app(settings: Settings | None = None, store: CatalogStore | None = No
         seen = set()
         for product in payload.products:
             title = _text(product.title, 500)
-            purchase_url = _https_url(product.purchase_url, settings.allowed_purchase_hosts)
-            if not title or not purchase_url or purchase_url in seen:
+            link = purchase_url(
+                product.purchase_url, settings.allowed_purchase_hosts, settings.adpick_api_key
+            )
+            if not title or not link or link in seen:
                 raise HTTPException(422)
-            seen.add(purchase_url)
+            seen.add(link)
             offers.append(
                 Offer(
                     offer_ref="curated_"
-                    + hashlib.sha256(
-                        (product.merchant_code + "\0" + purchase_url).encode()
-                    ).hexdigest()[:24],
+                    + hashlib.sha256((product.merchant_code + "\0" + link).encode()).hexdigest()[
+                        :24
+                    ],
                     title=title,
                     display_price=f"{product.price_krw:,}원"
                     if product.price_krw is not None
                     else "가격 확인 필요",
                     price_krw=product.price_krw,
                     image_url=_https_url(product.image_url),
-                    purchase_url=purchase_url,
+                    purchase_url=link,
                     merchant_code=product.merchant_code,
                     merchant_name=product.merchant_name,
                     fetched_at=fetched_at,

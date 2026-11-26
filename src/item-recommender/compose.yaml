@@ -7,7 +7,7 @@ x-app-environment: &app-environment
   PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
   ADPICK_STORAGE_APPROVED: ${ADPICK_STORAGE_APPROVED:-false}
   CATALOG_RETENTION_SECONDS: ${CATALOG_RETENTION_SECONDS:-86400}
-  ADPICK_ALLOWED_PURCHASE_HOSTS: ${ADPICK_ALLOWED_PURCHASE_HOSTS:-link.adpick.co.kr,deg.kr,adpick.co.kr}
+  ADPICK_ALLOWED_PURCHASE_HOSTS: ${ADPICK_ALLOWED_PURCHASE_HOSTS:-link.adpick.co.kr,deg.kr,adpick.co.kr,biz.adpick.co.kr}
 
 services:
   db:
