@@ -1,0 +1,1778 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "HobbyTree Next Activity",
+    "version": "2.1.0"
+  },
+  "paths": {
+    "/healthz": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Healthz Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/activity-feedback/analyze": {
+      "post": {
+        "summary": "Feedback",
+        "operationId": "feedback_internal_v1_activity_feedback_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    },
+    "/internal/v2/activity-feedback/analyze": {
+      "post": {
+        "summary": "Analyze each aspect of a completed activity record",
+        "operationId": "analyze_record_internal_v2_activity_feedback_analyze_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    },
+    "/internal/v2/activity-feedback/profile": {
+      "post": {
+        "summary": "Aggregate current record analyses for one hobby tree",
+        "operationId": "analyze_history_internal_v2_activity_feedback_profile_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    },
+    "/internal/v3/activity-feedback/profile": {
+      "post": {
+        "summary": "Aggregate recorded preferences with optional catalog group evidence",
+        "operationId": "group_profile_internal_v3_activity_feedback_profile_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupedHistoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupedProfileResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    },
+    "/internal/v2/next-activities/rank": {
+      "post": {
+        "summary": "Score the full eligible pool and return an actionable home result",
+        "operationId": "home_rank_internal_v2_next_activities_rank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HomeRankRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeRankResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    },
+    "/internal/v1/next-activities/rank": {
+      "post": {
+        "summary": "Rank",
+        "operationId": "rank_internal_v1_next_activities_rank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RankRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid service credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "NextActivityServiceToken": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisResult": {
+        "properties": {
+          "recordId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Recordid"
+          },
+          "reportedDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reporteddifficulty"
+          },
+          "aspects": {
+            "items": {
+              "$ref": "#/components/schemas/Aspect"
+            },
+            "type": "array",
+            "title": "Aspects"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "recordId",
+          "reportedDifficulty",
+          "aspects"
+        ],
+        "title": "AnalysisResult"
+      },
+      "Aspect": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "ENJOYMENT",
+              "DIFFICULTY",
+              "DURATION",
+              "COST",
+              "TOOLS",
+              "COOKING_METHOD"
+            ],
+            "title": "Category"
+          },
+          "polarity": {
+            "type": "string",
+            "enum": [
+              "POSITIVE",
+              "NEGATIVE",
+              "NEUTRAL",
+              "MIXED"
+            ],
+            "title": "Polarity"
+          },
+          "signal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PREFER_SHORTER",
+                  "PREFER_LOWER_COST",
+                  "PREFER_FEWER_TOOLS",
+                  "PREFER_ONE_PAN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "category",
+          "polarity",
+          "evidence"
+        ],
+        "title": "Aspect"
+      },
+      "AspectSummary": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "ENJOYMENT",
+              "DIFFICULTY",
+              "DURATION",
+              "COST",
+              "TOOLS",
+              "COOKING_METHOD"
+            ],
+            "title": "Category"
+          },
+          "polarity": {
+            "type": "string",
+            "enum": [
+              "POSITIVE",
+              "NEGATIVE",
+              "NEUTRAL",
+              "MIXED"
+            ],
+            "title": "Polarity"
+          },
+          "signal": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PREFER_SHORTER",
+                  "PREFER_LOWER_COST",
+                  "PREFER_FEWER_TOOLS",
+                  "PREFER_ONE_PAN"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "category",
+          "polarity"
+        ],
+        "title": "AspectSummary"
+      },
+      "AuthenticationError": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "AuthenticationError"
+      },
+      "Candidate": {
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Activityid"
+          },
+          "hobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Hobbyid"
+          },
+          "stageId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Stageid"
+          },
+          "stageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Stagenumber"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title"
+          },
+          "published": {
+            "type": "boolean",
+            "title": "Published"
+          },
+          "startable": {
+            "type": "boolean",
+            "title": "Startable"
+          },
+          "durationMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationminutes"
+          },
+          "estimatedCost": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimatedcost"
+          },
+          "requiredToolCount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requiredtoolcount"
+          },
+          "onePan": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onepan"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activityId",
+          "hobbyId",
+          "stageId",
+          "stageNumber",
+          "title",
+          "published",
+          "startable"
+        ],
+        "title": "Candidate"
+      },
+      "Evidence": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "memo",
+              "notDoneReason"
+            ],
+            "title": "Source"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text"
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Start",
+            "description": "Inclusive Unicode code point offset in source."
+          },
+          "end": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "End",
+            "description": "Exclusive Unicode code point offset in source."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "text",
+          "start",
+          "end"
+        ],
+        "title": "Evidence"
+      },
+      "FeedbackRequest": {
+        "properties": {
+          "recordId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Recordid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "COMPLETED",
+              "PARTIAL",
+              "NOT_DONE"
+            ],
+            "title": "Status"
+          },
+          "satisfactionScore": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 5.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Satisfactionscore"
+          },
+          "perceivedDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Perceiveddifficulty"
+          },
+          "memo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Memo"
+          },
+          "notDoneReason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notdonereason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "recordId",
+          "status"
+        ],
+        "title": "FeedbackRequest"
+      },
+      "FeedbackResult": {
+        "properties": {
+          "recordId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Recordid"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "sentiment": {
+            "type": "string",
+            "enum": [
+              "POSITIVE",
+              "NEGATIVE",
+              "MIXED",
+              "UNKNOWN"
+            ],
+            "title": "Sentiment"
+          },
+          "signals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PREFER_SHORTER",
+                "PREFER_LOWER_COST",
+                "PREFER_FEWER_TOOLS",
+                "PREFER_ONE_PAN"
+              ]
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Evidence"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "recordId",
+          "difficulty",
+          "sentiment",
+          "signals",
+          "evidence"
+        ],
+        "title": "FeedbackResult"
+      },
+      "GroupPreference": {
+        "properties": {
+          "activityGroup": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Activitygroup",
+            "description": "Stable BE catalog group shared by an activity record and candidate."
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ENJOYMENT",
+              "DIFFICULTY"
+            ],
+            "title": "Category"
+          },
+          "polarity": {
+            "type": "string",
+            "enum": [
+              "POSITIVE",
+              "NEGATIVE"
+            ],
+            "title": "Polarity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activityGroup",
+          "category",
+          "polarity"
+        ],
+        "title": "GroupPreference"
+      },
+      "GroupedHistoryRecord": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "recordId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Recordid"
+          },
+          "completedAt": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$",
+            "format": "date-time",
+            "title": "Completedat"
+          },
+          "reportedDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reporteddifficulty"
+          },
+          "aspects": {
+            "items": {
+              "$ref": "#/components/schemas/AspectSummary"
+            },
+            "type": "array",
+            "title": "Aspects"
+          },
+          "activityGroup": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "description": "Stable BE catalog group shared by an activity record and candidate."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activitygroup"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "recordId",
+          "completedAt",
+          "aspects"
+        ],
+        "title": "GroupedHistoryRecord"
+      },
+      "GroupedHistoryRequest": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/GroupedHistoryRecord"
+            },
+            "type": "array",
+            "title": "Records",
+            "description": "Current, nondeleted records of one tree with optional catalog group keys."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "records"
+        ],
+        "title": "GroupedHistoryRequest"
+      },
+      "GroupedProfileResult": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "recordCount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Recordcount"
+          },
+          "preferredDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferreddifficulty"
+          },
+          "signals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PREFER_SHORTER",
+                "PREFER_LOWER_COST",
+                "PREFER_FEWER_TOOLS",
+                "PREFER_ONE_PAN"
+              ]
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "groupPreferences": {
+            "items": {
+              "$ref": "#/components/schemas/GroupPreference"
+            },
+            "type": "array",
+            "title": "Grouppreferences"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "recordCount",
+          "preferredDifficulty",
+          "signals",
+          "groupPreferences"
+        ],
+        "title": "GroupedProfileResult"
+      },
+      "HistoryRecord": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "recordId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Recordid"
+          },
+          "completedAt": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$",
+            "format": "date-time",
+            "title": "Completedat"
+          },
+          "reportedDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reporteddifficulty"
+          },
+          "aspects": {
+            "items": {
+              "$ref": "#/components/schemas/AspectSummary"
+            },
+            "type": "array",
+            "title": "Aspects"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "recordId",
+          "completedAt",
+          "aspects"
+        ],
+        "title": "HistoryRecord"
+      },
+      "HistoryRequest": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryRecord"
+            },
+            "type": "array",
+            "title": "Records",
+            "description": "Current, nondeleted records of a single user's hobby tree."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "records"
+        ],
+        "title": "HistoryRequest"
+      },
+      "HomeCandidate": {
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Activityid"
+          },
+          "hobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Hobbyid"
+          },
+          "stageId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Stageid"
+          },
+          "stageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Stagenumber"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Title"
+          },
+          "published": {
+            "type": "boolean",
+            "title": "Published"
+          },
+          "startable": {
+            "type": "boolean",
+            "title": "Startable"
+          },
+          "durationMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationminutes"
+          },
+          "estimatedCost": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimatedcost"
+          },
+          "requiredToolCount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requiredtoolcount"
+          },
+          "onePan": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Onepan"
+          },
+          "activityGroup": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "description": "Stable BE catalog group shared by an activity record and candidate."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activitygroup",
+            "description": "Stable catalog group shared with historical records."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activityId",
+          "hobbyId",
+          "stageId",
+          "stageNumber",
+          "title",
+          "published",
+          "startable"
+        ],
+        "title": "HomeCandidate"
+      },
+      "HomeItem": {
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Activityid"
+          },
+          "stageId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Stageid"
+          },
+          "stageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Stagenumber"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "durationMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationminutes"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "estimatedCost": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimatedcost"
+          },
+          "score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "Policy points, not a probability."
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "STANDARD",
+              "RELAXED",
+              "OPEN"
+            ],
+            "title": "Tier"
+          },
+          "budgetStatus": {
+            "type": "string",
+            "enum": [
+              "UNSET",
+              "WITHIN",
+              "OVER",
+              "UNKNOWN"
+            ],
+            "title": "Budgetstatus"
+          },
+          "isRepeat": {
+            "type": "boolean",
+            "title": "Isrepeat"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activityId",
+          "stageId",
+          "stageNumber",
+          "title",
+          "durationMinutes",
+          "reason",
+          "estimatedCost",
+          "score",
+          "tier",
+          "budgetStatus",
+          "isRepeat"
+        ],
+        "title": "HomeItem"
+      },
+      "HomeRankRequest": {
+        "properties": {
+          "treeStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PAUSED",
+              "ENDED"
+            ],
+            "title": "Treestatus"
+          },
+          "hobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Hobbyid"
+          },
+          "currentStageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Currentstagenumber"
+          },
+          "currentRecordId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentrecordid"
+          },
+          "availableMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availableminutes"
+          },
+          "budgetKrw": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budgetkrw"
+          },
+          "completedActivityIds": {
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0.0
+            },
+            "type": "array",
+            "title": "Completedactivityids"
+          },
+          "signals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PREFER_SHORTER",
+                "PREFER_LOWER_COST",
+                "PREFER_FEWER_TOOLS",
+                "PREFER_ONE_PAN"
+              ]
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "preferredDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferreddifficulty",
+            "description": "Recent perceived difficulty reported by the user."
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/HomeCandidate"
+            },
+            "type": "array",
+            "title": "Candidates",
+            "description": "All scanned candidate pages. limit controls only the number returned."
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 2
+          },
+          "groupPreferences": {
+            "items": {
+              "$ref": "#/components/schemas/GroupPreference"
+            },
+            "type": "array",
+            "title": "Grouppreferences"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "treeStatus",
+          "hobbyId",
+          "currentStageNumber",
+          "candidates"
+        ],
+        "title": "HomeRankRequest"
+      },
+      "HomeRankResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "RECOMMENDED",
+              "RESUME",
+              "INACTIVE",
+              "SELF_GUIDED"
+            ],
+            "title": "Status"
+          },
+          "resumeRecordId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resumerecordid"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HomeItem"
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Items"
+          },
+          "alternative": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SelfGuidedActivity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evaluatedCount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Evaluatedcount",
+            "description": "Size of the valid pool actually scored before the display limit."
+          },
+          "priceFallback": {
+            "type": "boolean",
+            "title": "Pricefallback",
+            "description": "True when prices are ordered within fit bands because no known price fits the stated budget."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "resumeRecordId",
+          "items",
+          "alternative",
+          "evaluatedCount",
+          "priceFallback"
+        ],
+        "title": "HomeRankResult"
+      },
+      "InvalidRequest": {
+        "properties": {
+          "detail": {
+            "type": "string",
+            "title": "Detail"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Types"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "detail",
+          "types"
+        ],
+        "title": "InvalidRequest"
+      },
+      "ProfileResult": {
+        "properties": {
+          "userHobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Userhobbyid"
+          },
+          "recordCount": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Recordcount"
+          },
+          "preferredDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferreddifficulty"
+          },
+          "signals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PREFER_SHORTER",
+                "PREFER_LOWER_COST",
+                "PREFER_FEWER_TOOLS",
+                "PREFER_ONE_PAN"
+              ]
+            },
+            "type": "array",
+            "title": "Signals"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "userHobbyId",
+          "recordCount",
+          "preferredDifficulty",
+          "signals"
+        ],
+        "title": "ProfileResult"
+      },
+      "RankRequest": {
+        "properties": {
+          "treeStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PAUSED",
+              "ENDED"
+            ],
+            "title": "Treestatus"
+          },
+          "hobbyId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Hobbyid"
+          },
+          "currentStageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Currentstagenumber"
+          },
+          "currentRecordId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentrecordid"
+          },
+          "availableMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availableminutes"
+          },
+          "budgetKrw": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budgetkrw"
+          },
+          "completedActivityIds": {
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0.0
+            },
+            "type": "array",
+            "title": "Completedactivityids"
+          },
+          "signals": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "PREFER_SHORTER",
+                "PREFER_LOWER_COST",
+                "PREFER_FEWER_TOOLS",
+                "PREFER_ONE_PAN"
+              ]
+            },
+            "type": "array",
+            "title": "Signals"
+          },
+          "preferredDifficulty": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "EASY",
+                  "APPROPRIATE",
+                  "HARD"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferreddifficulty",
+            "description": "Recent perceived difficulty reported by the user."
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 2
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "treeStatus",
+          "hobbyId",
+          "currentStageNumber",
+          "candidates"
+        ],
+        "title": "RankRequest"
+      },
+      "RankResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "RECOMMENDED",
+              "RESUME",
+              "INACTIVE",
+              "NO_MATCH"
+            ],
+            "title": "Status"
+          },
+          "resumeRecordId": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resumerecordid"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendedItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "resumeRecordId",
+          "items"
+        ],
+        "title": "RankResult"
+      },
+      "RecommendedItem": {
+        "properties": {
+          "activityId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Activityid"
+          },
+          "stageId": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Stageid"
+          },
+          "stageNumber": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 1.0,
+            "title": "Stagenumber"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "durationMinutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Durationminutes"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "activityId",
+          "stageId",
+          "stageNumber",
+          "title",
+          "durationMinutes",
+          "reason"
+        ],
+        "title": "RecommendedItem"
+      },
+      "SelfGuidedActivity": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "SELF_GUIDED",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "instruction": {
+            "type": "string",
+            "title": "Instruction"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "title",
+          "instruction"
+        ],
+        "title": "SelfGuidedActivity"
+      }
+    },
+    "securitySchemes": {
+      "NextActivityServiceToken": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

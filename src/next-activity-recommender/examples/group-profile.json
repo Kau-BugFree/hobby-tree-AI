@@ -1,0 +1,24 @@
+{
+  "userHobbyId": 77,
+  "records": [
+    {
+      "recordId": 405,
+      "userHobbyId": 77,
+      "completedAt": "2026-11-25T20:00:00+09:00",
+      "reportedDifficulty": "APPROPRIATE",
+      "activityGroup": "ONE_PAN",
+      "aspects": [
+        {
+          "category": "ENJOYMENT",
+          "polarity": "POSITIVE",
+          "signal": null
+        },
+        {
+          "category": "DIFFICULTY",
+          "polarity": "NEGATIVE",
+          "signal": null
+        }
+      ]
+    }
+  ]
+}

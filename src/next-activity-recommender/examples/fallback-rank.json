@@ -1,0 +1,69 @@
+{
+  "treeStatus": "ACTIVE",
+  "hobbyId": 10,
+  "currentStageNumber": 2,
+  "availableMinutes": 30,
+  "budgetKrw": 5000,
+  "preferredDifficulty": "APPROPRIATE",
+  "signals": [],
+  "groupPreferences": [
+    {
+      "activityGroup": "ONE_PAN",
+      "category": "DIFFICULTY",
+      "polarity": "NEGATIVE"
+    },
+    {
+      "activityGroup": "ONE_PAN",
+      "category": "ENJOYMENT",
+      "polarity": "POSITIVE"
+    }
+  ],
+  "candidates": [
+    {
+      "activityId": 1005,
+      "hobbyId": 10,
+      "stageId": 102,
+      "stageNumber": 2,
+      "title": "예시 원팬 파스타",
+      "published": true,
+      "startable": true,
+      "durationMinutes": 20,
+      "estimatedCost": 9000,
+      "activityGroup": "ONE_PAN",
+      "onePan": true
+    },
+    {
+      "activityId": 1006,
+      "hobbyId": 10,
+      "stageId": 102,
+      "stageNumber": 2,
+      "title": "예시 제철 재료 샐러드",
+      "published": true,
+      "startable": true,
+      "durationMinutes": 20,
+      "estimatedCost": null
+    },
+    {
+      "activityId": 1004,
+      "hobbyId": 10,
+      "stageId": 102,
+      "stageNumber": 2,
+      "title": "예시 두부 샐러드",
+      "published": true,
+      "startable": true,
+      "durationMinutes": 20,
+      "estimatedCost": 6500
+    },
+    {
+      "activityId": 1007,
+      "hobbyId": 10,
+      "stageId": 101,
+      "stageNumber": 1,
+      "title": "예시 간단한 한 끼",
+      "published": true,
+      "startable": true,
+      "durationMinutes": 20,
+      "estimatedCost": 5500
+    }
+  ]
+}

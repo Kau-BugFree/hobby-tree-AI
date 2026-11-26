@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+.env
+!/examples/feedback.json
+!/examples/rank.json
+!/examples/absa-feedback.json
+!/examples/absa-profile.json
+!/examples/absa-rank.json
+!/examples/fallback-rank.json
+!/examples/group-profile.json
+!/docs/openapi.json
