@@ -33,6 +33,20 @@ X-Service-Token: <내부 서비스 토큰>
 
 운영 모드는 PostgreSQL 연결과 32자 이상의 `SERVICE_TOKEN`을 요구합니다. 로컬에서 토큰을 설정하지 않았을 때만 헤더를 생략할 수 있습니다. 공급자 API 키나 내부 토큰을 FE에 전달하지 않습니다.
 
+### BE 서비스 토큰 설정
+
+| 위치 | 지정할 설정 |
+| --- | --- |
+| AI API | 실행 환경의 `SERVICE_TOKEN` |
+| BE Spring | `item-recommendation.ai.enabled=true`, AI 원점을 가리키는 `item-recommendation.ai.base-url`, AI와 같은 값의 `item-recommendation.ai.service-token` |
+| BE → AI 요청 | BE 어댑터가 `X-Service-Token` 헤더를 설정 |
+
+해당 환경에서 이미 사용 중인 토큰은 팀의 시크릿 저장소를 통해 BE 담당자에게 공유합니다. 최초 설정 시 비밀번호 관리자에서 생성한 32자 이상, 공백 없는 출력 가능한 ASCII 난수를 양쪽에 등록합니다. 스테이징과 운영은 각각 별도의 값을 사용합니다. 채팅·이슈·PR에는 설정명과 테스트 결과만 기록합니다.
+
+BE가 환경변수 `ITEM_RECOMMENDER_SERVICE_TOKEN`을 사용하기로 했다면 Spring 설정에서 `item-recommendation.ai.service-token=${ITEM_RECOMMENDER_SERVICE_TOKEN}`으로 명시적으로 연결합니다. Compose를 사용하는 AI 호스트에서는 저장된 배포 설정을 불러온 뒤 `docker compose up -d --no-deps --force-recreate api`로 API 컨테이너에 적용합니다. BE도 변경한 설정으로 다시 기동합니다.
+
+Compose의 AI 포트가 열려 있는 호스트에서 모듈 루트로 이동해 `.venv/bin/python scripts/check_item_service_token.py`를 실행합니다. AI에 적용한 값을 현재 셸의 `SERVICE_TOKEN`으로 전달합니다. 정상 기준은 헤더 누락 401, 잘못된 값 401, 일치하는 값 200 및 `NO_MATERIALS`입니다. 점검 후 BE에서 테스트 사용자의 활동 조회로 한 번 더 확인합니다.
+
 | 필드 | 계약 |
 | --- | --- |
 | `activityId`, `activityContentVersion` | 1 이상 정수 |
