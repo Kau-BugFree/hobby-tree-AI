@@ -1,0 +1,35 @@
+{
+  "userHobbyId": 77,
+  "records": [
+    {
+      "userHobbyId": 77,
+      "recordId": 401,
+      "completedAt": "2026-11-25T19:00:00+09:00",
+      "reportedDifficulty": "APPROPRIATE",
+      "aspects": [
+        {
+          "category": "ENJOYMENT",
+          "polarity": "POSITIVE",
+          "signal": null
+        },
+        {
+          "category": "DURATION",
+          "polarity": "NEGATIVE",
+          "signal": "PREFER_SHORTER"
+        },
+        {
+          "category": "COOKING_METHOD",
+          "polarity": "POSITIVE",
+          "signal": "PREFER_ONE_PAN"
+        }
+      ]
+    },
+    {
+      "userHobbyId": 77,
+      "recordId": 400,
+      "completedAt": "2026-11-24T19:00:00+09:00",
+      "reportedDifficulty": "HARD",
+      "aspects": []
+    }
+  ]
+}
