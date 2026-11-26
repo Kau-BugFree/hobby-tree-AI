@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 from dataclasses import replace
+from urllib.parse import quote
 
 import httpx
 import httpcore
@@ -393,4 +394,36 @@ def test_discard_diagnostics_do_not_change_url_allowlist(settings):
     assert dict(result.discard_reasons) == {
         "PURCHASE_HOST_WWW_ADPICK_NOT_ALLOWED": 1,
         "HTTP_WWW_ADPICK_PURCHASE_URL": 1,
+    }
+
+
+def test_biz_purchase_host_defaults_and_override(monkeypatch):
+    monkeypatch.delenv("ADPICK_ALLOWED_PURCHASE_HOSTS", raising=False)
+    expected = ("link.adpick.co.kr", "deg.kr", "adpick.co.kr", "biz.adpick.co.kr")
+    assert (
+        Settings().allowed_purchase_hosts == Settings.from_env().allowed_purchase_hosts == expected
+    )
+    monkeypatch.setenv("ADPICK_ALLOWED_PURCHASE_HOSTS", "deg.kr")
+    assert Settings.from_env().allowed_purchase_hosts == ("deg.kr",)
+
+
+def test_biz_purchase_host_normalization(settings):
+    good = "https://biz.adpick.co.kr/sample?ref=spoon"
+    raw_urls = [
+        good,
+        "http://biz.adpick.co.kr/sample",
+        "https://biz.adpick.co.kr.example.com/sample",
+        "https://biz.adpick.co.kr/api/old-fixture-key/directlink?url=sample",
+        "https://biz.adpick.co.kr/sample?api_key=old-fixture-key",
+        "https://biz.adpick.co.kr/sample?ref=" + quote(settings.adpick_api_key, safe=""),
+    ]
+    response = httpx.Response(
+        200, json={"success": True, "data": [row(commissionlink=url) for url in raw_urls]}
+    )
+    result = asyncio.run(search_with(settings, response))
+    assert [(o.price_krw, o.purchase_url) for o in result.offers] == [(29900, good)]
+    assert dict(result.discard_reasons) == {
+        "HTTP_PURCHASE_URL": 1,
+        "PURCHASE_HOST_NOT_ALLOWED": 1,
+        "UNSAFE_PURCHASE_URL": 3,
     }

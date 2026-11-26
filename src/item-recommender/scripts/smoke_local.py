@@ -130,6 +130,7 @@ def main():
                             "commissionlink": f"https://link.adpick.co.kr/mock-{index}",
                         }
                     )
+                rows[2]["commissionlink"] = "https://biz.adpick.co.kr/mock-mat?ref=smoke"
                 rows.append(
                     {
                         **rows[0],
@@ -175,9 +176,11 @@ def main():
                 products = material["products"]
                 assert [p["priceKrw"] for p in products] == [12000, 19000, 30000, None]
                 assert all(p["availability"] == "UNKNOWN" for p in products)
+                assert products[0]["purchaseUrl"] == "https://biz.adpick.co.kr/mock-mat?ref=smoke"
                 assert all(
-                    p["purchaseUrl"].startswith("https://link.adpick.co.kr/") for p in products
+                    p["purchaseUrl"].startswith("https://link.adpick.co.kr/") for p in products[1:]
                 )
+                report["checks"]["biz_purchase_link_from_worker_to_api"] = "PASS"
                 comparisons = [p["budgetComparison"] for p in products]
                 assert [c["status"] for c in comparisons] == [
                     "WITHIN_BUDGET",
