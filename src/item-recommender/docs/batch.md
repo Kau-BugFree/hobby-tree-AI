@@ -105,17 +105,21 @@ python -m item_recommender.cli purge
 
 `Dockerfile.postgres`는 PostgreSQL 16 bookworm에 pg_cron 패키지를 설치합니다. `compose.yaml`은 독립 AI DB·API·작업자 세 개의 서비스를 구성하며 BE·FE를 실행하거나 연결하지 않습니다. 이미지 빌드 및 실제 pg_cron 예약 동작은 별도 검증이 필요합니다. 일반 PostgreSQL SQL·저장소 테스트와 예약 확장 동작 검증은 구분합니다.
 
-zsh 터미널에서 DB 암호를 화면에 표시하지 않고 입력하고, 내부 서비스 토큰을 생성할 수 있습니다.
+로컬에서 처음 Compose를 기동할 때, zsh 터미널에 DB 암호와 BE 담당자와 합의한 서비스 토큰을 숨김 입력합니다. 재기동 시에도 같은 환경의 시크릿 저장소에 보관한 값을 사용합니다. 기존 배포에서는 저장돼 있는 DB·애드픽 설정을 유지하세요.
 
 ```sh
 read -rs 'POSTGRES_PASSWORD?로컬 DB 암호: '; print
 export POSTGRES_PASSWORD
-export SERVICE_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+set +x
+read -rs 'SERVICE_TOKEN?BE와 공유한 준비물 서비스 토큰: '; print
+export SERVICE_TOKEN
 export ADPICK_FILTERING_APPROVED=false
 export ADPICK_STORAGE_APPROVED=false
 export ADPICK_API_KEY=
 docker compose up -d --build
 ```
+
+서비스가 준비되면 같은 터미널에서 `.venv/bin/python scripts/check_item_service_token.py`로 인증을 점검합니다. [BE 설정 및 검증 방법](integration.md#be-서비스-토큰-설정)
 
 이 기본 설정에서는 작업자가 시작돼도 외부 수집을 하지 않습니다. API는 loopback의 8001 포트로만 노출되고 DB 포트는 호스트에 공개하지 않습니다. API 컨테이너에는 공급자 키를 전달하지 않습니다. DB 암호는 URL에 넣지 않고 `PGPASSWORD`로 주입합니다.
 
